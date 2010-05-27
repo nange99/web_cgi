@@ -1,0 +1,14 @@
+config.h
+config.log
+config.status
+configure
+libtool
+m4/shave
+m4/shave-libtool
+.deps
+Makefile
+*.o
+*~
+src/web_digistar
+stamp-h1
+
