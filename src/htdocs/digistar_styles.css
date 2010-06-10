@@ -34,6 +34,10 @@ body {
 #toptext {
 	margin: auto;
 	float:right;
+	border-bottom-style: solid;
+	border-width: thin;
+	font-style: normal;
+	padding-right: 50px;	
 }
 
 #midmenu {

@@ -2,7 +2,8 @@ bin_PROGRAMS = \
 	web_digistar
 
 web_digistar_SOURCES = \
-	main.c
+	main.c \
+	interface_stats.c
 	
 htmlfilesdir = $(datadir)
 javascriptdir = $(datadir)/js

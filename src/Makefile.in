@@ -53,7 +53,7 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(appdir)" \
 	"$(DESTDIR)$(htmlfilesdir)" "$(DESTDIR)$(imagesdir)" \
 	"$(DESTDIR)$(javascriptdir)" "$(DESTDIR)$(templatesdir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_web_digistar_OBJECTS = main.$(OBJEXT)
+am_web_digistar_OBJECTS = main.$(OBJEXT) interface_stats.$(OBJEXT)
 web_digistar_OBJECTS = $(am_web_digistar_OBJECTS)
 web_digistar_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -226,7 +226,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 web_digistar_SOURCES = \
-	main.c
+	main.c \
+	interface_stats.c
 
 htmlfilesdir = $(datadir)
 javascriptdir = $(datadir)/js
@@ -328,6 +329,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interface_stats.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 
 .c.o:
