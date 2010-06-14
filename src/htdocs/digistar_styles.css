@@ -122,7 +122,7 @@ body {
 	font-family: sans-serif;
     font-weight: normal;
 	padding: 3px;
-	margin-left: 5px;
+	margin-left: 20px;
 }
 
 
@@ -138,6 +138,11 @@ body {
 
 #leftmenu .lvl2:first-child {
 	padding-top: 3px;
+}
+
+#leftmenu .lvl2 a {
+	text-decoration: none;
+	color: #29306C;
 }
 
 
