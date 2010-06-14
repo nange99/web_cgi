@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" dir="ltr">
+<head>
+<title>Roteador 3G Digistar</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="../digistar_styles.css"/>
+<script type="text/javascript" src="../js/jquery-1.4.2.js"></script>
+<script type="text/javascript" src="../js/time.js"></script>
+<script>
+
+function reboot_me() {
+    var rtn = confirm ("Reboot now?");
+
+    if (rtn == true)
+        alert ("go ahead");
+
+    return rtn
+}
+
+</script>
+</head>
+
+<body>
+<div id="bodywrap">
+	<div id="topmenu">
+
+		<div id="toplogo">
+			<img src="../images/digistar_logo_trans.png" width="105" height="40" alt="" />
+		</div>
+		<div id="toptext">
+			<ul>
+				<li><a href="/app/do_reboot" onclick="return reboot_me('reboot?');"> Reboot </a></li>
+				<li><a href="#" onclick="alert('save config?');"> Save Configuration </a></li>
+
+				<li><a href="/app/do_logout"> Log Out </a></li>
+			</ul>
+		</div>
+	</div><!--topmenu-->
+	
+    <div id="content">
+<h1>Routes</h1>
+<div id="context_menu">
+<ul>
+<li class="context_item">Add route</li>
+<li class="context_item">Add route</li>
+<li class="context_item"><a href="#">Add route</a></li>
+</ul>
+</div>
+<table>
+<thead>
+    <tr>
+        <th>Destination</th>
+        <th>Gateway</th>
+        <th>Mask</th>
+        <th>Metric</th>
+        <th>Interface</th>
+        <th></th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>192.168.100.0</td>
+        <td>0.0.0.0</td>
+        <td>255.255.255.0</td>
+        <td>1</td>
+        <td>eth0</td>
+        <td><a href="#" onclick="alert('remove?');">remove</a></td>
+    </tr>
+    <tr class="odd">
+        <td>192.168.100.0</td>
+        <td>0.0.0.0</td>
+        <td>255.255.255.0</td>
+        <td>1</td>
+        <td>eth0</td>
+        <td><a href="#" onclick="alert('remove?');">remove</a></td>
+    </tr>
+</tbody>
+</table>
+<div class="box">
+
+</div>
+    </div>
+	<div id="leftmenu">
+		<div class="lvl1"> Configuration
+			<div class="lvl2"> <a href="/app/config_interfaces">Interfaces</a></div>
+
+			<div class="lvl2"> <a href="/app/config_firewall">Firewall</a> </div>
+			<div class="lvl2"> <a href="/app/config_nat">Nat</a> </div>
+			<div class="lvl2"> <a href="/app/config_qos">QoS</a> </div>
+			<div class="lvl2"> <a href="/app/config_ipsec">IPSec</a> </div>
+
+			<div class="lvl2"> <a href="/app/config_snmp">SNMP</a> </div>
+			<div class="lvl2"> <a href="/app/config_auth">Authentication</a> </div>
+		</div>
+			
+		<div class="lvl1"> Status
+			<div class="lvl2"> <a href="/app/status_interfaces">Interfaces</a></div>
+
+			<div class="lvl2"> <a href="/app/status_firewall">Firewall</a> </div>
+			<div class="lvl2"> <a href="/app/status_nat">Nat</a> </div>
+			<div class="lvl2"> <a href="/app/status_qos">QoS</a> </div>
+			<div class="lvl2"> <a href="/app/status_ipsec">IPSec</a> </div>
+
+			<div class="lvl2"> <a href="/app/status_snmp">SNMP</a> </div>
+			<div class="lvl2"> <a href="/app/status_auth">Authentication</a> </div>
+		</div>
+			
+		<div class="lvl1"> Firmware
+			<div class="lvl2"> Upgrade </div>
+			<div class="lvl2"> Information </div>
+		</div>
+	</div>
+</div><!--bodywrap-->
+
+</body>
+</html>
