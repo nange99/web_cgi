@@ -3,8 +3,10 @@ bin_PROGRAMS = \
 
 web_digistar_SOURCES = \
 	main.c \
-	interface_stats.c
-	
+	interface_stats.c \
+	reboot.c \
+	route.c
+
 htmlfilesdir = $(datadir)
 javascriptdir = $(datadir)/js
 imagesdir = $(datadir)/images
