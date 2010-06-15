@@ -5,6 +5,12 @@ $(function () {
 	});
 });
 
+function reboot_me() {
+    var rtn = confirm ("Reboot now?");
+
+    return rtn;
+}
+
 function verifyIPAddress(buttonID) {
 	var x = $(buttonID).val();
 	var splitted = x.split(".");
