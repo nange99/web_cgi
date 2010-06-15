@@ -1,7 +1,7 @@
 body {
 	background-color: white;
 	font-family:Geneva,Arial,Helvetica,sans-serif;
-	font-size:16px;
+	font-size:10px;
 	margin:0;
 }
 
@@ -178,6 +178,12 @@ body {
     display: inline;
     margin: 0px 2px 0px 3px;
 	list-style-type: none;
+	font-size: 0.9em;
+}
+
+#content #table_wrapper
+{
+	margin-top:15px;
 }
 
 #content table
@@ -205,3 +211,36 @@ body {
 {
 	background: #DCD4C9; 
 }
+
+/* form style */
+fieldset { 
+	margin-top:15px; 
+	border: 0px;
+}
+fieldset div {
+	clear:both;
+	margin:0.3em 0;
+}
+label {
+	float: left;
+	width:10em;
+	text-align:right;
+	margin-right:1em;
+	padding-top:2px;
+}
+legend {
+	font-size:1.2em;
+} 
+input { 
+	padding:0.15em;
+	width:20em;
+	border:1px solid #ddd;
+	-moz-border-radius:0.4em;
+	-khtml-border-radius:0.4em;
+}
+select {
+	padding:0.15em;
+	width:20em;
+}
+
+
