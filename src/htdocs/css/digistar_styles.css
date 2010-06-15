@@ -180,6 +180,11 @@ body {
 	font-size: 0.9em;
 }
 
+#content #table_wrapper
+{
+	margin-top:15px;
+}
+
 #content table
 {
 	font-size: 12px;

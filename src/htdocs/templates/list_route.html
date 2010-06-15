@@ -24,6 +24,11 @@ $(function() {
 var destination = $("#destination"), gateway = $("#gateway"), mask = $("#mask"), metric = $("#metric"), interface = $("#interface");
 var allFields = $([]).add(destination).add(gateway).add(mask).add(metric).add(interface);
 
+function updateTable(url) {
+	alert(url);
+	$.ajax({url: "http://192.168.100.133/", success: function(data) { $("#table_wrapper").html(data); alert("reloaded"); }});
+}
+
 $("#dialog").dialog({
 	autoOpen: false,
 	position: "center",
@@ -31,12 +36,19 @@ $("#dialog").dialog({
 	buttons: {
 		"Add route": function() {
 			var ok = true;
+			var dialog = $(this);
 			ok = verifyIPAddress(destination) && ok;
 			ok = verifyIPAddress(gateway) && ok;
 			ok = verifyIPAddress(mask) && ok;
 
-			if (ok)
-				$("#routeForm").submit(); 
+			if (ok) {
+				var f = $("#routeForm");
+				$.post(f.get(0).action, f.serialize(), function (data) {
+					alert("data = ["+data+"]");
+					dialog.dialog('close');
+					updateTable("url to get data");
+				});
+			}
 		},
 		"Cancel": function() {
 			$(this).dialog('close');
@@ -77,6 +89,7 @@ $("#dialog").dialog({
 <li class="context_item"><a href="#" onclick="$('#dialog').dialog('open');">Add route</a></li>
 </ul>
 </div>
+<div id="table_wrapper">
 <table>
 <thead>
     <tr>
@@ -107,8 +120,9 @@ $("#dialog").dialog({
     </tr>
 </tbody>
 </table>
+</div>
 <div id="dialog" title="Add route">
-<form id="routeForm" action="/app/do_route_add" method="post">
+<form id="routeForm" action="http://192.168.100.133" method="post">
 <fieldset>
 	<legend>Route Details</legend>
 	<div>
