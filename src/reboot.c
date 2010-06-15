@@ -4,24 +4,42 @@
  *  Created on: Jun 14, 2010
  *      Author: Thomás Alimena Del Grande (tgrande@pd3.com.br)
  */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <syslog.h>
+#include <unistd.h>
+#include <errno.h>
+
+#include <sys/reboot.h>
+
+#include <libcgiservlet/cgi_servlet.h>
+#include <libcgiservlet/cgi_session.h>
+
+#include "web_config.h"
 
 int handle_reboot(struct request *req, struct response *resp)
 {
-	cgi_response_set_html(resp, "/wn/cgi/templates/confirm_reboot.html");
+	 char *const parms[] = {"/sbin/reboot", "-d", "3", "-f", NULL };
 
-	return 0;
-}
+	 if (!cgi_session_exists(req)) {
+		 cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		 return 0;
+	 }
 
-int handle_reboot_refuse(struct request *req, struct response *resp)
-{
-	cgi_response_set_html(resp, "/wn/cgi/templates/do_home.html");
+	web_dbg("rebooting ...\n");
 
-	return 0; /* Not reached */
-}
+	switch (fork()) {
+	case 0: /* child */
+		web_dbg("Child running ...\n");
+		execv("/sbin/reboot", parms);
+		break;
+	case -1: /* error */
+		break;
+	default: /* parent - nothing to be done */
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_reboot_message.html");
+		break;
+	}
 
-int handle_reboot_confirm(struct request *req, struct response *resp)
-{
-	sync();
-	reboot(0x01234567);
 	return 0; /* Not reached */
 }

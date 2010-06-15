@@ -8,20 +8,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
+#include <unistd.h>
 
 #include <libcgiservlet/cgi_servlet.h>
 #include <libcgiservlet/cgi_session.h>
 
+#include <libconfig/options.h>
 #include <libconfig/cish_defines.h>
 #include <libconfig/pam.h>
+#include <libconfig/defines.h>
+#include <libconfig/nv.h>
+#include <libconfig/config_fetcher.h>
 
-//#define DEBUG
-#ifdef DEBUG
-#define web_dbg(x,...) \
-		syslog(LOG_INFO, "%s : %d => "x , __FUNCTION__, __LINE__, ##__VA_ARGS__);
-#else
-#define web_dbg(x,...)
-#endif
+#include "web_config.h"
+#include "reboot.h"
+#include "route.h"
 
 int handle_config_interface(struct request *req, struct response *resp)
 {
@@ -122,15 +123,60 @@ int handle_logout(struct request *req, struct response *resp)
 	return 1;
 }
 
+/**
+ * Save current configuration on flash chip
+ *
+ * @param req
+ * @param resp
+ * @return
+ */
+int handle_saveconf(struct request *req, struct response *resp)
+{
+	cish_config *cish_cfg;
+
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cish_cfg = lconfig_mmap_cfg();
+
+	/* Store configuration in f */
+	if (lconfig_write_config(TMP_CFG_FILE, cish_cfg) < 0)
+
+	/* Save in flash */
+	save_configuration(TMP_CFG_FILE);
+
+	/* Remove temp file */
+	unlink(TMP_CFG_FILE);
+
+	lconfig_munmap_cfg(cish_cfg);
+
+	cgi_response_set_html(resp, "/wn/cgi/templates/do_home.html");
+
+	web_dbg("Configuration saved!\n");
+
+	return 0;
+}
+
 int main(int argc, char **argv)
 {
 	struct url_mapping map[] = {
+		/* Login handler */
 		{.url = "/do_login", .handler = handle_login},
+		/* Top menu handlers */
 		{.url = "/do_logout", .handler = handle_logout},
+		{.url = "/do_saveconf", .handler = handle_saveconf},
+		{.url = "/do_reboot", .handler = handle_reboot},
+
+		/* Home page */
 		{.url = "/do_home", .handler = handle_home},
+
+		/* Configuration pages */
 		{.url = "/config_interfaces", .handler = handle_config_interface},
 		{.url = "/config_nat", .handler = handle_config_nat},
-		{.url = "/config_firewall", .handler = handle_config_firewall}
+		{.url = "/config_firewall", .handler = handle_config_firewall},
+		{.url = "/config_static_routes", .handler = handle_static_routes}
 	};
 
 	struct config conf = {
