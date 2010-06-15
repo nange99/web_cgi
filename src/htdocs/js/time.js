@@ -5,22 +5,24 @@ $(function () {
 	});
 });
 
-function verifyIPAddress(buttonID) {
-	var x = $(buttonID).val();
+function verifyIPAddress(obj) {
+	var x = obj.val();
 	var splitted = x.split(".");
-	var invalid = 0;
+	var valid = true;
 	
 	if (splitted.length != 4)
-		invalid = 1;
-	
+		valid = false;
 	
 	for ( var i = 0; i < splitted.length; i++) {
 		if ((splitted[i] < 0)  || (splitted[i] > 255))
-			invalid = 1;
+			valid = false;
 	}	
 		
-	if (invalid)	
-		alert("Invalid IP address : " + x);
+	if (!valid) {
+		obj.addClass("ui-state-error");
+	} else {
+		obj.removeClass("ui-state-error");
+	}
 	
-	return ( invalid ? -1 : 0 );
+	return valid;
 }

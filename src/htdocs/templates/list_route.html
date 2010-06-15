@@ -3,10 +3,12 @@
 <head>
 <title>Roteador 3G Digistar</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="stylesheet" type="text/css" href="../digistar_styles.css"/>
+<link rel="stylesheet" type="text/css" href="../css/digistar_styles.css"/>
+<link rel="stylesheet" type="text/css" href="../css/smoothness/jquery-ui-1.8.2.custom.css"/>
 <script type="text/javascript" src="../js/jquery-1.4.2.js"></script>
+<script type="text/javascript" src="../js/jquery-ui-1.8.2.custom.min.js"></script>
 <script type="text/javascript" src="../js/time.js"></script>
-<script>
+<script type="text/javascript">
 
 function reboot_me() {
     var rtn = confirm ("Reboot now?");
@@ -16,6 +18,37 @@ function reboot_me() {
 
     return rtn
 }
+
+$(function() {
+
+var destination = $("#destination"), gateway = $("#gateway"), mask = $("#mask"), metric = $("#metric"), interface = $("#interface");
+var allFields = $([]).add(destination).add(gateway).add(mask).add(metric).add(interface);
+
+$("#dialog").dialog({
+	autoOpen: false,
+	position: "center",
+	width: 400,
+	buttons: {
+		"Add route": function() {
+			var ok = true;
+			ok = verifyIPAddress(destination) && ok;
+			ok = verifyIPAddress(gateway) && ok;
+			ok = verifyIPAddress(mask) && ok;
+
+			if (ok)
+				$("#routeForm").submit(); 
+		},
+		"Cancel": function() {
+			$(this).dialog('close');
+		}
+	},
+	open: function(event, ui) { 
+		allFields.removeClass("ui-state-error");
+		$("#routeForm").get(0).reset(); 
+	}
+	});
+});
+
 
 </script>
 </head>
@@ -41,9 +74,7 @@ function reboot_me() {
 <h1>Routes</h1>
 <div id="context_menu">
 <ul>
-<li class="context_item">Add route</li>
-<li class="context_item">Add route</li>
-<li class="context_item"><a href="#">Add route</a></li>
+<li class="context_item"><a href="#" onclick="$('#dialog').dialog('open');">Add route</a></li>
 </ul>
 </div>
 <table>
@@ -76,8 +107,36 @@ function reboot_me() {
     </tr>
 </tbody>
 </table>
-<div class="box">
-
+<div id="dialog" title="Add route">
+<form id="routeForm" action="/app/do_route_add" method="post">
+<fieldset>
+	<legend>Route Details</legend>
+	<div>
+	<label for="destination">Destination: </label>
+	<input type="text" name="destination" id="destination" class="text ui-widget-content ui-corner-all"/>
+	</div>
+	<div>
+	<label for="gateway">Gateway: </label>
+	<input type="text" name="gateway" id="gateway" class="text ui-widget-content ui-corner-all"/>
+	</div>
+	<div>
+	<label for="mask">Mask: </label>
+	<input type="text" name="mask" id="mask" class="text ui-widget-content ui-corner-all"/>
+	</div>
+	<div>
+	<label for="metric">Metric:</label>
+	<input type="text" name="metric" id="metric" class="text ui-widget-content ui-corner-all"/>
+	</div>
+	<div>
+	<label for="interface">Interface:</label>
+	<select name="interface" id="interface">
+		<option value=""></option>
+		<option value="eth0">ethernet</option>
+		<option value="ppp0">3g</option>
+	</select>
+	</div>
+</fieldset>
+</form>
 </div>
     </div>
 	<div id="leftmenu">
@@ -114,3 +173,4 @@ function reboot_me() {
 
 </body>
 </html>
+
