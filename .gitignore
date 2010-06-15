@@ -1,4 +1,5 @@
 config.h
+config.h.in
 config.log
 config.status
 configure
@@ -11,5 +12,7 @@ Makefile
 *~
 src/web_digistar
 stamp-h1
+autom4te.cache
 .*
+Makefile.in
 
