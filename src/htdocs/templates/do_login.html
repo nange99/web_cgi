@@ -5,12 +5,15 @@
 <title>Login Page</title>
 <style type="text/css">
 #main {
-	margin-top: 50px;
+	margin-top: 70px;
 }
 
 form {
 	margin: 0 auto;
-	width: 455px;
+	width: 456px;
+	background-image: url("/images/login_border.gif");
+	background-repeat: repeat-y;
+	background-position: left;
 	background-color: #CECBBF;
 	display: block;
 }
@@ -19,6 +22,15 @@ form {
 	display: block;
 	text-transform: uppercase;
 	padding: 10px;
+	font-family: Tahoma,Arial,Helvetica;
+	font-size: small;
+}
+
+.firstfield {
+	display: block;
+	text-transform: uppercase;
+	padding: 10px;
+	padding-top: 50px;
 	font-family: Tahoma,Arial,Helvetica;
 	font-size: small;
 }
@@ -41,7 +53,7 @@ form {
 
 </style>
 
-<script type="text/javascript" src="/js/jquery-1.4.2.js"></script>
+<script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="/js/time.js"></script>
 
 </head>
@@ -51,7 +63,7 @@ form {
 	<img src="/images/login_top.gif"/>
 	<div>
 		<form method="post" action="/app/do_login">
-			<div class="field"> Username: <input id="username" type="text" value="" name="username"/></div>
+			<div class="firstfield"> Username: <input id="username" type="text" value="" name="username"/></div>
 			<div class="field"> Password: <input id="password" type="password" value="" name="password"/></div>
 			<input class="logon" type="submit" value="Log On">
 		</form>
