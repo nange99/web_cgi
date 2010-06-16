@@ -32,6 +32,10 @@ body {
 	margin:10px;
 }
 
+#toplogo img {
+	border: 0;
+}
+
 #toptext {
 	float: right;
 	font-style: normal;
@@ -153,6 +157,12 @@ body {
     float:right;
     width:679px;
     height: 700px;
+}
+
+#content p {
+    text-align: center;
+    color: #29306C;
+    padding-top: 100px;	
 }
 
 #content h1 {
