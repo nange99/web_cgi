@@ -23,6 +23,7 @@
 #include "web_config.h"
 #include "reboot.h"
 #include "route.h"
+#include "firmware.h"
 
 int handle_config_interface(struct request *req, struct response *resp)
 {
@@ -176,7 +177,11 @@ int main(int argc, char **argv)
 		{.url = "/config_interfaces", .handler = handle_config_interface},
 		{.url = "/config_nat", .handler = handle_config_nat},
 		{.url = "/config_firewall", .handler = handle_config_firewall},
-		{.url = "/config_static_routes", .handler = handle_static_routes}
+		{.url = "/config_static_routes", .handler = handle_static_routes},
+
+		/* Firmware */
+		{.url ="/firmware_info", .handler = handle_firmware_version},
+		{.url ="/firmware_upgrade", .handler = handle_firmware_upgrade}
 	};
 
 	struct config conf = {
