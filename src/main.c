@@ -4,12 +4,6 @@
  *  Created on: May 26, 2010
  *      Author: tgrande
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <syslog.h>
-#include <unistd.h>
-
 #include <libcgiservlet/cgi_servlet.h>
 #include <libcgiservlet/cgi_session.h>
 
