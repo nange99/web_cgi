@@ -13,13 +13,6 @@
 #include <libcgiservlet/cgi_servlet.h>
 #include <libcgiservlet/cgi_session.h>
 
-#include <libconfig/options.h>
-#include <libconfig/cish_defines.h>
-#include <libconfig/pam.h>
-#include <libconfig/defines.h>
-#include <libconfig/nv.h>
-#include <libconfig/config_fetcher.h>
-
 #include "web_config.h"
 #include "reboot.h"
 #include "route.h"
@@ -141,18 +134,30 @@ int handle_saveconf(struct request *req, struct response *resp)
 
 	cish_cfg = lconfig_mmap_cfg();
 
+	if (cish_cfg == NULL) {
+		syslog(LOG_ERR, "Failed in mapping cish config\n");
+		goto saveconf_finish;
+	}
+
 	/* Store configuration in f */
-	if (lconfig_write_config(TMP_CFG_FILE, cish_cfg) < 0)
+	if (lconfig_write_config(TMP_CFG_FILE, cish_cfg) < 0) {
+		syslog(LOG_ERR, "Failed in writing to tmp file\n");
+		goto saveconf_finish;
+	}
 
 	/* Save in flash */
-	save_configuration(TMP_CFG_FILE);
+	if (save_configuration(TMP_CFG_FILE) < 0) {
+		syslog(LOG_ERR, "Failed in writing to flash\n");
+		goto saveconf_finish;
+	}
 
+saveconf_finish:
 	/* Remove temp file */
 	unlink(TMP_CFG_FILE);
 
 	lconfig_munmap_cfg(cish_cfg);
 
-	cgi_response_set_html(resp, "/wn/cgi/templates/do_home.html");
+	cgi_response_set_html(resp, "/wn/cgi/templates/do_show_config_saved.html");
 
 	web_dbg("Configuration saved!\n");
 
@@ -186,7 +191,7 @@ int main(int argc, char **argv)
 
 	int size = sizeof(map) / sizeof(struct url_mapping);
 
-	web_dbg("web_digistar is running. Config size is %d\n", size);
+	web_dbg("web_digistar is running as %d UID. Config size is %d\n", geteuid(), size);
 
 	cgi_servlet_init (&conf, &map, size, NULL);
 
