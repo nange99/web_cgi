@@ -8,6 +8,13 @@
 #ifndef WEB_CONFIG_H_
 #define WEB_CONFIG_H_
 
+/* Needed for libconfig includes*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <syslog.h>
+#include <unistd.h>
+
 /* Libconfig includes */
 #include <libconfig/options.h>
 #include <libconfig/acl.h>
