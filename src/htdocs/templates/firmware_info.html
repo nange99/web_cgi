@@ -3,11 +3,11 @@
 <head>
 <title>Roteador 3G Digistar - Firmware Info</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="stylesheet" type="text/css" href="../css/digistar_styles.css"/>
-<link rel="stylesheet" type="text/css" href="../css/smoothness/jquery-ui-1.8.2.custom.css"/>
-<script type="text/javascript" src="../js/jquery-1.4.2.js"></script>
-<script type="text/javascript" src="../js/jquery-ui-1.8.2.custom.min.js"></script>
-<script type="text/javascript" src="../js/time.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/digistar_styles.css"/>
+<link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.2.custom.css"/>
+<script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="/js/jquery-ui-1.8.2.custom.min.js"></script>
+<script type="text/javascript" src="/js/time.js"></script>
 <script type="text/javascript">
 function reboot_me() {
     var rtn = confirm ("Reboot now?");
@@ -22,20 +22,7 @@ function reboot_me() {
 
 <body>
 <div id="bodywrap">
-	<div id="topmenu">
-
-		<div id="toplogo">
-			<img src="../images/digistar_logo_trans.png" width="105" height="40" alt="" />
-		</div>
-		<div id="toptext">
-			<ul>
-				<li><a href="/app/do_reboot" onclick="return reboot_me('reboot?');"> Reboot </a></li>
-				<li><a href="#" onclick="alert('save config?');"> Save Configuration </a></li>
-
-				<li><a href="/app/do_logout"> Log Out </a></li>
-			</ul>
-		</div>
-	</div><!--topmenu-->
+	<?include "/wn/cgi/templates/topmenu"?>
 	<div id="contentwrap">
     <div id="content">
 <h1>Firmware Info</h1>
@@ -56,39 +43,8 @@ function reboot_me() {
 </table>
 </div>
     </div>
-	<div id="leftmenu">
-		<div class="lvl1"> Configuration
-			<div class="lvl2"> <a href="/app/config_interfaces">Interfaces</a></div>
-
-			<div class="lvl2"> <a href="/app/config_firewall">Firewall</a> </div>
-			<div class="lvl2"> <a href="/app/config_nat">Nat</a> </div>
-			<div class="lvl2"> <a href="/app/config_qos">QoS</a> </div>
-			<div class="lvl2"> <a href="/app/config_ipsec">IPSec</a> </div>
-
-			<div class="lvl2"> <a href="/app/config_snmp">SNMP</a> </div>
-			<div class="lvl2"> <a href="/app/config_auth">Authentication</a> </div>
-		</div>
-			
-		<div class="lvl1"> Status
-			<div class="lvl2"> <a href="/app/status_interfaces">Interfaces</a></div>
-
-			<div class="lvl2"> <a href="/app/status_firewall">Firewall</a> </div>
-			<div class="lvl2"> <a href="/app/status_nat">Nat</a> </div>
-			<div class="lvl2"> <a href="/app/status_qos">QoS</a> </div>
-			<div class="lvl2"> <a href="/app/status_ipsec">IPSec</a> </div>
-
-			<div class="lvl2"> <a href="/app/status_snmp">SNMP</a> </div>
-			<div class="lvl2"> <a href="/app/status_auth">Authentication</a> </div>
-		</div>
-			
-		<div class="lvl1"> Firmware
-			<div class="lvl2"> Upgrade </div>
-			<div class="lvl2"> Information </div>
-		</div>
-	</div>
+<?include "/wn/cgi/templates/leftmenu" ?>
     </div><!--contentwrap-->
-	<div id="footer">
-	</div>
 </div><!--bodywrap-->
 
 </body>
