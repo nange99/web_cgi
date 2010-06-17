@@ -1,0 +1,27 @@
+<div id="leftmenu">
+	<div class="lvl1"> Configuration
+		<div class="lvl2"> <a href="/app/config_interfaces">Interfaces</a></div>
+		<div class="lvl2"> <a href="/app/config_static_routes">Static Routes</a></div>
+		<div class="lvl2"> <a href="/app/config_firewall">Firewall</a> </div>
+		<div class="lvl2"> <a href="/app/config_nat">Nat</a> </div>
+		<div class="lvl2"> <a href="/app/config_qos">QoS</a> </div>
+		<div class="lvl2"> <a href="/app/config_ipsec">IPSec</a> </div>
+		<div class="lvl2"> <a href="/app/config_snmp">SNMP</a> </div>
+		<div class="lvl2"> <a href="/app/config_auth">Authentication</a> </div>
+	</div>
+	
+	<div class="lvl1"> Status
+		<div class="lvl2"> <a href="/app/status_interfaces">Interfaces</a></div>
+		<div class="lvl2"> <a href="/app/status_firewall">Firewall</a> </div>
+		<div class="lvl2"> <a href="/app/status_nat">Nat</a> </div>
+		<div class="lvl2"> <a href="/app/status_qos">QoS</a> </div>
+		<div class="lvl2"> <a href="/app/status_ipsec">IPSec</a> </div>
+		<div class="lvl2"> <a href="/app/status_snmp">SNMP</a> </div>
+		<div class="lvl2"> <a href="/app/status_auth">Authentication</a> </div>
+	</div>
+	
+	<div class="lvl1"> Firmware
+		<div class="lvl2"> Upgrade </div>
+		<div class="lvl2"> Information </div>
+	</div>
+</div>

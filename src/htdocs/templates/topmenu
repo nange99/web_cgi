@@ -1,0 +1,14 @@
+	<div id="topmenu">
+		<div id="toplogo">
+			<a href="/app/do_home">
+				<img src="/images/digistar_logo_trans.png" width="105" height="40" alt="" />
+			</a>
+		</div>
+		<div id="toptext">
+			<ul>
+				<li><a href="/app/do_reboot" onclick="return reboot_me('reboot?');"> Reboot </a></li>
+				<li><a href="/app/do_saveconf"> Save Configuration </a></li>
+				<li><a href="/app/do_logout"> Log Out </a></li>
+			</ul>
+		</div>
+	</div><!--topmenu-->

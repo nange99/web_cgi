@@ -27,6 +27,8 @@ install:
 	if [ -f Makefile ]; then \
 		$(MAKE) install; \
 	fi
+	sudo chown 0:0 $(ROOTDIR)/$(FSDIR)/wn/cgi/web_digistar
+	sudo chmod +s $(ROOTDIR)/$(FSDIR)/wn/cgi/web_digistar
 
 clean:
 	if [ -f Makefile ]; then \
