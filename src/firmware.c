@@ -23,6 +23,9 @@ int handle_firmware_version(struct request *req, struct response *resp)
 	version = get_system_version();
 	boot = get_boot_version();
 
+	web_dbg("Firmware version : %s\n", version);
+	web_dbg("Bootloader version : %s\n", boot);
+
 	cgi_response_add_parameter(resp, "version", version, CGI_STRING);
 	cgi_response_add_parameter(resp, "boot", boot, CGI_STRING);
 
