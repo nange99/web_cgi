@@ -5,7 +5,8 @@ web_digistar_SOURCES = \
 	main.c \
 	interface_stats.c \
 	reboot.c \
-	route.c
+	route.c \
+	firmware.c 
 
 htmlfilesdir = $(datadir)
 cssdir = $(datadir)/css

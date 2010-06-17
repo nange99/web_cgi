@@ -21,7 +21,7 @@
 	</div>
 	
 	<div class="lvl1"> Firmware
-		<div class="lvl2"> Upgrade </div>
-		<div class="lvl2"> Information </div>
+		<div class="lvl2"><a href="/app/firmware_upgrade">Upgrade</a></div>
+		<div class="lvl2"><a href="/app/firmware_info">Information</a></div>
 	</div>
 </div>
