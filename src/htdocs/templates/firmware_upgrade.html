@@ -7,7 +7,7 @@
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.2.custom.css"/>
 <script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="/js/jquery-ui-1.8.2.custom.min.js"></script>
-<script type="text/javascript" src="/js/time.js"></script>
+<script type="text/javascript" src="/js/router.js"></script>
 <script type="text/javascript">
 function reboot_me() {
     var rtn = confirm ("Reboot now?");
@@ -23,16 +23,23 @@ function reboot_me() {
 <body>
 <div id="bodywrap">
 	<?include "/wn/cgi/templates/topmenu"?>
-	<div id="contentwrap">
-    <div id="content">
-<h1>Firmware Upgrade</h1>
-<div id="context_menu">
-</div>
-<div id="table_wrapper">
-</div>
+	<?include "/wn/cgi/templates/leftmenu" ?>
+<div id="content">
+	<h1>Firmware Upgrade</h1>
+	<div id="table_wrapper">
+	<form action="/app/firmware_upgrade" method="post" enctype="multipart/form-data">
+		<fieldset>
+		<div>
+			<label for="firmware">Firmware: </label>
+			<input id="firmware" type="file" name="firmware">
+		</div>
+		</fieldset>
+		<fieldset class="submit" style="font-size:10px">
+			<input id="submit" type="submit" value="Upgrade" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"/>
+		</fieldset>
+		</form>
+		</div>
     </div>
-<?include "/wn/cgi/templates/leftmenu" ?>
-    </div><!--contentwrap-->
 </div><!--bodywrap-->
 
 </body>

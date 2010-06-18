@@ -227,6 +227,15 @@ fieldset {
 	margin-top:15px; 
 	border: 0px;
 }
+
+fieldset.submit {
+	margin: 0px;  
+	float: none;    
+	width: auto;    
+	border: 0 none #FFF;    
+	padding-left: 17em;  
+}
+
 fieldset div {
 	clear:both;
 	margin:0.3em 0;
@@ -240,7 +249,8 @@ label {
 }
 legend {
 	font-size:1.2em;
-} 
+}
+
 input { 
 	padding:0.15em;
 	width:20em;
@@ -248,9 +258,9 @@ input {
 	-moz-border-radius:0.4em;
 	-khtml-border-radius:0.4em;
 }
+
 select {
 	padding:0.15em;
 	width:20em;
 }
-
 
