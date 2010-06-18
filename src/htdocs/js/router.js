@@ -50,3 +50,8 @@ function deleteRoute(hash) {
 		$.ajax({url: "/app/config_static_routes?del=" + hash, success: function(data) { $("#table_wrapper").html(data)}});
 }
 
+/* Fetch route table */
+function updateRouteTable() {
+	$.ajax({url: "/app/config_static_routes?table=1", success: function(data) { $("#table_wrapper").html(data)}});
+}
+
