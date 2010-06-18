@@ -1,16 +1,19 @@
 
+/* Left menu sliding function */
 $(function () {
 	$(".lvl1").click( function() {
 		$(this).children().slideToggle();
 	});
 });
 
+/* Reboot confirmation */
 function reboot_me() {
     var rtn = confirm ("Reboot now?");
 
     return rtn;
 }
 
+/* IP address validation */
 function verifyIPAddress(obj) {
 	var x = obj.val();
 	var splitted = x.split(".");
@@ -32,3 +35,11 @@ function verifyIPAddress(obj) {
 	
 	return valid;
 }
+
+/* Route deletion */
+function deleteRoute(hash) {
+	
+	if (confirm("Delete this route?"))
+		$.ajax({url: "/app/config_static_routes?del=" + hash, success: function(data) { $("#table_wrapper").html(data)}});
+}
+
