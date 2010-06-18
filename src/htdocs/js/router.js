@@ -1,3 +1,10 @@
+/*!
+ * PD3 Router JavaScript Library
+ * Depends on jQuery and jQuery UI
+ * http://jquery.com/
+ *
+ * Copyright 2010, PD3 Tecnologia
+ */
 
 /* Left menu sliding function */
 $(function () {
