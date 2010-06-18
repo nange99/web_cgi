@@ -14,6 +14,16 @@
 #include <string.h>
 #include <syslog.h>
 #include <unistd.h>
+#include <ctype.h>
+
+
+/* LibCGI includes*/
+#include <libcgiservlet/cgi_servlet.h>
+#include <libcgiservlet/cgi_session.h>
+#include <libcgiservlet/cgi_table.h>
+
+#include <libcgiservlet/util/list.h>
+#include <libcgiservlet/util/sha1.h>
 
 /* Libconfig includes */
 #include <libconfig/options.h>
