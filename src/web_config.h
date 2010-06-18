@@ -22,9 +22,6 @@
 #include <libcgiservlet/cgi_session.h>
 #include <libcgiservlet/cgi_table.h>
 
-#include <libcgiservlet/util/list.h>
-#include <libcgiservlet/util/sha1.h>
-
 /* Libconfig includes */
 #include <libconfig/options.h>
 #include <libconfig/acl.h>
@@ -59,6 +56,7 @@
 #include <libconfig/snmp.h>
 #include <libconfig/ppcio.h>
 #include <libconfig/md5.h>
+#include <libconfig/sha1.h>
 
 #ifdef OPTION_MODEM3G
 #include <libconfig/modem3G.h>
