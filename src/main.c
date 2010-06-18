@@ -6,6 +6,7 @@
  */
 #include <libcgiservlet/cgi_servlet.h>
 #include <libcgiservlet/cgi_session.h>
+#include <libcgiservlet/cgi_table.h>
 
 #include "web_config.h"
 #include "reboot.h"
@@ -177,6 +178,7 @@ int main(int argc, char **argv)
 		{.url = "/config_nat", .handler = handle_config_nat},
 		{.url = "/config_firewall", .handler = handle_config_firewall},
 		{.url = "/config_static_routes", .handler = handle_static_routes},
+		{.url = "/add_route", .handler = handle_add_route},
 
 		/* Firmware */
 		{.url ="/firmware_info", .handler = handle_firmware_version},
