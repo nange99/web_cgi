@@ -8,6 +8,7 @@
 #ifndef ROUTE_H_
 #define ROUTE_H_
 
+int handle_add_route(struct request *req, struct response *resp);
 int handle_static_routes(struct request *req, struct response *resp);
 
 #endif /* ROUTE_H_ */

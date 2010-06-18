@@ -20,7 +20,7 @@
 
 int handle_reboot(struct request *req, struct response *resp)
 {
-	 char *const parms[] = {"/sbin/reboot", "-d", "3", "-f", NULL };
+	 char *const parms[] = {"/sbin/reboot", "-d", "5", "-f", NULL };
 
 	 if (!cgi_session_exists(req)) {
 		 cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
@@ -31,7 +31,6 @@ int handle_reboot(struct request *req, struct response *resp)
 
 	switch (fork()) {
 	case 0: /* child */
-		web_dbg("Child running ...\n");
 		execv("/sbin/reboot", parms);
 		break;
 	case -1: /* error */

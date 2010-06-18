@@ -194,7 +194,7 @@ int main(int argc, char **argv)
 
 	web_dbg("web_digistar is running as %d UID. Config size is %d\n", geteuid(), size);
 
-	cgi_servlet_init (&conf, &map, size, NULL);
+	cgi_servlet_init (&conf, (struct url_mapping *)&map, size, NULL);
 
 	web_dbg("web_digistar done!\n");
 
