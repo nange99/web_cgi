@@ -7,18 +7,13 @@
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.2.custom.css"/>
 <script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="/js/jquery-ui-1.8.2.custom.min.js"></script>
-<script type="text/javascript" src="/js/time.js"></script>
-<script type="text/javascript">
+<script type="text/javascript" src="/js/router.js"></script>
 
+<script type="text/javascript">
 $(function() {
 
-var destination = $("#destination"), gateway = $("#gateway"), mask = $("#mask"), metric = $("#metric"), interface = $("#interface");
+var destination = $("#dest"), gateway = $("#gateway"), mask = $("#mask"), metric = $("#metric"), interface = $("#interface");
 var allFields = $([]).add(destination).add(gateway).add(mask).add(metric).add(interface);
-
-function updateTable(url) {
-	alert(url);
-	$.ajax({url: "/app/config_static_routes?table=1", success: function(data) { $("#table_wrapper").html(data); alert("reloaded"); }});
-}
 
 $("#dialog").dialog({
 	autoOpen: false,
@@ -35,9 +30,8 @@ $("#dialog").dialog({
 			if (ok) {
 				var f = $("#routeForm");
 				$.post(f.get(0).action, f.serialize(), function (data) {
-					alert("data = ["+data+"]");
 					dialog.dialog('close');
-					updateTable("url to get data");
+					updateRouteTable();
 				});
 			}
 		},
@@ -71,48 +65,46 @@ $("#dialog").dialog({
 <thead>
     <tr>
         <th>Destination</th>
-        <th>Gateway</th>
         <th>Mask</th>
-        <th>Metric</th>
+        <th>Gateway</th>
         <th>Interface</th>
+        <th>Metric</th>
         <th></th>
     </tr>
 </thead>
 <tbody>
-    <tr>
-        <td>192.168.100.0</td>
-        <td>0.0.0.0</td>
-        <td>255.255.255.0</td>
-        <td>1</td>
-        <td>eth0</td>
-        <td><a href="#" onclick="alert('remove?');">remove</a></td>
-    </tr>
-    <tr class="odd">
-        <td>192.168.100.0</td>
-        <td>0.0.0.0</td>
-        <td>255.255.255.0</td>
-        <td>1</td>
-        <td>eth0</td>
-        <td><a href="#" onclick="alert('remove?');">remove</a></td>
-    </tr>
+    <?foreach row in response.table?>
+		<?if odd_ then?>
+			<tr>
+		<?else?>
+			<tr class="odd">
+		<?endif?>
+			  <td><?echo row.dest?></td>
+			  <td><?echo row.mask?></td>
+			  <td><?echo row.gateway?></td>
+			  <td><?echo row.interface?></td>
+			  <td><?echo row.metric?></td>
+			  <td><a href="#" onclick="deleteRoute('<?echo row.hash?>');">remove</a></td>
+			</tr>
+	<?endforeach?>
 </tbody>
 </table>
 </div>
 <div id="dialog" title="Add route">
-<form id="routeForm" action="/app/config_route" method="post">
+<form id="routeForm" action="/app/add_route" method="post">
 <fieldset>
 	<legend>Route Details</legend>
 	<div>
 	<label for="destination">Destination: </label>
-	<input type="text" name="destination" id="destination" class="text ui-widget-content ui-corner-all"/>
+	<input type="text" name="dest" id="dest" class="text ui-widget-content ui-corner-all"/>
+	</div>
+		<div>
+	<label for="mask">Mask: </label>
+	<input type="text" name="mask" id="mask" class="text ui-widget-content ui-corner-all"/>
 	</div>
 	<div>
 	<label for="gateway">Gateway: </label>
 	<input type="text" name="gateway" id="gateway" class="text ui-widget-content ui-corner-all"/>
-	</div>
-	<div>
-	<label for="mask">Mask: </label>
-	<input type="text" name="mask" id="mask" class="text ui-widget-content ui-corner-all"/>
 	</div>
 	<div>
 	<label for="metric">Metric:</label>
@@ -122,8 +114,9 @@ $("#dialog").dialog({
 	<label for="interface">Interface:</label>
 	<select name="interface" id="interface">
 		<option value=""></option>
-		<option value="eth0">ethernet</option>
+		<option value="ethernet0">ethernet</option>
 		<option value="ppp0">3g</option>
+		<option value="loopback0">loopback</option>
 	</select>
 	</div>
 </fieldset>
