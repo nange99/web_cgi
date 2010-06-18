@@ -22,20 +22,6 @@ int handle_config_interface(struct request *req, struct response *resp)
 	return 1;
 }
 
-int handle_config_firewall(struct request *req, struct response *resp)
-{
-	cgi_response_set_html(resp, "/wn/cgi/templates/config_firewall.html");
-
-	return 1;
-}
-
-int handle_config_nat(struct request *req, struct response *resp)
-{
-	cgi_response_set_html(resp, "/wn/cgi/templates/config_nat.html");
-
-	return 1;
-}
-
 /**
  * Go to home page
  *
@@ -160,6 +146,168 @@ saveconf_finish:
 	return 0;
 }
 
+/*
+ * Temporary Handlers
+ *
+ */
+int handle_config_firewall(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_set_html(resp, "/wn/cgi/templates/config_firewall.html");
+
+	return 1;
+}
+
+int handle_config_nat(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_set_html(resp, "/wn/cgi/templates/config_nat.html");
+
+	return 1;
+}
+
+int handle_config_qos(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_set_html(resp, "/wn/cgi/templates/config_qos.html");
+
+	return 1;
+}
+
+int handle_config_ipsec(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_set_html(resp, "/wn/cgi/templates/config_ipsec.html");
+
+	return 1;
+}
+
+int handle_config_snmp(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_set_html(resp, "/wn/cgi/templates/config_snmp.html");
+
+	return 1;
+}
+
+int handle_config_auth(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_set_html(resp, "/wn/cgi/templates/config_auth.html");
+
+	return 1;
+}
+
+int handle_status_interfaces(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_set_html(resp, "/wn/cgi/templates/status_interfaces.html");
+
+	return 1;
+}
+
+int handle_status_firewall(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_set_html(resp, "/wn/cgi/templates/status_firewall.html");
+
+	return 1;
+}
+
+int handle_status_nat(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_set_html(resp, "/wn/cgi/templates/status_nat.html");
+
+	return 1;
+}
+
+int handle_status_qos(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_set_html(resp, "/wn/cgi/templates/status_qos.html");
+
+	return 1;
+}
+
+int handle_status_ipsec(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_set_html(resp, "/wn/cgi/templates/status_ipsec.html");
+
+	return 1;
+}
+
+int handle_status_snmp(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_set_html(resp, "/wn/cgi/templates/status_snmp.html");
+
+	return 1;
+}
+
+int handle_status_auth(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_set_html(resp, "/wn/cgi/templates/status_auth.html");
+
+	return 1;
+}
+
+
+
 int main(int argc, char **argv)
 {
 	struct url_mapping map[] = {
@@ -175,10 +323,23 @@ int main(int argc, char **argv)
 
 		/* Configuration pages */
 		{.url = "/config_interfaces", .handler = handle_config_interface},
-		{.url = "/config_nat", .handler = handle_config_nat},
-		{.url = "/config_firewall", .handler = handle_config_firewall},
 		{.url = "/config_static_routes", .handler = handle_static_routes},
 		{.url = "/add_route", .handler = handle_add_route},
+
+		{ .url = "/config_firewall", .handler = handle_config_firewall },
+		{ .url = "/config_nat", .handler = handle_config_nat },
+		{ .url = "/config_qos", .handler = handle_config_qos },
+		{ .url = "/config_ipsec", .handler = handle_config_ipsec },
+		{ .url = "/config_snmp", .handler = handle_config_snmp },
+		{ .url = "/config_auth", .handler = handle_config_auth },
+		{ .url = "/status_interfaces", .handler = handle_status_interfaces },
+		{ .url = "/status_firewall", .handler = handle_status_firewall },
+		{ .url = "/status_nat", .handler = handle_status_nat },
+		{ .url = "/status_qos", .handler = handle_status_qos },
+		{ .url = "/status_ipsec", .handler = handle_status_ipsec },
+		{ .url = "/status_snmp", .handler = handle_status_snmp },
+		{ .url = "/status_auth", .handler = handle_status_auth },
+
 
 		/* Firmware */
 		{.url ="/firmware_info", .handler = handle_firmware_version},
