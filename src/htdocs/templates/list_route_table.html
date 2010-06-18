@@ -1,0 +1,28 @@
+<table>
+<thead>
+    <tr>
+        <th>Destination</th>
+        <th>Mask</th>
+        <th>Gateway</th>
+        <th>Interface</th>
+        <th>Metric</th>
+        <th></th>
+    </tr>
+</thead>
+<tbody>
+    <?foreach row in response.table?>
+		<?if odd_ then?>
+			<tr>
+		<?else?>
+			<tr class="odd">
+		<?endif?>
+			  <td><?echo row.dest?></td>
+			  <td><?echo row.mask?></td>
+			  <td><?echo row.gateway?></td>
+			  <td><?echo row.interface?></td>
+			  <td><?echo row.metric?></td>
+			  <td><a href="#" onclick="alert('remove?');">remove</a></td>
+			</tr>
+	<?endforeach?>
+</tbody>
+</table>
