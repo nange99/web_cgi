@@ -1,2 +1,2 @@
 Attributes=serveall
-Subdirs=app images js
+Subdirs=css app images js
