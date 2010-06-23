@@ -7,32 +7,68 @@
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.2.custom.css"/>
 <script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="/js/jquery-ui-1.8.2.custom.min.js"></script>
-<script type="text/javascript" src="/js/time.js"></script>
+<script type="text/javascript" src="/js/router.js"></script>
 <script type="text/javascript">
-function reboot_me() {
-    var rtn = confirm ("Reboot now?");
-
-    if (rtn == true)
-        alert ("go ahead");
-
-    return rtn
+function loading_dlg(status) {
+	$("#dialog").dialog(status);
+	if (status == 'open') {
+		$(".ui-dialog-titlebar-close").hide();
+	}
+	$("#upgradeFrame").hide();
 }
+
+function get_contents() {
+	frame = $("#upgradeFrame").contents().find("#firmware_form");
+	if (frame.length == 0) {
+		text = $("#upgradeFrame").contents().text();
+		$("#sending").fadeOut('slow');
+		$("#response").html(text).fadeIn('slow');
+		$("#upgradeFrame").get(0).src = "/app/firmware_upgrade_frame";
+		$(".ui-dialog-titlebar-close").show();
+	}
+}
+
+$(function() {
+$("#firmware_form").onsubmit = function () {
+	$("#firmware_form").target = 'upload_target';
+}
+$("#dialog").dialog({
+	autoOpen: false,
+	position: "center",
+	width: 400,
+	open: function(event, ui) { 
+		$("#response").hide();
+		$("#sending").show();
+	},
+	close: function(event, ui) {
+		//frame.get(0).src = "/app/firmware_upgrade_frame";
+		//frame.contentWindow.location.reload(true);
+		$("#upgradeFrame").fadeIn('slow');
+	}
+});
+});
 </script>
 </head>
 
 <body>
 <div id="bodywrap">
 	<?include "/wn/cgi/templates/topmenu"?>
-	<div id="contentwrap">
-    <div id="content">
-<h1>Firmware Upgrade</h1>
-<div id="context_menu">
+	<?include "/wn/cgi/templates/leftmenu" ?>
+<div id="content">
+	<h1>Firmware Upgrade</h1>
+	<div id="dialog" title="Upgrading ...">
+		<div id="sending">
+			<center>
+			<p>Please wait...</p>
+			<img src="/images/loading.gif"/>
+			</center>
+		</div>
+		<div id="response"></div>
+	</div>
+	<div id="table_wrapper">
+	<iframe id="upgradeFrame" src="/app/firmware_upgrade_frame" onload="get_contents();" width="100%" style="border:0px"></iframe>
+	</div>
 </div>
-<div id="table_wrapper">
-</div>
-    </div>
-<?include "/wn/cgi/templates/leftmenu" ?>
-    </div><!--contentwrap-->
 </div><!--bodywrap-->
 
 </body>

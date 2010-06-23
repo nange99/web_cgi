@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" dir="ltr">
+<head>
+<link rel="stylesheet" type="text/css" href="/css/digistar_styles.css"/>
+<link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.2.custom.css"/>
+<style type="text/css">
+body {
+	font-size:12px;
+}
+</style>
+</head>
+<body>
+	<form id="firmware_form" action="/app/firmware_upgrade_save" method="post" enctype="multipart/form-data">
+		<fieldset>
+		<div>
+			<label for="firmware">Firmware: </label>
+			<input id="firmware" type="file" name="firmware"/>
+		</div>
+		</fieldset>
+		<fieldset class="submit" style="font-size:10px">
+			<input id="submit" type="submit" onclick="return window.parent.loading_dlg('open');" value="Upgrade" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"/>
+		</fieldset>
+	</form>
+</body>
+</html>

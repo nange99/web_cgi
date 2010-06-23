@@ -335,7 +335,9 @@ int main(int argc, char **argv)
 
 		/* Firmware */
 		{.url ="/firmware_info", .handler = handle_firmware_version},
-		{.url ="/firmware_upgrade", .handler = handle_firmware_upgrade}
+		{.url ="/firmware_upgrade", .handler = handle_firmware_upgrade},
+		{.url ="/firmware_upgrade_frame", .handler = handle_firmware_upgrade_frame },
+		{.url ="/firmware_upgrade_save", .handler = handle_firmware_receive_file}
 	};
 
 	struct config conf = {
