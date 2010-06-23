@@ -3,7 +3,7 @@ bin_PROGRAMS = \
 
 web_digistar_SOURCES = \
 	main.c \
-	interface_stats.c \
+	interface.c \
 	reboot.c \
 	route.c \
 	firmware.c 

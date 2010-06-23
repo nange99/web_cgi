@@ -12,15 +12,7 @@
 #include "reboot.h"
 #include "route.h"
 #include "firmware.h"
-
-int handle_config_interface(struct request *req, struct response *resp)
-{
-	cgi_response_set_html(resp, "/wn/cgi/templates/config_interfaces.html");
-
-	cgi_response_add_parameter (resp, "teste", "O codigo CGI funciona", CGI_STRING);
-
-	return 1;
-}
+#include "interface.h"
 
 /**
  * Go to home page

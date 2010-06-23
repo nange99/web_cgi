@@ -31,8 +31,10 @@ int handle_reboot(struct request *req, struct response *resp)
 
 	switch (fork()) {
 	case 0: /* child */
+		/* Create a new SID for the child process */
+		setsid();
 		execv("/sbin/reboot", parms);
-		break;
+		exit(0);
 	case -1: /* error */
 		break;
 	default: /* parent - nothing to be done */

@@ -21,6 +21,7 @@
 #include <libcgiservlet/cgi_servlet.h>
 #include <libcgiservlet/cgi_session.h>
 #include <libcgiservlet/cgi_table.h>
+#include <libcgiservlet/cgi_list.h>
 
 /* Libconfig includes */
 #include <libconfig/options.h>
