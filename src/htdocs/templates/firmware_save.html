@@ -1,0 +1,18 @@
+<? if response.err == 1 then ?>
+You have to select a file first.
+<? elseif response.err == 2 then ?>
+There was an error receiving this file...
+<?echo response.err_msg ?>
+<? elseif response.err == 3 then ?>
+Image error
+<? elseif response.err == 4 then ?>
+Write error
+<? else ?>
+<p>
+<ul>
+	<li>Image verified... Ok</li>
+	<li>Writing image... Ok</li>
+</ul>
+<span style="color:red; font-size:14px; text-align:center">Rebooting in 5 seconds...</span>
+</p>
+<? endif ?>

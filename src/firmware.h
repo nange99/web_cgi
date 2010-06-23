@@ -10,6 +10,7 @@
 
 int handle_firmware_version(struct request *req, struct response *resp);
 int handle_firmware_upgrade(struct request *req, struct response *resp);
+int handle_firmware_upgrade_frame(struct request *req, struct response *resp);
 int handle_firmware_receive_file(struct request *req, struct response *resp);
 
 #endif /* FIRMWARE_H_ */
