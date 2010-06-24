@@ -23,7 +23,7 @@ int show_ethernet_stats (struct response *resp)
 	struct interface_conf conf;
 	char buf[64];
 
-	if (lconfig_get_iface_config("ethernet0", &conf))
+	if (libconfig_ip_iface_get_config("ethernet0", &conf))
 		return -1;
 
 	sprintf(buf, "Link is %s", conf.running ? "UP" : "DOWN");
