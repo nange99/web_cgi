@@ -128,7 +128,7 @@ int handle_saveconf(struct request *req, struct response *resp)
 	}
 
 	/* Save in flash */
-	if (save_configuration(TMP_CFG_FILE) < 0) {
+	if (libconfig_nv_save_configuration(TMP_CFG_FILE) < 0) {
 		syslog(LOG_ERR, "Failed in writing to flash\n");
 		goto saveconf_finish;
 	}
