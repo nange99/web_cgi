@@ -68,7 +68,7 @@ int handle_login(struct request *req, struct response *resp)
 	}
 
 	/* Do PAM authentication */
-	if (pam_web_authenticate(username, password) == AUTH_OK) {
+	if (libconfig_pam_web_authenticate(username, password) == AUTH_OK) {
 		cgi_session_init(req); /* Initiates a session */
 		cgi_response_set_html(resp, "/wn/cgi/templates/do_home.html");
 	} else {
