@@ -60,7 +60,7 @@ int handle_login(struct request *req, struct response *resp)
 	}
 
 	/* Do PAM authentication */
-	if (pam_web_authenticate(username, password) == AUTH_OK) {
+	if (libconfig_pam_web_authenticate(username, password) == AUTH_OK) {
 		cgi_session_init(req); /* Initiates a session */
 		cgi_response_set_html(resp, "/wn/cgi/templates/do_home.html");
 	} else {
@@ -106,7 +106,7 @@ int handle_saveconf(struct request *req, struct response *resp)
 		return 0;
 	}
 
-	cish_cfg = lconfig_mmap_cfg();
+	cish_cfg = libconfig_config_mmap_cfg();
 
 	if (cish_cfg == NULL) {
 		syslog(LOG_ERR, "Failed in mapping cish config\n");
@@ -114,13 +114,13 @@ int handle_saveconf(struct request *req, struct response *resp)
 	}
 
 	/* Store configuration in f */
-	if (lconfig_write_config(TMP_CFG_FILE, cish_cfg) < 0) {
+	if (libconfig_config_write(TMP_CFG_FILE, cish_cfg) < 0) {
 		syslog(LOG_ERR, "Failed in writing to tmp file\n");
 		goto saveconf_finish;
 	}
 
 	/* Save in flash */
-	if (save_configuration(TMP_CFG_FILE) < 0) {
+	if (libconfig_nv_save_configuration(TMP_CFG_FILE) < 0) {
 		syslog(LOG_ERR, "Failed in writing to flash\n");
 		goto saveconf_finish;
 	}
@@ -129,7 +129,7 @@ saveconf_finish:
 	/* Remove temp file */
 	unlink(TMP_CFG_FILE);
 
-	lconfig_munmap_cfg(cish_cfg);
+	libconfig_config_munmap_cfg(cish_cfg);
 
 	cgi_response_set_html(resp, "/wn/cgi/templates/do_show_config_saved.html");
 

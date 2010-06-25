@@ -10,7 +10,7 @@ int show_interface_stats (cgi_table *t, char *name)
 {
 	struct interface_conf conf;
 
-	if (lconfig_get_iface_config(name, &conf))
+	if (libconfig_ip_iface_get_config(name, &conf))
 		return -1;
 
 	cgi_table_add_row(t);
