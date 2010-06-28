@@ -31,7 +31,7 @@ int handle_add_route(struct request *req, struct response *resp)
 	web_dbg("gateway = %s\n", route->gateway);
 
 
-	lconfig_add_route(route);
+	libconfig_quagga_add_route(route);
 
 	free(route); /* libcgi frees the parameters */
 
@@ -53,14 +53,14 @@ int handle_static_routes(struct request *req, struct response *resp)
 
 	/* Check if we are deleting one entry */
 	if (del)
-		lconfig_del_route(del);
+		libconfig_quagga_del_route(del);
 
 	/* Check if returning just table (AJAX) */
 	table = cgi_request_get_parameter(req, "table");
 
 	t = cgi_table_create(6, "dest", "mask", "gateway", "interface", "metric", "hash");
 
-	next = route = lconfig_get_routes();
+	next = route = libconfig_quagga_get_routes();
 
 	while (next) {
 		web_dbg("dest = %s\n", next->network);
@@ -97,7 +97,7 @@ int handle_static_routes(struct request *req, struct response *resp)
 	else
 		cgi_response_set_html(resp, "/wn/cgi/templates/list_route.html");
 
-	lconfig_free_routes(route);
+	libconfig_quagga_free_routes(route);
 
 	return 0;
 }

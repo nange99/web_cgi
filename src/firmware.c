@@ -30,8 +30,8 @@ int handle_firmware_version(struct request *req, struct response *resp)
 		return 0;
 	}
 
-	version = get_system_version();
-	boot = get_boot_version();
+	version = libconfig_get_system_version();
+	boot = libconfig_get_boot_version();
 
 	web_dbg("Firmware version : %s\n", version);
 	web_dbg("Bootloader version : %s\n", boot);
