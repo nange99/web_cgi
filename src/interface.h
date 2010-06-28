@@ -8,7 +8,7 @@
 #ifndef INTERFACE_H_
 #define INTERFACE_H_
 
-int show_interface_stats (cgi_table *t, char *name);
+int handle_apply_intf_settings(struct request *req, struct response *resp);
 int handle_config_interface(struct request *req, struct response *resp);
 
 #endif /* INTERFACE_H_ */
