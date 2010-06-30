@@ -73,6 +73,8 @@ form {
 
 <?if (response.err) then?>
 <div id="err_visible"> Authentication failed </div>
+<?elseif (response.empty) then?>
+<div id="err_visible"> Must supply an Username </div>
 <?endif ?>
 
 </body>
