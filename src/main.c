@@ -214,6 +214,18 @@ int handle_config_auth(struct request *req, struct response *resp)
 	return 1;
 }
 
+int handle_config_ntp(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_set_html(resp, "/wn/cgi/templates/config_ntp.html");
+
+	return 1;
+}
+
 int handle_status_interfaces(struct request *req, struct response *resp)
 {
 	if (!cgi_session_exists(req)) {
@@ -324,6 +336,7 @@ int main(int argc, char **argv)
 		{ .url = "/config_ipsec", .handler = handle_config_ipsec },
 		{ .url = "/config_snmp", .handler = handle_config_snmp },
 		{ .url = "/config_auth", .handler = handle_config_auth },
+		{ .url = "/config_ntp", .handler = handle_config_ntp },
 		{ .url = "/status_interfaces", .handler = handle_status_interfaces },
 		{ .url = "/status_firewall", .handler = handle_status_firewall },
 		{ .url = "/status_nat", .handler = handle_status_nat },
