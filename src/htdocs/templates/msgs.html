@@ -1,0 +1,8 @@
+<?if (response.success == 0) then?>
+<p> Changes were applied successfully!</p>
+<?elseif (response.success < 0) then?>
+<p> An error happened when applying changes. <br/>
+Please contact support.</p>
+<?else?>
+<p> No return value defined!</p>
+<?endif?>

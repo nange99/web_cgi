@@ -80,4 +80,7 @@
 #define web_dbg(x,...)
 #endif
 
+#define log_err(x,...) \
+	syslog(LOG_ERR, "%s : %d => "x , __FUNCTION__, __LINE__, ##__VA_ARGS__);
+
 #endif /* WEB_CONFIG_H_ */

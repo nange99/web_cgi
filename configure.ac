@@ -45,7 +45,7 @@ AC_CHECK_LIB(crypto, RSA_public_encrypt,, exit)
 AC_CHECK_LIB(netsnmp, snmpv3_store,, exit)
 AC_CHECK_LIB(cgiservlet, cgi_servlet_init,, exit)
 AC_CHECK_LIB(usb-1.0, libusb_init,, exit)
-AC_CHECK_LIB(config, acl_apply,, exit)
+AC_CHECK_LIB(config, libconfig_acl_apply,, exit)
 
 AC_SEARCH_LIBS([strerror],[cposix])
 AC_PROG_AWK

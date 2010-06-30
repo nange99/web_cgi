@@ -59,6 +59,13 @@ int handle_login(struct request *req, struct response *resp)
 		return 1;
 	}
 
+	/* Do not accept an empty user */
+	if (username[0] == '\0') {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		cgi_response_add_parameter(resp, "empty", (void *)1, CGI_INTEGER);
+		return 1;
+	}
+
 	/* Do PAM authentication */
 	if (libconfig_pam_web_authenticate(username, password) == AUTH_OK) {
 		cgi_session_init(req); /* Initiates a session */
@@ -327,6 +334,9 @@ int main(int argc, char **argv)
 
 		/* Configuration pages */
 		{.url = "/config_interfaces", .handler = handle_config_interface},
+		{.url = "/apply_intf_settings", .handler = handle_apply_intf_settings},
+
+
 		{.url = "/config_static_routes", .handler = handle_static_routes},
 		{.url = "/add_route", .handler = handle_add_route},
 
