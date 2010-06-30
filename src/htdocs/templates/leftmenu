@@ -8,6 +8,7 @@
 		<div class="lvl2"> <a href="/app/config_ipsec">IPSec</a> </div>
 		<div class="lvl2"> <a href="/app/config_snmp">SNMP</a> </div>
 		<div class="lvl2"> <a href="/app/config_auth">Authentication</a> </div>
+		<div class="lvl2"> <a href="/app/config_ntp">NTP</a> </div>
 	</div>
 	
 	<div class="lvl1"> Status
