@@ -15,6 +15,19 @@ $(function() {
 var destination = $("#dest"), gateway = $("#gateway"), mask = $("#mask"), metric = $("#metric"), interface = $("#interface");
 var allFields = $([]).add(destination).add(gateway).add(mask).add(metric).add(interface);
 
+/* Route deletion */
+function deleteRoute(hash) {
+	
+	if (confirm("Delete this route?"))
+		$.ajax({url: "/app/config_static_routes?del=" + hash, success: function(data) { $("#table_wrapper").html(data)}});
+}
+
+/* Fetch route table */
+function updateRouteTable() {
+	$.ajax({url: "/app/config_static_routes?table=1", success: function(data) { $("#table_wrapper").html(data)}});
+}
+
+
 $("#dialog").dialog({
 	autoOpen: false,
 	position: "center",
@@ -112,7 +125,8 @@ $("#dialog").dialog({
 	</div>
 	<div>
 	<label for="interface">Interface:</label>
-	<select name="interface" id="interface">
+	<select name="interface" id="interface"
+	class="text ui-widget-content ui-corner-all">
 		<option value=""></option>
 		<option value="ethernet0">ethernet</option>
 		<option value="ppp0">3g</option>

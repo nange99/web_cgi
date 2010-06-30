@@ -6,6 +6,12 @@
  * Copyright 2010, PD3 Tecnologia
  */
 
+/* Global objects */
+var ethernet = new RegExp("^eth*");
+var loopback = new RegExp("^lo*");
+var m3g = new RegExp("^m3[Gg]*");
+var intf_type = {ethernet:1, loopback:2, m3g:3};
+
 /* Left menu sliding function */
 $(function () {
 	$(".lvl1").click( function() {
@@ -18,6 +24,18 @@ function reboot_me() {
     var rtn = confirm ("Reboot now?");
 
     return rtn;
+}
+
+function verifyInterfaceType(name) {
+	
+	if (ethernet.test(name))
+		return intf_type.ethernet;
+	else if (loopback.test(name))
+		return intf_type.loopback;
+	else if (m3g.test(name))
+		return intf_type.m3g;
+	
+	return 0;
 }
 
 /* IP address validation */
@@ -42,16 +60,3 @@ function verifyIPAddress(obj) {
 	
 	return valid;
 }
-
-/* Route deletion */
-function deleteRoute(hash) {
-	
-	if (confirm("Delete this route?"))
-		$.ajax({url: "/app/config_static_routes?del=" + hash, success: function(data) { $("#table_wrapper").html(data)}});
-}
-
-/* Fetch route table */
-function updateRouteTable() {
-	$.ajax({url: "/app/config_static_routes?table=1", success: function(data) { $("#table_wrapper").html(data)}});
-}
-
