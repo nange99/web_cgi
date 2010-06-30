@@ -4,9 +4,9 @@
 <title>Interface Configuration</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="/css/digistar_styles.css" />
-<link rel="stylesheet" type="text/css"
-	href="/css/jquery-ui-1.8.2.custom.css" />
+<link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.2.custom.css" />
 <style type="text/css">
+
 #intfTabs {
 	width: 92%;
 	font-size: 10px;
@@ -14,43 +14,248 @@
 	margin-top: 25px;
 	float: none;
 }
+
+.disabledField {
+	background-color: gray;
+}
+
+.applySettings {
+	float: right;
+	text-decoration: none;
+	
+}
 </style>
+
 <script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="/js/jquery-ui-1.8.2.custom.min.js"></script>
 <script type="text/javascript" src="/js/router.js"></script>
 <script type="text/javascript">
-	$(function() {
-		$("#intfTabs").tabs();
+$(function() {
+	/* Creates interface tabs */
+	$("#intfTabs").tabs();
+
+	/* Define message dialog */
+	$("#myDialog").dialog({
+		autoOpen: false,
+		buttons: { "OK" : function() { $(this).dialog("close"); } },
+		position: "center",
+		width: 400,
+		height: 150,
+		modal: true
 	});
+
+	/* Set maximum length for text inputs */
+	$(':text').attr('maxlength','50');
+	
+	/* ETHERNET FUNCTIONS */
+	<?foreach row in response.eth_table?>
+	$("#<?echo row.name?>-apply").click(function () {
+
+		var dhcp = $("#<?echo row.name?>-dhcpc").attr('checked');
+
+		/* If DHCP Client is on we don't have
+		to check if typed IPs are valid */
+		if (dhcp == false) {
+			var ok = true;
+			var ok = verifyIPAddress($("#<?echo row.name?>-ipaddr")) && ok;
+			var ok = verifyIPAddress($("#<?echo row.name?>-ipmask")) && ok;
+
+			if (ok == false) {
+				setTimeout(function () {
+					$("#<?echo row.name?>-ipaddr").removeClass("ui-state-error");
+					$("#<?echo row.name?>-ipmask").removeClass("ui-state-error");
+				}, 3000);
+				return;
+			}
+		}
+		
+		var form = $(this).parents("form").get(0);
+		var form_data = $(this).parents("form").serialize();
+
+		$.post(form.action, form_data, function (data) {
+			$("#myDialog").html(data);
+			$("#myDialog").dialog("open");
+		});
+	});
+	
+	$("#<?echo row.name?>-dhcpc").change(function () {
+		if ($(this).attr('checked')) {
+			$("#<?echo row.name?>-ipaddr").attr('disabled','disabled').addClass(".disabledField");
+			$("#<?echo row.name?>-ipmask").attr('disabled','disabled').addClass(".disabledField");
+		} else {
+			$("#<?echo row.name?>-ipaddr").removeAttr('disabled').removeClass(".disabledField");
+			$("#<?echo row.name?>-ipmask").removeAttr('disabled').removeClass(".disabledField");
+		}
+	});
+	<?endforeach?>
+
+	/* LOOPBACK FUNCTIONS */
+	<?foreach row in response.lo_table?>
+	$("#<?echo row.name?>-apply").click(function () {
+		var form = $(this).parent().serialize();
+		alert($(this).parents("form").serialize());
+		$("#myDialog").dialog("open");
+	});
+	<?endforeach?>
+
+	/* 3G FUNCTIONS */
+	<?foreach row in response.m3g_table?>
+	$("#<?echo row.name?>-apply").click(function () {
+		var form = $(this).parents("form").get(0);
+		var form_data = $(this).parents("form").serialize();
+		/* alert($(this).parents("form").serialize()); DEBUG! */
+		
+		$.post(form.action, form_data, function () {
+			$("#myDialog").dialog("open");
+		});
+	});
+	<?endforeach?>
+
+});
+
 </script>
 </head>
 
 <body>
-<div id="bodywrap"><?include "/wn/cgi/templates/topmenu"?> <?include "/wn/cgi/templates/leftmenu" ?>
+<div id="bodywrap">
+
+<?include "/wn/cgi/templates/topmenu"?>
+<?include "/wn/cgi/templates/leftmenu"?>
+
 <div id="content">
 <h1>Interface Configuration</h1>
 <div id="intfTabs">
 <ul>
-	<?foreach intf in response.interface?>
-	<li><a href="#tab-<?echo intf?>"><?echo intf?></a></li>
+	<?foreach row in response.eth_table?>
+	<li><a href="#tab-<?echo row.name?>"><?echo row.name?></a></li>
+	<?endforeach?>
+	<?foreach row in response.lo_table?>
+	<li><a href="#tab-<?echo row.name?>"><?echo row.name?></a></li>
+	<?endforeach?>
+	<?foreach row in response.m3g_table?>
+	<li><a href="#tab-<?echo row.name?>"><?echo row.name?></a></li>
 	<?endforeach?>
 </ul>
-<?foreach intf in response.interface?>
-<div id="tab-<?echo intf?>">
-	<form id="form-<?echo intf?>" action="/app/config_intf" method="post">
+
+<!-- ETHERNET -->
+<?foreach row in response.eth_table?>
+<div id="tab-<?echo row.name?>">
+	<form id="form-<?echo row.name?>" action="/app/apply_intf_settings" method="post">
 		<fieldset><legend>Interface Settings</legend>
-			<div><label for="ipaddr">IP Address: </label> <input
-			type="text" name="ipaddr" id="ipaddr" value="<?response.ipaddr?>"
-			class="text ui-widget-content ui-corner-all" />
+		
+			<input type="hidden" name="name" value="<?echo row.name?>"/>
+		
+			<div>
+				<label for="<?echo row.name?>-ipaddr">IP Address: </label> 
+				<input type="text" name="ipaddr" id="<?echo row.name?>-ipaddr" value="<?echo row.ipaddr?>" <?if row.dhcpc then?>disabled="disabled"<?endif?> class="text ui-widget-content ui-corner-all" />
 			</div>
-			<div><label for="mask">Mask: </label> <input type="text"
-			name="mask" id="mask" value="<?response.ipmask?>" 
-			class="text ui-widget-content ui-corner-all" />
+			
+			<div>
+				<label for="<?echo row.name?>-ipmask">Mask: </label> 
+				<input type="text" name="ipmask" id="<?echo row.name?>-ipmask" value="<?echo row.ipmask?>" <?if row.dhcpc then?>disabled="disabled"<?endif?> class="text ui-widget-content ui-corner-all" />
+			</div>
+			
+			<div>
+				<label for="<?echo row.name?>-dhcpc">DHCP Client </label>
+				<input type="checkbox" name="dhcpc" id="<?echo row.name?>-dhcpc" <?if row.dhcpc then?>checked="checked"<?endif?> class="text ui-widget-content ui-corner-all"/>
+			</div>
+			
+			<div>
+				<label for="<?echo row.name?>-up">Enable</label>
+				<input type="checkbox" name="up" id="<?echo row.name?>-up" <?if row.up then?>checked="checked"<?endif?> class="text ui-widget-content ui-corner-all" />
+			</div>
+			 
+			<div style="float:right">		 
+				<input type="button" id="<?echo row.name?>-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
 			</div>
 		</fieldset>
 	</form>
 </div>
-<?endforeach?></div>
+<?endforeach?>
+
+<!-- LOOPBACK -->
+<?foreach row in response.lo_table?>
+<div id="tab-<?echo row.name?>">
+	<form id="form-<?echo row.name?>" action="/app/apply_intf_settings" method="post">
+		<fieldset><legend>Interface Settings</legend>
+		
+			<input type="hidden" name="name" value="<?echo row.name?>"/>
+		
+			<div>
+				<label for="<?echo row.name?>-ipaddr">IP Address: </label> 
+				<input type="text" name="ipaddr" id="<?echo row.name?>-ipaddr" value="<?echo row.ipaddr?>" <?if row.dhcpc then?>disabled="disabled"<?endif?> class="text ui-widget-content ui-corner-all" />
+			</div>
+			
+			<div>
+				<label for="<?echo row.name?>-ipmask">Mask: </label>
+				<input type="text" name="ipmask" id="<?echo row.name?>-ipmask" value="<?echo row.ipmask?>" <?if row.dhcpc then?>disabled="disabled"<?endif?> class="text ui-widget-content ui-corner-all" />
+			</div>
+			
+			<div>
+				<label for="<?echo row.name?>-up">Enable</label>
+				<input type="checkbox" name="up" id="<?echo row.name?>-up" <?if row.up then?>checked="checked"<?endif?> class="text ui-widget-content ui-corner-all" />
+			</div>
+			 
+			<div style="float:right">		 
+				<input type="button" id="<?echo row.name?>-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
+			</div>
+				
+		</fieldset>
+	</form>
+</div>
+<?endforeach?>
+
+<!-- 3G -->
+<?foreach row in response.m3g_table?>
+<div id="tab-<?echo row.name?>">
+	<form id="form-<?echo row.name?>" action="/app/apply_intf_settings" method="post">
+		<fieldset><legend>Interface Settings</legend>
+		
+			<input type="hidden" name="name" value="<?echo row.name?>"/>
+		
+			<div>
+				<label for="<?echo row.name?>-apn">APN</label> 
+				<input type="text" name="apn" id="<?echo row.name?>-apn" value="<?echo row.apn?>" class="text ui-widget-content ui-corner-all" />
+			</div>
+			
+			<div>
+				<label for="<?echo row.name?>-user">User</label>
+				<input type="text" name="user" id="<?echo row.name?>-user" value="<?echo row.user?>" class="text ui-widget-content ui-corner-all" />
+			</div>
+			
+			<div>
+				<label for="<?echo row.name?>-pass">Pass</label> 
+				<input type="text" name="pass" id="<?echo row.name?>-pass" value="<?echo row.pass?>" class="text ui-widget-content ui-corner-all" />
+			</div>
+			
+			<?if row.name == "m3G0" then?>
+			<div>
+				<label for="<?echo row.name?>-sim">SIM Card Selection</label>
+				<select name="sim" id="<?echo row.name?>-sim" class="text ui-widget-content ui-corner-all">
+					<option value="1">Card 1</option>
+					<option value="2">Card 2</option>
+				</select>
+			</div>
+			<?endif?>
+		
+			<div>
+				<label for="<?echo row.name?>-up">Enable</label>
+				<input type="checkbox" name="up" id="<?echo row.name?>-up" <?if row.up then?>checked="checked"<?endif?> class="text ui-widget-content ui-corner-all" />
+			</div>
+
+			<div style="float:right">		 
+				<input type="button" id="<?echo row.name?>-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
+			</div>
+
+		</fieldset>
+	</form>
+</div>
+<?endforeach?>
+</div>
+  
+<div id="myDialog" title="Notification">
+</div>
+		
 </div>
 </div>
 </body>
