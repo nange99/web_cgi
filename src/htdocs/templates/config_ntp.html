@@ -18,10 +18,20 @@
 <script type="text/javascript" src="/js/jquery-ui-1.8.2.custom.min.js"></script>
 <script type="text/javascript" src="/js/router.js"></script>
 <script type="text/javascript">
-	$(function() {
-		$("#intfTabs").tabs();
-		$("#datepicker").datepicker();
+$(function() {
+	$("#intfTabs").tabs();
+	$("#datepicker").datepicker();
+	
+	/* Define message dialog */
+	$("#myDialog").dialog({
+		autoOpen: false,
+		buttons: { "OK" : function() { $(this).dialog("close"); } },
+		position: "center",
+		width: 400,
+		height: 150,
+		modal: true
 	});
+});
 </script>
 </head>
 <body>
@@ -29,7 +39,7 @@
 <?include "/wn/cgi/templates/topmenu"?>
 <?include "/wn/cgi/templates/leftmenu" ?>
 	<div id="content">
-		<h1>NTP Configuration</h1>
+		<h1>Time Configuration</h1>
 
 <div id="intfTabs">
 <ul>
@@ -49,6 +59,19 @@
 				<label for="time">Time: </label>
 				<input type="text" name="time" id="time" class="text ui-widget-content ui-corner-all" />
 			</div>
+		</fieldset>
+		<fieldset>
+			<legend>Automatically sync date</legend>
+			<div>
+				<label for="ntp-sync">Use NTP: </label>
+				<input type="checkbox" name="ntp_sync" id="ntp-sync" class="text ui-widget-content ui-corner-all" />
+			</div>	
+			<div>
+				<label for="ntp_server">NTP Server: </label>
+				<input type="text" name="ntp_server" id="ntp_server" class="text ui-widget-content ui-corner-all" />
+			</div>
+		</fieldset>
+		<fieldset>
 			<div style="float:right">		 
 				<input type="button" id="date-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
 			</div>
@@ -75,7 +98,11 @@
 <div id="tab-ntp">
 	<form id="form-ntp" action="/app/config_intf" method="post">
 		<fieldset>
-			<legend>Interface Settings</legend>
+			<legend>NTP Server</legend>
+			<div>
+				<label for="ntp-server">Enable: </label>
+				<input type="checkbox" name="enable_server" id="ntp-server" class="text ui-widget-content ui-corner-all" />
+			</div>
 			<div>
 				<label for="ipaddr">IP Address: </label>
 				<input type="text" name="ipaddr" id="ipaddr" value="" class="text ui-widget-content ui-corner-all" />
@@ -91,6 +118,9 @@
 	</form>
 </div>
 </div>		
+
+<div id="myDialog" title="Notification">
+</div>
 				
 	</div>
 </div>
