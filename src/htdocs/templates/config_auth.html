@@ -5,22 +5,179 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="/css/digistar_styles.css"/>
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.2.custom.css"/>
+<style type="text/css">
+#intfTabs {
+	width: 92%;
+	font-size: 10px;
+	margin-left: 30px;
+	margin-top: 25px;
+	float: none;
+}
+</style>
 <script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="/js/jquery-ui-1.8.2.custom.min.js"></script>
 <script type="text/javascript" src="/js/router.js"></script>
-</head>
+<script type="text/javascript">
+$(function() {
+	$("#intfTabs").tabs();
 
+	/* Define message dialog */
+	$("#userDialog").dialog({
+		autoOpen: false,
+		buttons: {
+			"Add user": function() {
+				ok = true;
+				var dialog = $(this);
+
+				if (ok) {
+					/*
+					var f = $("#routeForm");
+					$.post(f.get(0).action, f.serialize(), function (data) {
+						dialog.dialog('close');
+						updateRouteTable();
+					});
+					*/
+				}
+			},
+			"Cancel": function() {
+				$(this).dialog('close');
+			}
+		},
+		position: "center",
+		width: 400,
+		height: 300,
+		modal: true
+	});
+	
+	/* Define message dialog */
+	$("#notificationDialog").dialog({
+		autoOpen: false,
+		buttons: { "OK" : function() { $(this).dialog("close"); } },
+		position: "center",
+		width: 400,
+		height: 150,
+		modal: true
+	});
+});
+</script>
+</head>
 <body>
 <div id="bodywrap">
 <?include "/wn/cgi/templates/topmenu"?>
 <?include "/wn/cgi/templates/leftmenu" ?>
 	<div id="content">
 		<h1>Authentication Configuration</h1>
-		<div style="margin-top: 40px;">
-		<center>
-			<img src="/images/underconst.gif" />
-		</center>
-		</div>
+
+<div id="intfTabs">
+<ul>
+	<li><a href="#tab-users">Users</a></li>
+	<li><a href="#tab-auth">Authentication Type</a></li>
+	<li><a href="#tab-radius">Radius</a></li>
+	<li><a href="#tab-tacacs">TACACS</a></li>
+</ul>
+<div id="tab-users">
+<div id="context_menu">
+<ul>
+<li class="context_item"><a href="#" onclick="$('#userDialog').dialog('open');">Add user</a></li>
+</ul>
+</div>
+<table style="margin-left:8px; margin-top:3px;">
+<thead>
+    <tr>
+        <th>Username</th>
+        <th>Name</th>
+        <th></th>
+    </tr>
+</thead>
+<tbody>
+	<tr>
+		<td>asdf</td>
+		<td>Asdrubal</td>
+		<td><a href="#" onclick="deleteUser('asdf');">remove</a></td>
+	</tr>
+	<tr class="odd">
+		<td>asdf</td>
+		<td>Asdrubal</td>
+		<td><a href="#" onclick="deleteUser('asdf');">remove</a></td>
+	</tr>
+	<tr>
+		<td>asdf</td>
+		<td>Asdrubal</td>
+		<td><a href="#" onclick="deleteUser('asdf');">remove</a></td>
+	</tr>
+</tbody>
+</table>
+</div>
+<div id="tab-auth">
+	<form id="form-timezone" action="/app/config_intf" method="post">
+		<fieldset>
+			<legend>Authentication Type</legend>
+			<div>
+				<label for="timezone">Timezone: </label>
+				<select id="timezone" name="timezone" class="text ui-widget-content ui-corner-all">
+				<option>-- Select one --</option>
+				<option value="sp">Brazil / São Paulo</option>
+				</select>
+			</div>
+			<div style="float:right">		 
+				<input type="button" id="timezone-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
+			</div>
+		</fieldset>
+	</form>
+</div>
+<div id="tab-radius">
+	<form id="form-ntp" action="/app/config_intf" method="post">
+		<fieldset>
+			<legend>Radius Configuration</legend>
+			<div>
+				<label for="ntp-server">Enable: </label>
+				<input type="checkbox" name="enable_server" id="ntp-server" class="text ui-widget-content ui-corner-all" />
+			</div>
+			<div>
+				<label for="ipaddr">IP Address: </label>
+				<input type="text" name="ipaddr" id="ipaddr" value="" class="text ui-widget-content ui-corner-all" />
+			</div>
+			<div>
+				<label for="mask">Mask: </label>
+				<input type="text" name="mask" id="mask" value="" class="text ui-widget-content ui-corner-all" />
+			</div>
+			<div style="float:right">		 
+				<input type="button" id="timezone-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
+			</div>
+		</fieldset>
+	</form>
+</div>
+<div id="tab-tacacs">
+	<form id="form-ntp" action="/app/config_intf" method="post">
+		<fieldset>
+			<legend>TACACS Configuration</legend>
+			<div>
+				<label for="ntp-server">Enable: </label>
+				<input type="checkbox" name="enable_server" id="ntp-server" class="text ui-widget-content ui-corner-all" />
+			</div>
+			<div>
+				<label for="ipaddr">IP Address: </label>
+				<input type="text" name="ipaddr" id="ipaddr" value="" class="text ui-widget-content ui-corner-all" />
+			</div>
+			<div>
+				<label for="mask">Mask: </label>
+				<input type="text" name="mask" id="mask" value="" class="text ui-widget-content ui-corner-all" />
+			</div>
+			<div style="float:right">		 
+				<input type="button" id="timezone-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
+			</div>
+		</fieldset>
+	</form>
+</div>
+
+</div>		
+
+<div id="userDialog" title="Add User">
+</div>
+
+<div id="notificationDialog" title="Notification">
+</div>
+				
 	</div>
 </div>
 </body>
