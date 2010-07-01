@@ -15,7 +15,7 @@ var intf_type = {ethernet:1, loopback:2, m3g:3};
 /* Left menu sliding function */
 $(function () {
 	$(".lvl1").click( function() {
-		$(this).children().slideToggle();
+		$(this).children().children().slideToggle();
 	});
 });
 
