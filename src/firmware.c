@@ -30,8 +30,8 @@ int handle_firmware_version(struct request *req, struct response *resp)
 		return 0;
 	}
 
-	version = libconfig_get_system_version();
-	boot = libconfig_get_boot_version();
+	version = librouter_get_system_version();
+	boot = librouter_get_boot_version();
 
 	web_dbg("Firmware version : %s\n", version);
 	web_dbg("Bootloader version : %s\n", boot);
@@ -102,7 +102,7 @@ int handle_firmware_receive_file(struct request *req, struct response *resp)
 		return 0;
 	}
 
-	rtn = libconfig_flash_check_image(f->tmp_filename);
+	rtn = librouter_flash_check_image(f->tmp_filename);
 
 	web_dbg("libconfig check image status: %d\n", rtn);
 
@@ -112,7 +112,7 @@ int handle_firmware_receive_file(struct request *req, struct response *resp)
 		return 0;
 	}
 
-	rtn = libconfig_flash_write_image(f->tmp_filename);
+	rtn = librouter_flash_write_image(f->tmp_filename);
 
 	if (rtn > 0) {
 		/* write error */

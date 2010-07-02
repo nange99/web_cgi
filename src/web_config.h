@@ -8,7 +8,7 @@
 #ifndef WEB_CONFIG_H_
 #define WEB_CONFIG_H_
 
-/* Needed for libconfig includes*/
+/* Needed for librouter includes*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,53 +24,53 @@
 #include <libcgiservlet/cgi_list.h>
 
 /* Libconfig includes */
-#include <libconfig/options.h>
-#include <libconfig/acl.h>
-#include <libconfig/args.h>
-#include <libconfig/cish_defines.h>
-#include <libconfig/config_fetcher.h>
-#include <libconfig/device.h>
-#include <libconfig/typedefs.h>
-#include <libconfig/ip.h>
-#include <libconfig/dev.h>
-#include <libconfig/dhcp.h>
-#include <libconfig/dns.h>
-#include <libconfig/lan.h>
-#include <libconfig/ppp.h>
-#include <libconfig/str.h>
-#include <libconfig/libtime.h>
-#include <libconfig/flashsave.h>
-#include <libconfig/mangle.h>
-#include <libconfig/nat.h>
-#include <libconfig/ntp.h>
-#include <libconfig/nv.h>
-#include <libconfig/pam.h>
-#include <libconfig/pim.h>
-#include <libconfig/defines.h>
-#include <libconfig/version.h>
-#include <libconfig/debug.h>
-#include <libconfig/qos.h>
-#include <libconfig/ipsec.h>
-#include <libconfig/exec.h>
-#include <libconfig/process.h>
-#include <libconfig/quagga.h>
-#include <libconfig/snmp.h>
-#include <libconfig/ppcio.h>
-#include <libconfig/md5.h>
-#include <libconfig/sha1.h>
+#include <librouter/options.h>
+#include <librouter/acl.h>
+#include <librouter/args.h>
+#include <librouter/cish_defines.h>
+#include <librouter/config_fetcher.h>
+#include <librouter/device.h>
+#include <librouter/typedefs.h>
+#include <librouter/ip.h>
+#include <librouter/dev.h>
+#include <librouter/dhcp.h>
+#include <librouter/dns.h>
+#include <librouter/lan.h>
+#include <librouter/ppp.h>
+#include <librouter/str.h>
+#include <librouter/libtime.h>
+#include <librouter/flashsave.h>
+#include <librouter/mangle.h>
+#include <librouter/nat.h>
+#include <librouter/ntp.h>
+#include <librouter/nv.h>
+#include <librouter/pam.h>
+#include <librouter/pim.h>
+#include <librouter/defines.h>
+#include <librouter/version.h>
+#include <librouter/debug.h>
+#include <librouter/qos.h>
+#include <librouter/ipsec.h>
+#include <librouter/exec.h>
+#include <librouter/process.h>
+#include <librouter/quagga.h>
+#include <librouter/snmp.h>
+#include <librouter/ppcio.h>
+#include <librouter/md5.h>
+#include <librouter/sha1.h>
 
 #ifdef OPTION_MODEM3G
-#include <libconfig/modem3G.h>
+#include <librouter/modem3G.h>
 #endif
 #ifdef OPTION_SMCROUTE
-#include <libconfig/smcroute.h>
+#include <librouter/smcroute.h>
 #endif
-#include <libconfig/tunnel.h>
+#include <librouter/tunnel.h>
 #ifdef OPTION_VRRP
-#include <libconfig/vrrp.h>
+#include <librouter/vrrp.h>
 #endif
-#include <libconfig/ssh.h>
-#include <libconfig/vlan.h>
+#include <librouter/ssh.h>
+#include <librouter/vlan.h>
 
 #define DEBUG
 #ifdef DEBUG

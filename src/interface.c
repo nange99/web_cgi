@@ -54,11 +54,11 @@ int handle_apply_intf_settings(struct request *req, struct response *resp)
 		up = cgi_request_get_parameter(req, "up");
 
 		if (dhcpc)
-			libconfig_exec_daemon (daemon_dhcpc);
+			librouter_exec_daemon (daemon_dhcpc);
 		else {
 			/* Kill DHCP client daemon if it is running */
-			if (libconfig_exec_check_daemon(daemon_dhcpc))
-				libconfig_kill_daemon(daemon_dhcpc);
+			if (librouter_exec_check_daemon(daemon_dhcpc))
+				librouter_kill_daemon(daemon_dhcpc);
 		}
 
 		ret = -1;
@@ -92,7 +92,7 @@ static cgi_table * _fetch_eth_info(void)
 
 	for (i = 0; i < ETHERNET_IFACE_NUM; i++) {
 		sprintf(iface, "ethernet%d", i);
-		if (libconfig_ip_iface_get_config(iface, &conf) < 0)
+		if (librouter_ip_iface_get_config(iface, &conf) < 0)
 			return NULL;
 
 		cgi_table_add_row(t);
@@ -120,7 +120,7 @@ static cgi_table * _fetch_lo_info(void)
 
 	for (i = 0; i < LOOPBACK_IFACE_NUM; i++) {
 		sprintf(iface, "loopback%d", i);
-		if (libconfig_ip_iface_get_config(iface, &conf) < 0)
+		if (librouter_ip_iface_get_config(iface, &conf) < 0)
 			return NULL;
 
 		cgi_table_add_row(t);
@@ -147,10 +147,10 @@ static cgi_table * _fetch_3g_info(void)
 
 	for (i = 0; i < M3G_IFACE_NUM; i++) {
 		sprintf(iface, "ppp%d", i);
-		if (libconfig_ip_iface_get_config(iface, &conf) < 0)
+		if (librouter_ip_iface_get_config(iface, &conf) < 0)
 			return NULL;
 
-		if (libconfig_ppp_get_config(i, &ppp_cfg) < 0)
+		if (librouter_ppp_get_config(i, &ppp_cfg) < 0)
 			return NULL;
 
 		cgi_table_add_row(t);
