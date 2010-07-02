@@ -41,7 +41,7 @@ $(function() {
 		buttons: { "OK" : function() { $(this).dialog("close"); } },
 		position: "center",
 		width: 400,
-		height: 150,
+		height: 200,
 		modal: true
 	});
 
@@ -52,14 +52,14 @@ $(function() {
 	<?foreach row in response.eth_table?>
 	$("#<?echo row.name?>-apply").click(function () {
 
-		var dhcp = $("#<?echo row.name?>-dhcpc").attr('checked');
+		dhcp = $("#<?echo row.name?>-dhcpc").attr('checked');
 
 		/* If DHCP Client is on we don't have
 		to check if typed IPs are valid */
 		if (dhcp == false) {
-			var ok = true;
-			var ok = verifyIPAddress($("#<?echo row.name?>-ipaddr")) && ok;
-			var ok = verifyIPAddress($("#<?echo row.name?>-ipmask")) && ok;
+			ok = true;
+			ok = verifyIPAddress($("#<?echo row.name?>-ipaddr")) && ok;
+			ok = verifyIPAddress($("#<?echo row.name?>-ipmask")) && ok;
 
 			if (ok == false) {
 				setTimeout(function () {
@@ -70,15 +70,17 @@ $(function() {
 			}
 		}
 		
-		var form = $(this).parents("form").get(0);
-		var form_data = $(this).parents("form").serialize();
+		form = $(this).parents("form").get(0);
+		form_data = $(this).parents("form").serialize();
 
+		/* Send via AJAX and warn if configuration was successful */
 		$.post(form.action, form_data, function (data) {
 			$("#myDialog").html(data);
 			$("#myDialog").dialog("open");
 		});
 	});
-	
+
+	/* Disable IPs field in case dhcp is selected */
 	$("#<?echo row.name?>-dhcpc").change(function () {
 		if ($(this).attr('checked')) {
 			$("#<?echo row.name?>-ipaddr").attr('disabled','disabled').addClass(".disabledField");
@@ -93,20 +95,39 @@ $(function() {
 	/* LOOPBACK FUNCTIONS */
 	<?foreach row in response.lo_table?>
 	$("#<?echo row.name?>-apply").click(function () {
-		var form = $(this).parent().serialize();
-		alert($(this).parents("form").serialize());
-		$("#myDialog").dialog("open");
+		/* Check for valid IPs */
+		ok = true;
+		ok = verifyIPAddress($("#<?echo row.name?>-ipaddr")) && ok;
+		ok = verifyIPAddress($("#<?echo row.name?>-ipmask")) && ok;
+	
+		if (ok == false) {
+				setTimeout(function () {
+					$("#<?echo row.name?>-ipaddr").removeClass("ui-state-error");
+					$("#<?echo row.name?>-ipmask").removeClass("ui-state-error");
+				}, 3000);
+				return;
+		}
+	
+		form = $(this).parents("form").get(0);
+		form_data = $(this).parents("form").serialize();
+	
+		/* Send via AJAX and warn if configuration was successful */
+		$.post(form.action, form_data, function (data) {
+			$("#myDialog").html(data);
+			$("#myDialog").dialog("open");
+		});
 	});
 	<?endforeach?>
 
 	/* 3G FUNCTIONS */
 	<?foreach row in response.m3g_table?>
 	$("#<?echo row.name?>-apply").click(function () {
-		var form = $(this).parents("form").get(0);
-		var form_data = $(this).parents("form").serialize();
-		/* alert($(this).parents("form").serialize()); DEBUG! */
-		
-		$.post(form.action, form_data, function () {
+		form = $(this).parents("form").get(0);
+		form_data = $(this).parents("form").serialize();
+	
+		/* Send via AJAX and warn if configuration was successful */
+		$.post(form.action, form_data, function (data) {
+			$("#myDialog").html(data);
 			$("#myDialog").dialog("open");
 		});
 	});
