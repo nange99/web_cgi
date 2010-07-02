@@ -28,7 +28,7 @@ static char *_convert_string_web_to_linux(device_type type, char *web_interface)
 
 	/* Position the string at the index */
 	web_interface += strlen(fam->web_string);
-	sprintf(linux_interface, "%s%s", fam->linux_string, web_interface);
+	snprintf(linux_interface, 32, "%s%s", fam->linux_string, web_interface);
 
 	return linux_interface;
 }
@@ -61,7 +61,7 @@ static int _apply_eth_settings(struct request *req, struct response *resp)
 		return -1;
 	}
 
-	sprintf(daemon_dhcpc, DHCPC_DAEMON, linux_interface);
+	snprintf(daemon_dhcpc, 32, DHCPC_DAEMON, linux_interface);
 
 	if (dhcpc)
 		libconfig_exec_daemon (daemon_dhcpc);
@@ -100,7 +100,7 @@ static int _apply_lo_settings(struct request *req, struct response *resp)
 	up = cgi_request_get_parameter(req, "up");
 
 	web_dbg("interface is %s\n", interface);
-	linux_interface = _convert_string_web_to_linux(eth, interface);
+	linux_interface = _convert_string_web_to_linux(lo, interface);
 	if (linux_interface == NULL) {
 		log_err("Linux interface not found\n");
 		return -1;
@@ -138,7 +138,7 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 	up = cgi_request_get_parameter(req, "up");
 
 	web_dbg("interface is %s\n", interface);
-	linux_interface = _convert_string_web_to_linux(eth, interface);
+	linux_interface = _convert_string_web_to_linux(ppp, interface);
 	if (linux_interface == NULL) {
 		log_err("Linux interface not found\n");
 		return -1;
@@ -230,11 +230,11 @@ static cgi_table * _fetch_eth_info(void)
 	t = cgi_table_create(6, "name", "speed", "ipaddr", "ipmask", "dhcpc", "up");
 
 	for (i = 0; i < ETHERNET_IFACE_NUM; i++) {
-		sprintf(iface, "%s%d", fam->linux_string, i);
+		snprintf(iface, 16, "%s%d", fam->linux_string, i);
 		if (libconfig_ip_iface_get_config(iface, &conf) < 0)
 			return NULL;
 
-		sprintf(iface, "%s%d", fam->web_string, i);
+		snprintf(iface, 16, "%s%d", fam->web_string, i);
 
 		cgi_table_add_row(t);
 
@@ -271,11 +271,11 @@ static cgi_table * _fetch_lo_info(void)
 	t = cgi_table_create(4, "name", "ipaddr", "ipmask", "up");
 
 	for (i = 0; i < LOOPBACK_IFACE_NUM; i++) {
-		sprintf(iface, "%s%d", fam->linux_string, i);
+		snprintf(iface, 16, "%s%d", fam->linux_string, i);
 		if (libconfig_ip_iface_get_config(iface, &conf) < 0)
 			return NULL;
 
-		sprintf(iface, "%s%d", fam->web_string, i);
+		snprintf(iface, 16,"%s%d", fam->web_string, i);
 
 		cgi_table_add_row(t);
 
@@ -311,14 +311,14 @@ static cgi_table * _fetch_3g_info(void)
 	t = cgi_table_create(5, "name", "apn", "user", "pass", "up");
 
 	for (i = 0; i < M3G_IFACE_NUM; i++) {
-		sprintf(iface, "%s%d", fam->linux_string, i);
+		snprintf(iface, 16, "%s%d", fam->linux_string, i);
 		if (libconfig_ip_iface_get_config(iface, &conf) < 0)
 			return NULL;
 
 		if (libconfig_ppp_get_config(i, &ppp_cfg) < 0)
 			return NULL;
 
-		sprintf(iface, "%s%d", fam->web_string, i);
+		snprintf(iface, 16, "%s%d", fam->web_string, i);
 		cgi_table_add_row(t);
 
 		cgi_table_add_value(t, "name", (char *) iface, CGI_STRING);
@@ -350,7 +350,6 @@ int handle_config_interface(struct request *req, struct response *resp)
 	eth_table = cgi_table_create(6, "name", "speed", "ipaddr", "ipmask", "dhcpc", "up");
 	lo_table = cgi_table_create(4, "name", "ipaddr", "ipmask", "up");
 	m3g_table = cgi_table_create(5, "name", "apn", "username", "password", "up");
-
 
 	eth_table = _fetch_eth_info();
 	if (eth_table == NULL) {
