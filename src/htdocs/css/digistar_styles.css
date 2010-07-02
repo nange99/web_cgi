@@ -129,6 +129,10 @@ body {
 	color: red;
 }
 
+#leftmenu ul.menu ul li .cur_menu {
+	color: red;	
+}
+
 #leftmenu ul.menu ul a:active,a:link,a:visited {
 	color: #29306C;
 	text-decoration: none;

@@ -39,6 +39,8 @@ int handle_firmware_version(struct request *req, struct response *resp)
 	cgi_response_add_parameter(resp, "version", version, CGI_STRING);
 	cgi_response_add_parameter(resp, "boot", boot, CGI_STRING);
 
+	cgi_response_add_parameter(resp, "menu_firmware", (void *) 1, CGI_INTEGER);
+
 	cgi_response_set_html(resp, "/wn/cgi/templates/firmware_info.html");
 
 	return 0;
@@ -50,6 +52,8 @@ int handle_firmware_upgrade(struct request *req, struct response *resp)
 		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
 		return 0;
 	}
+
+	cgi_response_add_parameter(resp, "menu_firmware", (void *) 2, CGI_INTEGER);
 
 	cgi_response_set_html(resp, "/wn/cgi/templates/firmware_upgrade.html");
 
