@@ -1,28 +1,52 @@
 <div id="leftmenu">
-	<div class="lvl1"> Configuration
-		<div class="lvl2"> <a href="/app/config_interfaces">Interfaces</a></div>
-		<div class="lvl2"> <a href="/app/config_static_routes">Static Routes</a></div>
-		<div class="lvl2"> <a href="/app/config_firewall">Firewall</a> </div>
-		<div class="lvl2"> <a href="/app/config_nat">Nat</a> </div>
-		<div class="lvl2"> <a href="/app/config_qos">QoS</a> </div>
-		<div class="lvl2"> <a href="/app/config_ipsec">IPSec</a> </div>
-		<div class="lvl2"> <a href="/app/config_snmp">SNMP</a> </div>
-		<div class="lvl2"> <a href="/app/config_auth">Authentication</a> </div>
-		<div class="lvl2"> <a href="/app/config_ntp">NTP</a> </div>
-	</div>
+	<ul class="menu noaccordion">
+<?if response.menu_config > 0 then?>
+	<li class="expand"> 
+<?else?>
+	<li> 
+<?endif?>
+		<a href="#" class="menu_parent">Configuration</a>
+		<ul class="acitem">
+			<li> <a href="/app/config_interfaces" <?if response.menu_config == 1 then?>class="cur_menu"<?endif?>>Interfaces</a></li>
+			<li> <a href="/app/config_static_routes" <?if response.menu_config == 2 then?>class="cur_menu"<?endif?>>Static Routes</a></li>
+			<li> <a href="/app/config_firewall" <?if response.menu_config == 3 then?>class="cur_menu"<?endif?>>Firewall</a> </li>
+			<li> <a href="/app/config_nat" <?if response.menu_config == 4 then?>class="cur_menu"<?endif?>>Nat</a> </li>
+			<li> <a href="/app/config_qos" <?if response.menu_config == 5 then?>class="cur_menu"<?endif?>>QoS</a> </li>
+			<li> <a href="/app/config_ipsec" <?if response.menu_config == 6 then?>class="cur_menu"<?endif?>>IPSec</a> </li>
+			<li> <a href="/app/config_snmp" <?if response.menu_config == 7 then?>class="cur_menu"<?endif?>>SNMP</a> </li>
+			<li> <a href="/app/config_auth" <?if response.menu_config == 8 then?>class="cur_menu"<?endif?>>Authentication</a> </li>
+			<li> <a href="/app/config_ntp" <?if response.menu_config == 9 then?>class="cur_menu"<?endif?>>NTP</a> </li>
+			<li> <a href="/app/config_dhcpd" <?if response.menu_config == 10 then?>class="cur_menu"<?endif?>>DHCP Server</a> </li>
+		</ul>
+	</li>
 	
-	<div class="lvl1"> Status
-		<div class="lvl2"> <a href="/app/status_interfaces">Interfaces</a></div>
-		<div class="lvl2"> <a href="/app/status_firewall">Firewall</a> </div>
-		<div class="lvl2"> <a href="/app/status_nat">Nat</a> </div>
-		<div class="lvl2"> <a href="/app/status_qos">QoS</a> </div>
-		<div class="lvl2"> <a href="/app/status_ipsec">IPSec</a> </div>
-		<div class="lvl2"> <a href="/app/status_snmp">SNMP</a> </div>
-		<div class="lvl2"> <a href="/app/status_auth">Authentication</a> </div>
-	</div>
+<?if response.menu_status > 0 then?>
+	<li class="expand"> 
+<?else?>
+	<li> 
+<?endif?>
+		<a href="#" class="menu_parent">Status</a>
+		<ul class="acitem">
+			<li> <a href="/app/status_interfaces" <?if response.menu_status == 1 then?>class="cur_menu"<?endif?>>Interfaces</a></li>
+			<li> <a href="/app/status_firewall" <?if response.menu_status == 2 then?>class="cur_menu"<?endif?>>Firewall</a> </li>
+			<li> <a href="/app/status_nat" <?if response.menu_status == 3 then?>class="cur_menu"<?endif?>>Nat</a> </li>
+			<li> <a href="/app/status_qos" <?if response.menu_status == 4 then?>class="cur_menu"<?endif?>>QoS</a> </li>
+			<li> <a href="/app/status_ipsec" <?if response.menu_status == 5 then?>class="cur_menu"<?endif?>>IPSec</a> </li>
+			<li> <a href="/app/status_snmp" <?if response.menu_status == 6 then?>class="cur_menu"<?endif?>>SNMP</a> </li>
+			<li> <a href="/app/status_auth" <?if response.menu_status == 7 then?>class="cur_menu"<?endif?>>Authentication</a> </li>
+		</ul>
+	</li>
 	
-	<div class="lvl1"> Firmware
-		<div class="lvl2"><a href="/app/firmware_upgrade">Upgrade</a></div>
-		<div class="lvl2"><a href="/app/firmware_info">Information</a></div>
-	</div>
+<?if response.menu_firmware > 0 then?>
+	<li class="expand"> 
+<?else?>
+	<li> 
+<?endif?>
+		<a href="#" class="menu_parent">Firmware</a>
+		<ul class="acitem">
+			<li><a href="/app/firmware_upgrade" <?if response.menu_firmware == 2 then?>class="cur_menu"<?endif?>>Upgrade</a></li>
+			<li><a href="/app/firmware_info" <?if response.menu_firmware == 1 then?>class="cur_menu"<?endif?>>Information</a></li>
+		</ul>
+	</li>
+	</ul>
 </div>

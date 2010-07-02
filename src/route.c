@@ -92,10 +92,12 @@ int handle_static_routes(struct request *req, struct response *resp)
 	}
 
 	cgi_response_add_parameter(resp, "table", (void *) t, CGI_TABLE);
-	if (table || del)
+	if (table || del) {
 		cgi_response_set_html(resp, "/wn/cgi/templates/list_route_table.html");
-	else
+	} else {
+		cgi_response_add_parameter(resp, "menu_config", (void *) 2, CGI_INTEGER);
 		cgi_response_set_html(resp, "/wn/cgi/templates/list_route.html");
+	}
 
 	libconfig_quagga_free_routes(route);
 

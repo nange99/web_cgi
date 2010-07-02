@@ -371,6 +371,7 @@ int handle_config_interface(struct request *req, struct response *resp)
 	}
 
 	web_dbg("Filling tables...\n");
+	cgi_response_add_parameter(resp, "menu_config", (void *) 1, CGI_INTEGER);
 	cgi_response_add_parameter(resp, "eth_table", (void *) eth_table, CGI_TABLE);
 	cgi_response_add_parameter(resp, "lo_table", (void *) lo_table, CGI_TABLE);
 	cgi_response_add_parameter(resp, "m3g_table", (void *) m3g_table, CGI_TABLE);

@@ -156,6 +156,7 @@ int handle_config_firewall(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	cgi_response_add_parameter(resp, "menu_config", (void *) 3, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/config_firewall.html");
 
 	return 1;
@@ -168,6 +169,7 @@ int handle_config_nat(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	cgi_response_add_parameter(resp, "menu_config", (void *) 4, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/config_nat.html");
 
 	return 1;
@@ -180,6 +182,7 @@ int handle_config_qos(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	cgi_response_add_parameter(resp, "menu_config", (void *) 5, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/config_qos.html");
 
 	return 1;
@@ -192,6 +195,7 @@ int handle_config_ipsec(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	cgi_response_add_parameter(resp, "menu_config", (void *) 6, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/config_ipsec.html");
 
 	return 1;
@@ -204,6 +208,7 @@ int handle_config_snmp(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	cgi_response_add_parameter(resp, "menu_config", (void *) 7, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/config_snmp.html");
 
 	return 1;
@@ -216,6 +221,7 @@ int handle_config_auth(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	cgi_response_add_parameter(resp, "menu_config", (void *) 8, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/config_auth.html");
 
 	return 1;
@@ -228,7 +234,21 @@ int handle_config_ntp(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	cgi_response_add_parameter(resp, "menu_config", (void *) 9, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/config_ntp.html");
+
+	return 1;
+}
+
+int handle_config_dhcpd(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_add_parameter(resp, "menu_config", (void *) 10, CGI_INTEGER);
+	cgi_response_set_html(resp, "/wn/cgi/templates/config_dhcpd.html");
 
 	return 1;
 }
@@ -240,6 +260,7 @@ int handle_status_interfaces(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	cgi_response_add_parameter(resp, "menu_status", (void *) 1, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/status_interfaces.html");
 
 	return 1;
@@ -252,6 +273,7 @@ int handle_status_firewall(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	cgi_response_add_parameter(resp, "menu_status", (void *) 2, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/status_firewall.html");
 
 	return 1;
@@ -264,6 +286,7 @@ int handle_status_nat(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	cgi_response_add_parameter(resp, "menu_status", (void *) 3, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/status_nat.html");
 
 	return 1;
@@ -276,6 +299,7 @@ int handle_status_qos(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	cgi_response_add_parameter(resp, "menu_status", (void *) 4, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/status_qos.html");
 
 	return 1;
@@ -288,6 +312,7 @@ int handle_status_ipsec(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	cgi_response_add_parameter(resp, "menu_status", (void *) 5, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/status_ipsec.html");
 
 	return 1;
@@ -300,6 +325,7 @@ int handle_status_snmp(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	cgi_response_add_parameter(resp, "menu_status", (void *) 6, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/status_snmp.html");
 
 	return 1;
@@ -312,6 +338,7 @@ int handle_status_auth(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	cgi_response_add_parameter(resp, "menu_status", (void *) 7, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/status_auth.html");
 
 	return 1;
@@ -347,6 +374,7 @@ int main(int argc, char **argv)
 		{ .url = "/config_snmp", .handler = handle_config_snmp },
 		{ .url = "/config_auth", .handler = handle_config_auth },
 		{ .url = "/config_ntp", .handler = handle_config_ntp },
+		{ .url = "/config_dhcpd", .handler = handle_config_dhcpd },
 		{ .url = "/status_interfaces", .handler = handle_status_interfaces },
 		{ .url = "/status_firewall", .handler = handle_status_firewall },
 		{ .url = "/status_nat", .handler = handle_status_nat },
