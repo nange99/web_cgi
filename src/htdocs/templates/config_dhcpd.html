@@ -13,6 +13,10 @@
 	margin-top: 25px;
 	float: none;
 }
+
+label {
+	width: 20em;
+}
 </style>
 <script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="/js/jquery-ui-1.8.2.custom.min.js"></script>
@@ -22,6 +26,9 @@
 $(function() {
 	$("#intfTabs").tabs();
 
+	/* Set maximum length for text inputs */
+	$(':text').attr('maxlength','50');
+
 	/* Define message dialog */
 	$("#notificationDialog").dialog({
 		autoOpen: false,
@@ -30,6 +37,40 @@ $(function() {
 		width: 400,
 		height: 150,
 		modal: true
+	});
+
+	$("#dhcp-apply").click(function () {
+		server = $("#dhcp-server").attr('checked');
+
+		ok = true;
+		ok = verifyIPAddress($("#poolstart")) && ok;
+		ok = verifyIPAddress($("#poolend")) && ok;
+
+		/* Empty IP fields are accepted. We only need to check
+		for a valid IP if something is written */
+		if (isTextFieldEmpty($("#router")) == false)
+			ok = verifyIPAddress($("#router")) && ok;
+		if (isTextFieldEmpty($("#dnsserver")) == false)
+			ok = verifyIPAddress($("#dnsserver")) && ok;
+
+		if (ok == false) {
+			setTimeout(function () {
+				$("#poolstart").removeClass("ui-state-error");
+				$("#poolend").removeClass("ui-state-error");
+				$("#router").removeClass("ui-state-error");
+				$("#dnsserver").removeClass("ui-state-error");
+			}, 3000);
+			return;
+		}
+
+		form = $(this).parents("form").get(0);
+		form_data = $(this).parents("form").serialize();
+
+		/* Send via AJAX and warn if configuration was successful */
+		$.post(form.action, form_data, function (data) {
+			$("#notificationDialog").html(data);
+			$("#notificationDialog").dialog("open");
+		});
 	});
 });
 </script>
@@ -47,23 +88,43 @@ $(function() {
 	<li><a href="#tab-users">Connected Users</a></li>
 </ul>
 <div id="tab-server">
-	<form id="form-ntp" action="/app/config_intf" method="post">
+	<form id="form-ntp" action="/app/apply_dhcp_settings" method="post">
 		<fieldset>
 			<legend>DHCP Server Configuration</legend>
 			<div>
 				<label for="dhcp-server">Enable: </label>
-				<input type="checkbox" name="enable_server" id="dhcp-server" class="text ui-widget-content ui-corner-all" />
+				<input type="checkbox" name="enable_server" id="dhcp-server" <?if response.enable_server then?>checked="checked"<?endif?> class="text ui-widget-content ui-corner-all" />
 			</div>
 			<div>
-				<label for="ipaddr">IP Address: </label>
-				<input type="text" name="ipaddr" id="ipaddr" value="" class="text ui-widget-content ui-corner-all" />
+				<label for="poolstart">Pool Start: </label>
+				<input type="text" name="poolstart" id="poolstart" value="<?echo response.poolstart?>" class="text ui-widget-content ui-corner-all" />
 			</div>
 			<div>
-				<label for="mask">Mask: </label>
-				<input type="text" name="mask" id="mask" value="" class="text ui-widget-content ui-corner-all" />
+				<label for="poolend">Pool End: </label>
+				<input type="text" name="poolend" id="poolend" value="<?echo response.poolend?>" class="text ui-widget-content ui-corner-all" />
+			</div>
+			<div>
+				<label for="router">Default Gateway (Optional): </label>
+				<input type="text" name="router" id="router" value="<?echo response.default_router?>" class="text ui-widget-content ui-corner-all" />
+			</div>
+			<div>
+				<label for="dnsserver">DNS Server (Optional): </label>
+				<input type="text" name="dnsserver" id="dnsserver" value="<?echo response.dnsserver?>" class="text ui-widget-content ui-corner-all" />
+			</div>
+			<div>
+				<label for="domain">Domain Name (Optional): </label>
+				<input type="text" name="domain" id="domain" value="<?echo response.domain?>" class="text ui-widget-content ui-corner-all" />
+			</div>
+			<div>
+				<label for="leasetime">Lease Time (Optional): </label>
+				<input type="text" name="leasetime" id="leasetime" value="<?echo response.default_lease_time?>" class="text ui-widget-content ui-corner-all" />
+			</div>
+			<div>
+				<label for="maxleasetime">Maximum Lease Time (Optional): </label>
+				<input type="text" name="maxleasetime" id="maxleasetime" value="<?echo response.max_lease_time?>" class="text ui-widget-content ui-corner-all" />
 			</div>
 			<div style="float:right">		 
-				<input type="button" id="timezone-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
+				<input type="button" id="dhcp-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
 			</div>
 		</fieldset>
 	</form>

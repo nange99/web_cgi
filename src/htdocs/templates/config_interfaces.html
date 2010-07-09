@@ -36,7 +36,7 @@ $(function() {
 	$("#intfTabs").tabs();
 
 	/* Define message dialog */
-	$("#myDialog").dialog({
+	$("#notificationDialog").dialog({
 		autoOpen: false,
 		buttons: { "OK" : function() { $(this).dialog("close"); } },
 		position: "center",
@@ -75,8 +75,8 @@ $(function() {
 
 		/* Send via AJAX and warn if configuration was successful */
 		$.post(form.action, form_data, function (data) {
-			$("#myDialog").html(data);
-			$("#myDialog").dialog("open");
+			$("#notificationDialog").html(data);
+			$("#notificationDialog").dialog("open");
 		});
 	});
 
@@ -113,8 +113,8 @@ $(function() {
 	
 		/* Send via AJAX and warn if configuration was successful */
 		$.post(form.action, form_data, function (data) {
-			$("#myDialog").html(data);
-			$("#myDialog").dialog("open");
+			$("#notificationDialog").html(data);
+			$("#notificationDialog").dialog("open");
 		});
 	});
 	<?endforeach?>
@@ -127,8 +127,8 @@ $(function() {
 	
 		/* Send via AJAX and warn if configuration was successful */
 		$.post(form.action, form_data, function (data) {
-			$("#myDialog").html(data);
-			$("#myDialog").dialog("open");
+			$("#notificationDialog").html(data);
+			$("#notificationDialog").dialog("open");
 		});
 	});
 	<?endforeach?>
@@ -275,7 +275,7 @@ $(function() {
 <?endforeach?>
 </div>
   
-<div id="myDialog" title="Notification">
+<div id="notificationDialog" title="Notification">
 </div>
 		
 </div>
