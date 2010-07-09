@@ -38,6 +38,33 @@ function verifyInterfaceType(name) {
 	return 0;
 }
 
+/**
+ * isTextFieldEmpty		Check if a text field is empty
+ * 
+ * @param obj
+ * @return true if empty, false otherwise
+ */
+function isTextFieldEmpty(obj) {
+	var x = obj.val();
+	
+	if (x.length == 0)
+		return true;
+	else
+		return false;
+}
+
+function isText(obj) {
+	var x = /\w*/;
+	
+	return (x.test(obj.val()));	
+}
+
+function isNaturalValue(obj) {
+	var x = /\d*/;
+	
+	return (x.test(obj.val()));
+}
+
 /* IP address validation */
 function verifyIPAddress(obj) {
 	var x = obj.val();
