@@ -18,6 +18,9 @@
 #include <libcgiservlet/cgi_session.h>
 #include <libcgiservlet/cgi_upload.h>
 
+#include <librouter/version.h>
+#include <librouter/flashsave.h>
+
 #include "firmware.h"
 #include "web_config.h"
 

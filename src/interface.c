@@ -4,10 +4,28 @@
  *  Created on: May 28, 2010
  *      Author: Thomás Alimena Del Grande (tgrande@pd3.com.br)
  */
-#include "web_config.h"
-#include "interface.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <syslog.h>
 
 #include <net/if_arp.h>
+
+#include <libcgiservlet/cgi_servlet.h>
+#include <libcgiservlet/cgi_session.h>
+#include <libcgiservlet/cgi_table.h>
+
+#include <librouter/options.h>
+#include <librouter/device.h>
+#include <librouter/dhcp.h>
+#include <librouter/exec.h>
+#include <librouter/ip.h>
+#include <librouter/dev.h>
+#include <librouter/ppp.h>
+#include <librouter/modem3G.h>
+
+#include "web_config.h"
+#include "interface.h"
 
 /**
  * _convert_string_web_to_linux		Convert web to linux string
@@ -47,12 +65,12 @@ static int _apply_eth_settings(struct request *req, struct response *resp)
 	char *linux_interface;
 
 	/* Handle Ethernet */
-	interface = cgi_request_get_parameter(req, "name");
-	dhcpc = cgi_request_get_parameter(req, "dhcpc");
-	ipaddr = cgi_request_get_parameter(req, "ipaddr");
-	ipmask = cgi_request_get_parameter(req, "ipmask");
-	speed = cgi_request_get_parameter(req, "speed");
-	up = cgi_request_get_parameter(req, "up");
+	interface = _get_parameter(req, "name");
+	dhcpc = _get_parameter(req, "dhcpc");
+	ipaddr = _get_parameter(req, "ipaddr");
+	ipmask = _get_parameter(req, "ipmask");
+	speed = _get_parameter(req, "speed");
+	up = _get_parameter(req, "up");
 
 	web_dbg("interface is %s\n", interface);
 	linux_interface = _convert_string_web_to_linux(eth, interface);
@@ -94,10 +112,10 @@ static int _apply_lo_settings(struct request *req, struct response *resp)
 	char *interface, *ipaddr, *ipmask, *up;
 	char *linux_interface;
 
-	interface = cgi_request_get_parameter(req, "name");
-	ipaddr = cgi_request_get_parameter(req, "ipaddr");
-	ipmask = cgi_request_get_parameter(req, "ipmask");
-	up = cgi_request_get_parameter(req, "up");
+	interface = _get_parameter(req, "name");
+	ipaddr = _get_parameter(req, "ipaddr");
+	ipmask = _get_parameter(req, "ipmask");
+	up = _get_parameter(req, "up");
 
 	web_dbg("interface is %s\n", interface);
 	linux_interface = _convert_string_web_to_linux(lo, interface);
@@ -130,12 +148,12 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 	char *linux_interface;
 	int major;
 
-	interface = cgi_request_get_parameter(req, "name");
-	apn = cgi_request_get_parameter(req, "apn");
-	user = cgi_request_get_parameter(req, "user");
-	pass = cgi_request_get_parameter(req, "pass");
-	sim = cgi_request_get_parameter(req, "sim");
-	up = cgi_request_get_parameter(req, "up");
+	interface = _get_parameter(req, "name");
+	apn = _get_parameter(req, "apn");
+	user = _get_parameter(req, "user");
+	pass = _get_parameter(req, "pass");
+	sim = _get_parameter(req, "sim");
+	up = _get_parameter(req, "up");
 
 	web_dbg("interface is %s\n", interface);
 	linux_interface = _convert_string_web_to_linux(ppp, interface);
@@ -180,7 +198,7 @@ int handle_apply_intf_settings(struct request *req, struct response *resp)
 		return 0;
 	}
 
-	interface = cgi_request_get_parameter(req, "name");
+	interface = _get_parameter(req, "name");
 	if (interface == NULL) {
 		log_err("NULL interface received by handler\n");
 		return ret;
@@ -231,7 +249,7 @@ static cgi_table * _fetch_eth_info(void)
 
 	for (i = 0; i < ETHERNET_IFACE_NUM; i++) {
 		snprintf(iface, 16, "%s%d", fam->linux_string, i);
-		if (librouter_ip_iface_get_config(iface, &conf) < 0)
+		if (librouter_ip_iface_get_config(iface, &conf, NULL) < 0)
 			return NULL;
 
 		snprintf(iface, 16, "%s%d", fam->web_string, i);
@@ -272,7 +290,7 @@ static cgi_table * _fetch_lo_info(void)
 
 	for (i = 0; i < LOOPBACK_IFACE_NUM; i++) {
 		snprintf(iface, 16, "%s%d", fam->linux_string, i);
-		if (librouter_ip_iface_get_config(iface, &conf) < 0)
+		if (librouter_ip_iface_get_config(iface, &conf, NULL) < 0)
 			return NULL;
 
 		snprintf(iface, 16,"%s%d", fam->web_string, i);
@@ -312,7 +330,7 @@ static cgi_table * _fetch_3g_info(void)
 
 	for (i = 0; i < M3G_IFACE_NUM; i++) {
 		snprintf(iface, 16, "%s%d", fam->linux_string, i);
-		if (librouter_ip_iface_get_config(iface, &conf) < 0)
+		if (librouter_ip_iface_get_config(iface, &conf, NULL) < 0)
 			return NULL;
 
 		if (librouter_ppp_get_config(i, &ppp_cfg) < 0)

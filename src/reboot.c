@@ -13,11 +13,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-
 #include <sys/reboot.h>
 
 #include <libcgiservlet/cgi_servlet.h>
 #include <libcgiservlet/cgi_session.h>
+#include <libcgiservlet/cgi_table.h>
+
+#include <librouter/options.h>
 
 #include "web_config.h"
 

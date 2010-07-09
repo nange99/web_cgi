@@ -4,6 +4,20 @@
  *  Created on: Jun 14, 2010
  *      Author: Thomás Alimena Del Grande (tgrande@pd3.com.br)
  */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <syslog.h>
+#include <unistd.h>
+#include <ctype.h>
+
+#include <libcgiservlet/cgi_servlet.h>
+#include <libcgiservlet/cgi_session.h>
+#include <libcgiservlet/cgi_table.h>
+
+#include <librouter/options.h>
+#include <librouter/quagga.h>
+
 #include "web_config.h"
 #include "route.h"
 
@@ -20,11 +34,11 @@ int handle_add_route(struct request *req, struct response *resp)
 	memset(route, 0, sizeof(struct routes_t));
 
 	/* Get form info */
-	route->network = cgi_request_get_parameter(req, "dest");
-	route->mask = cgi_request_get_parameter(req, "mask");
-	route->gateway = cgi_request_get_parameter(req, "gateway");
-	route->interface = cgi_request_get_parameter(req, "interface");
-	route->metric = atoi(cgi_request_get_parameter(req, "metric"));
+	route->network = _get_parameter(req, "dest");
+	route->mask = _get_parameter(req, "mask");
+	route->gateway = _get_parameter(req, "gateway");
+	route->interface = _get_parameter(req, "interface");
+	route->metric = atoi(_get_parameter(req, "metric"));
 
 	web_dbg("network = %s\n", route->network);
 	web_dbg("mask = %s\n", route->mask);
@@ -49,14 +63,14 @@ int handle_static_routes(struct request *req, struct response *resp)
 		return 0;
 	}
 
-	del = cgi_request_get_parameter(req, "del");
+	del = _get_parameter(req, "del");
 
 	/* Check if we are deleting one entry */
 	if (del)
 		librouter_quagga_del_route(del);
 
 	/* Check if returning just table (AJAX) */
-	table = cgi_request_get_parameter(req, "table");
+	table = _get_parameter(req, "table");
 
 	t = cgi_table_create(6, "dest", "mask", "gateway", "interface", "metric", "hash");
 
