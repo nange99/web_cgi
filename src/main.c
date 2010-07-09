@@ -4,15 +4,56 @@
  *  Created on: May 26, 2010
  *      Author: tgrande
  */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <syslog.h>
+#include <unistd.h>
+#include <ctype.h>
+
 #include <libcgiservlet/cgi_servlet.h>
 #include <libcgiservlet/cgi_session.h>
 #include <libcgiservlet/cgi_table.h>
+
+#include <librouter/pam.h>
+#include <librouter/config_fetcher.h>
+#include <librouter/defines.h>
+#include <librouter/nv.h>
 
 #include "web_config.h"
 #include "reboot.h"
 #include "route.h"
 #include "firmware.h"
 #include "interface.h"
+#include "dhcp.h"
+
+/**
+ * _get_parameter	Wrapper for _get_parameter
+ *
+ * @param req
+ * @param param
+ * @return cgi string pointer
+ */
+char *_get_parameter(struct request *req, char *param)
+{
+	char *value;
+	value = cgi_request_get_parameter(req, param);
+
+	if (value == NULL)
+		return NULL;
+
+	if (strlen(value) == 0)
+		return NULL;
+
+	if (strlen(value) > CGI_MAX_PARAM_LEN)
+		return NULL;
+
+	return value;
+}
+
+/*****************/
+/* Main handlers */
+/*****************/
 
 /**
  * Go to home page
@@ -50,8 +91,8 @@ int handle_login(struct request *req, struct response *resp)
 	}
 
 	/* Get User and Pass */
-	username = cgi_request_get_parameter(req, "username");
-	password = cgi_request_get_parameter(req, "password");
+	username = _get_parameter(req, "username");
+	password = _get_parameter(req, "password");
 
 	/* This may be the first access, so the fields might be NULL */
 	if ((username == NULL) && (password == NULL)) {
@@ -240,19 +281,6 @@ int handle_config_ntp(struct request *req, struct response *resp)
 	return 1;
 }
 
-int handle_config_dhcpd(struct request *req, struct response *resp)
-{
-	if (!cgi_session_exists(req)) {
-		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
-		return 0;
-	}
-
-	cgi_response_add_parameter(resp, "menu_config", (void *) 10, CGI_INTEGER);
-	cgi_response_set_html(resp, "/wn/cgi/templates/config_dhcpd.html");
-
-	return 1;
-}
-
 int handle_status_interfaces(struct request *req, struct response *resp)
 {
 	if (!cgi_session_exists(req)) {
@@ -374,7 +402,10 @@ int main(int argc, char **argv)
 		{ .url = "/config_snmp", .handler = handle_config_snmp },
 		{ .url = "/config_auth", .handler = handle_config_auth },
 		{ .url = "/config_ntp", .handler = handle_config_ntp },
+
 		{ .url = "/config_dhcpd", .handler = handle_config_dhcpd },
+		{ .url = "/apply_dhcp_settings", .handler = handle_apply_dhcpd_settings },
+
 		{ .url = "/status_interfaces", .handler = handle_status_interfaces },
 		{ .url = "/status_firewall", .handler = handle_status_firewall },
 		{ .url = "/status_nat", .handler = handle_status_nat },
