@@ -53,16 +53,27 @@ function isTextFieldEmpty(obj) {
 		return false;
 }
 
-function isText(obj) {
-	var x = /\w*/;
+function inRange(obj, min, max) {
+	var ok = true;
+	var value = obj.val();
+	var bla;
 	
-	return (x.test(obj.val()));	
-}
-
-function isNaturalValue(obj) {
-	var x = /\d*/;
+	if (isNaN(value)) /* Test if entry is a valid number */
+		ok = false;
 	
-	return (x.test(obj.val()));
+	if (parseInt(value) < min)
+		ok = false;
+	
+	if (parseInt(value) > max)
+		ok = false;
+	
+	if (ok == false) {
+		obj.addClass("ui-state-error");
+	} else {
+		obj.removeClass("ui-state-error");
+	}
+	
+	return ok;
 }
 
 /* IP address validation */
