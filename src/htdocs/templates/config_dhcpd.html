@@ -42,7 +42,7 @@ $(function() {
 	$("#dhcp-apply").click(function () {
 		server = $("#dhcp-server").attr('checked');
 
-		ok = true;
+		var ok = true;
 		ok = verifyIPAddress($("#poolstart")) && ok;
 		ok = verifyIPAddress($("#poolend")) && ok;
 
@@ -52,13 +52,19 @@ $(function() {
 			ok = verifyIPAddress($("#router")) && ok;
 		if (isTextFieldEmpty($("#dnsserver")) == false)
 			ok = verifyIPAddress($("#dnsserver")) && ok;
-
+		if (isTextFieldEmpty($("#leasetime")) == false)
+			ok = inRange($("#leasetime"), 60, 1000000) && ok;
+		if (isTextFieldEmpty($("#maxleasetime")) == false)
+			ok = inRange($("#maxleasetime"), 60, 1000000) && ok;
+			
 		if (ok == false) {
 			setTimeout(function () {
 				$("#poolstart").removeClass("ui-state-error");
 				$("#poolend").removeClass("ui-state-error");
 				$("#router").removeClass("ui-state-error");
 				$("#dnsserver").removeClass("ui-state-error");
+				$("#leasetime").removeClass("ui-state-error");
+				$("#maxleasetime").removeClass("ui-state-error");
 			}, 3000);
 			return;
 		}
@@ -105,7 +111,7 @@ $(function() {
 			</div>
 			<div>
 				<label for="router">Default Gateway (Optional): </label>
-				<input type="text" name="router" id="router" value="<?echo response.default_router?>" class="text ui-widget-content ui-corner-all" />
+				<input type="text" name="router" id="router" value="<?echo response.router?>" class="text ui-widget-content ui-corner-all" />
 			</div>
 			<div>
 				<label for="dnsserver">DNS Server (Optional): </label>
@@ -135,25 +141,17 @@ $(function() {
     <tr>
         <th>MAC Address</th>
         <th>IP</th>
-        <th>Last Renew</th>
+        <th>Expires in</th>
     </tr>
 </thead>
 <tbody>
+	<?foreach row in response.connected?>
 	<tr>
-		<td>AA:BB:CC:DD:EE:FF</td>
-		<td>10.10.10.10</td>
-		<td>2010/07/01 10:10:10</td>
+		<td><?echo row.mac?></td>
+		<td><?echo row.ipaddr?></td>
+		<td><?echo row.lease_time?></td>
 	</tr>
-	<tr class="odd">
-		<td>AA:BB:CC:DD:EE:FF</td>
-		<td>10.10.10.10</td>
-		<td>2010/07/01 10:10:10</td>
-	</tr>
-	<tr>
-		<td>AA:BB:CC:DD:EE:FF</td>
-		<td>10.10.10.10</td>
-		<td>2010/07/01 10:10:10</td>
-	</tr>
+	<?endforeach?>
 </tbody>
 </table>
 </div>

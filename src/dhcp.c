@@ -13,6 +13,7 @@
 
 #include <libcgiservlet/cgi_servlet.h>
 #include <libcgiservlet/cgi_session.h>
+#include <libcgiservlet/cgi_table.h>
 
 #include <librouter/options.h>
 #include <librouter/dhcp.h>
@@ -53,6 +54,35 @@ int handle_apply_dhcpd_settings(struct request *req, struct response *resp)
 	return ret;
 }
 
+static int _show_leases(struct response *resp)
+{
+	cgi_table *table;
+	struct dhcp_lease_t leases[DHCP_MAX_NUM_LEASES], *l;
+
+	memset(leases, 0, sizeof(leases));
+
+	if (librouter_dhcp_server_get_leases(leases) < 0) {
+		log_err("Could not fetch leases information\n");
+		return -1;
+	}
+
+	table = cgi_table_create(3, "mac","ipaddr","lease_time");
+
+	l = leases;
+	while (l->mac) {
+		cgi_table_add_row(table);
+		cgi_table_add_value(table, "mac", (char *) l->mac, CGI_STRING);
+		cgi_table_add_value(table, "ipaddr", (char *) l->ipaddr, CGI_STRING);
+		cgi_table_add_value(table, "lease_time", (char *) l->lease_time, CGI_STRING);
+		l++;
+	}
+
+	cgi_response_add_parameter(resp, "connected", (void *)table, CGI_TABLE);
+	librouter_dhcp_server_free_leases(leases);
+
+	return 0;
+}
+
 int handle_config_dhcpd(struct request *req, struct response *resp)
 {
 	struct dhcp_server_conf_t conf;
@@ -66,6 +96,8 @@ int handle_config_dhcpd(struct request *req, struct response *resp)
 		log_err("Could not get DHCP server configuration\n");
 		return -1;
 	}
+
+	_show_leases(resp); /* Create table with current leases */
 
 	cgi_response_add_parameter(resp, "enable_server", (void *) conf.enable, CGI_INTEGER);
 
