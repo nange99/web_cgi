@@ -27,6 +27,7 @@
 #include "interface.h"
 #include "dhcp.h"
 #include "logging.h"
+#include "cpu.h"
 
 /**
  * _get_parameter	Wrapper for _get_parameter
@@ -415,6 +416,8 @@ int main(int argc, char **argv)
 		{ .url = "/status_snmp", .handler = handle_status_snmp },
 		{ .url = "/status_auth", .handler = handle_status_auth },
 		{ .url = "/status_logging", .handler = handle_status_logging },
+		{ .url = "/status_cpu", .handler = handle_status_cpu },
+		{ .url = "/status_memory", .handler = handle_status_memory },
 
 
 		/* Firmware */

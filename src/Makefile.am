@@ -11,7 +11,8 @@ web_digistar_SOURCES = \
 	firewall.c \
 	nat.c \
 	ipsec.c \
-	logging.c
+	logging.c \
+	cpu.c
 
 htmlfilesdir = $(datadir)
 cssdir = $(datadir)/css

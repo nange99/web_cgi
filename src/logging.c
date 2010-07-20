@@ -41,7 +41,10 @@ int handle_status_logging(struct request *req, struct response *resp)
 	stat("/var/log/messages", &st);
 	buf = malloc(st.st_size);
 
+	web_dbg("File messages has size is %d\n", st.st_size);
+
 	fread(buf, st.st_size, 1, f);
+	fclose(f);
 
 	cgi_response_add_parameter(resp, "log", (char *) buf, CGI_STRING);
 	cgi_response_add_parameter(resp, "menu_status", (void *) 8, CGI_INTEGER);

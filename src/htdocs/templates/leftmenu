@@ -35,6 +35,8 @@
 			<li> <a href="/app/status_snmp" <?if response.menu_status == 6 then?>class="cur_menu"<?endif?>>SNMP</a> </li>
 			<li> <a href="/app/status_auth" <?if response.menu_status == 7 then?>class="cur_menu"<?endif?>>Authentication</a> </li>
 			<li> <a href="/app/status_logging" <?if response.menu_status == 8 then?>class="cur_menu"<?endif?>>Logging</a> </li>
+			<li> <a href="/app/status_cpu" <?if response.menu_status == 9 then?>class="cur_menu"<?endif?>>CPU</a> </li>
+			<li> <a href="/app/status_memory" <?if response.menu_status == 10 then?>class="cur_menu"<?endif?>>Memory</a> </li>
 		</ul>
 	</li>
 	
