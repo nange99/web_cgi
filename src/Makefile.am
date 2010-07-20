@@ -7,7 +7,11 @@ web_digistar_SOURCES = \
 	reboot.c \
 	route.c \
 	firmware.c \
-	dhcp.c
+	dhcp.c \
+	firewall.c \
+	nat.c \
+	ipsec.c \
+	logging.c
 
 htmlfilesdir = $(datadir)
 cssdir = $(datadir)/css

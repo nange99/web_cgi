@@ -34,6 +34,7 @@
 			<li> <a href="/app/status_ipsec" <?if response.menu_status == 5 then?>class="cur_menu"<?endif?>>IPSec</a> </li>
 			<li> <a href="/app/status_snmp" <?if response.menu_status == 6 then?>class="cur_menu"<?endif?>>SNMP</a> </li>
 			<li> <a href="/app/status_auth" <?if response.menu_status == 7 then?>class="cur_menu"<?endif?>>Authentication</a> </li>
+			<li> <a href="/app/status_logging" <?if response.menu_status == 8 then?>class="cur_menu"<?endif?>>Logging</a> </li>
 		</ul>
 	</li>
 	

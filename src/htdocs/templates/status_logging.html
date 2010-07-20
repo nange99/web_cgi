@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" dir="ltr">
+<head>
+<title>System Log</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="/css/digistar_styles.css"/>
+<link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.2.custom.css"/>
+<script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="/js/jquery-ui-1.8.2.custom.min.js"></script>
+<script type="text/javascript" src="/js/router.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+<style type="text/css">
+#log {
+	margin-top: 20px; 
+	margin-left: 10px; 
+	font-size: 10px; 
+	overflow:auto;
+	width: 670px;
+	height: 650px;
+}
+</style>
+</head>
+
+<body>
+<div id="bodywrap">
+<?include "/wn/cgi/templates/topmenu"?>
+<?include "/wn/cgi/templates/leftmenu" ?>
+	<div id="content">
+		<h1>System Log</h1>
+		<div id="log">
+			<pre><?echo response.log?></pre>
+		</div>
+	</div>
+</div>
+</body>
+</html>

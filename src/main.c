@@ -26,6 +26,7 @@
 #include "firmware.h"
 #include "interface.h"
 #include "dhcp.h"
+#include "logging.h"
 
 /**
  * _get_parameter	Wrapper for _get_parameter
@@ -413,6 +414,7 @@ int main(int argc, char **argv)
 		{ .url = "/status_ipsec", .handler = handle_status_ipsec },
 		{ .url = "/status_snmp", .handler = handle_status_snmp },
 		{ .url = "/status_auth", .handler = handle_status_auth },
+		{ .url = "/status_logging", .handler = handle_status_logging },
 
 
 		/* Firmware */
@@ -421,6 +423,7 @@ int main(int argc, char **argv)
 		{.url ="/firmware_upgrade_frame", .handler = handle_firmware_upgrade_frame },
 		{.url ="/firmware_upgrade_save", .handler = handle_firmware_receive_file}
 	};
+	struct url_mapping **map_p = (struct url_mapping **)((void *) &map);
 
 	struct config conf = {
 		NULL
@@ -431,7 +434,7 @@ int main(int argc, char **argv)
 
 	web_dbg("web_digistar is running as %d UID. Config size is %d\n", geteuid(), size);
 
-	cgi_servlet_init (&conf, (struct url_mapping *)&map, size, NULL);
+	cgi_servlet_init (&conf, map_p, size, NULL);
 
 	web_dbg("web_digistar done!\n");
 
