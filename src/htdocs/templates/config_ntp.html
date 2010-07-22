@@ -21,16 +21,105 @@
 <script type="text/javascript">
 $(function() {
 	$("#intfTabs").tabs();
-	$("#datepicker").datepicker();
-	
+	$("#datepicker").datepicker({
+			dateFormat: 'dd/mm/yy'
+	});
+
+	/* Set maximum length for text inputs */
+	$(':text').attr('maxlength','50');
+
+	$("#gmt<?echo response.tzvalue?>").attr('selected','selected');
+		
 	/* Define message dialog */
-	$("#myDialog").dialog({
+	$("#notificationDialog").dialog({
 		autoOpen: false,
 		buttons: { "OK" : function() { $(this).dialog("close"); } },
 		position: "center",
 		width: 400,
 		height: 150,
 		modal: true
+	});
+
+	/* Disable datepicker and hour settings if ntp is enabled */
+	<?if response.ntp_sync == 1 then?>
+		$("#datepicker").attr("disabled", "disabled");
+		$("#time").attr('disabled','disabled');
+	<?endif?>
+
+	$("#ntp-sync").change(function () {
+		if ($(this).attr('checked')) {
+			$("#datepicker").attr("disabled", "disabled");
+			$("#time").attr('disabled','disabled');
+		} else {
+			$("#datepicker").removeAttr("disabled", "disabled");
+			$("#time").removeAttr('disabled');
+		}
+	});
+
+	$("#date-apply").click(function () {
+		var enable_ntp = $("#ntp-sync").attr('checked');
+		var ok = true;
+
+		/* Verify date and time only if NTP is disabled */
+		if (enable_ntp == false) {
+			if (!isTextFieldEmpty($("#datepicker")))
+				ok = verifyDate($("#datepicker")) && ok;
+			if (!isTextFieldEmpty($("#time")))
+				ok = verifyTime($("#time")) && ok;
+		}
+		
+		if (!isTextFieldEmpty($("#ntp_server1")))
+			ok = verifyIPAddress($("#ntp_server1")) && ok;
+		if (!isTextFieldEmpty($("#ntp_server2")))
+			ok = verifyIPAddress($("#ntp_server2")) && ok;
+		if (!isTextFieldEmpty($("#ntp_server3")))
+			ok = verifyIPAddress($("#ntp_server3")) && ok;
+		
+		
+		if (ok == false) {
+			setTimeout(function () {
+				$("#datepicker").removeClass("ui-state-error");
+				$("#time").removeClass("ui-state-error");
+				$("#ntp_server1").removeClass("ui-state-error");
+				$("#ntp_server2").removeClass("ui-state-error");
+				$("#ntp_server3").removeClass("ui-state-error");
+			}, 3000);
+			return;
+		}
+
+		form = $(this).parents("form").get(0);
+		form_data = $(this).parents("form").serialize();
+
+		/* Send via AJAX and warn if configuration was successful */
+		$.post(form.action, form_data, function (data) {
+			$("#notificationDialog").html(data);
+			$("#notificationDialog").dialog("open");
+		});
+	});
+
+	$("#timezone-apply").click(function () {
+		var ok = true;
+
+		if (isTextFieldEmpty($("#tzname"))) {
+			$("#tzname").addClass("ui-state-error");
+			ok = false;
+		}
+		
+		if (ok == false) {
+			setTimeout(function () {
+				$("#tzname").removeClass("ui-state-error");
+			}, 3000);
+			return;
+		}
+
+		form = $(this).parents("form").get(0);
+		form_data = $(this).parents("form").serialize();
+
+		/* Send via AJAX and warn if configuration was successful */
+		$.post(form.action, form_data, function (data) {
+			$("#notificationDialog").html(data);
+			$("#notificationDialog").dialog("open");
+		});
 	});
 });
 </script>
@@ -46,10 +135,9 @@ $(function() {
 <ul>
 	<li><a href="#tab-date">Date</a></li>
 	<li><a href="#tab-timezone">Time Zone</a></li>
-	<li><a href="#tab-ntp">NTP Server</a></li>
 </ul>
 <div id="tab-date">
-	<form id="form-date" action="/app/config_intf" method="post">
+	<form id="form-date" action="/app/apply_date_settings" method="post">
 		<fieldset>
 			<legend>Time Settings</legend>
 			<div>
@@ -57,19 +145,27 @@ $(function() {
 				<input id="datepicker" type="text" name="date" class="text ui-widget-content ui-corner-all"/>
 			</div>
 			<div>
-				<label for="time">Time: </label>
-				<input type="text" name="time" id="time" class="text ui-widget-content ui-corner-all" />
+				<label for="time">Time (hh:mm:ss): </label>
+				<input type="text" name="time" id="time" <?if response.ntp_sync then?>disabled="disabled"<?endif?> class="text ui-widget-content ui-corner-all" />
 			</div>
 		</fieldset>
 		<fieldset>
 			<legend>Automatically sync date</legend>
 			<div>
 				<label for="ntp-sync">Use NTP: </label>
-				<input type="checkbox" name="ntp_sync" id="ntp-sync" class="text ui-widget-content ui-corner-all" />
+				<input type="checkbox" name="ntp_sync" id="ntp-sync" <?if response.ntp_sync then?>checked="checked"<?endif?> class="text ui-widget-content ui-corner-all" />
 			</div>	
 			<div>
-				<label for="ntp_server">NTP Server: </label>
-				<input type="text" name="ntp_server" id="ntp_server" class="text ui-widget-content ui-corner-all" />
+				<label for="ntp_server1">NTP Server 1: </label>
+				<input type="text" name="ntp_server1" id="ntp_server1" value="<?echo response.ntp_server1?>" class="text ui-widget-content ui-corner-all" />
+			</div>
+			<div>
+				<label for="ntp_server2">NTP Server 2: </label>
+				<input type="text" name="ntp_server2" id="ntp_server2" value="<?echo response.ntp_server2?>" class="text ui-widget-content ui-corner-all" />
+			</div>
+			<div>
+				<label for="ntp_server3">NTP Server 3: </label>
+				<input type="text" name="ntp_server3" id="ntp_server3" value="<?echo response.ntp_server3?>" class="text ui-widget-content ui-corner-all" />
 			</div>
 		</fieldset>
 		<fieldset>
@@ -80,37 +176,44 @@ $(function() {
 	</form>
 </div>
 <div id="tab-timezone">
-	<form id="form-timezone" action="/app/config_intf" method="post">
+	<form id="form-timezone" action="/app/apply_timezone_settings" method="post">
 		<fieldset>
 			<legend>Time Zone Settings</legend>
 			<div>
-				<label for="timezone">Timezone: </label>
-				<select id="timezone" name="timezone" class="text ui-widget-content ui-corner-all">
-				<option>-- Select one --</option>
-				<option value="sp">Brazil / São Paulo</option>
-				</select>
-			</div>
-			<div style="float:right">		 
-				<input type="button" id="timezone-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
-			</div>
-		</fieldset>
-	</form>
-</div>
-<div id="tab-ntp">
-	<form id="form-ntp" action="/app/config_intf" method="post">
-		<fieldset>
-			<legend>NTP Server</legend>
-			<div>
-				<label for="ntp-server">Enable: </label>
-				<input type="checkbox" name="enable_server" id="ntp-server" class="text ui-widget-content ui-corner-all" />
+				<label for="tzname">Name: </label>
+				<input type="text" name="tzname" id="tzname" value="<?echo response.tzname?>" class="text ui-widget-content ui-corner-all"/>
 			</div>
 			<div>
-				<label for="ipaddr">IP Address: </label>
-				<input type="text" name="ipaddr" id="ipaddr" value="" class="text ui-widget-content ui-corner-all" />
-			</div>
-			<div>
-				<label for="mask">Mask: </label>
-				<input type="text" name="mask" id="mask" value="" class="text ui-widget-content ui-corner-all" />
+				<label for="tzvalue">Offset:</label>
+				<select name="tzvalue">
+				<option value="utc0" id="utc">UTC</option>
+        		<option value="gmt-12" id="gmt-12">GMT -12:00</option>
+        		<option value="gmt-11" id="gmt-11">GMT -11:00</option>
+				<option value="gmt-10" id="gmt-10">GMT -10:00</option>
+				<option value="gmt-9" id="gmt-9">GMT -9:00</option>
+				<option value="gmt-8" id="gmt-8">GMT -8:00</option>
+				<option value="gmt-7" id="gmt-7">GMT -7:00</option>
+				<option value="gmt-6" id="gmt-6">GMT -6:00</option>
+				<option value="gmt-5" id="gmt-5">GMT -5:00</option>
+				<option value="gmt-4" id="gmt-4">GMT -4:00</option>
+				<option value="gmt-3" id="gmt-3">GMT -3:00</option>
+				<option value="gmt-2" id="gmt-2">GMT -2:00</option>
+				<option value="gmt-1" id="gmt-1">GMT -1:00</option>
+				<option value="gmt0" id="gmt0">GMT</option>
+				<option value="gmt1" id="gmt1">GMT +1:00</option>
+				<option value="gmt2" id="gmt2">GMT +2:00</option>
+				<option value="gmt3" id="gmt3">GMT +3:00</option>
+				<option value="gmt4" id="gmt4">GMT +4:00</option>
+				<option value="gmt5" id="gmt5">GMT +5:00</option>
+				<option value="gmt6" id="gmt6">GMT +6:00</option>
+				<option value="gmt7" id="gmt7">GMT +7:00</option>
+				<option value="gmt" id="gmt8">GMT +8:00</option>
+				<option value="gmt9" id="gmt9">GMT +9:00</option>
+				<option value="gmt10" id="gmt10">GMT +10:00</option>
+				<option value="gmt11" id="gmt11">GMT +11:00</option>
+				<option value="gmt12" id="gmt12">GMT +12:00</option>
+				<option value="gmt13" id="gmt13">GMT +13:00</option>
+			    </select>
 			</div>
 			<div style="float:right">		 
 				<input type="button" id="timezone-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
@@ -120,7 +223,7 @@ $(function() {
 </div>
 </div>		
 
-<div id="myDialog" title="Notification">
+<div id="notificationDialog" title="Notification">
 </div>
 				
 	</div>

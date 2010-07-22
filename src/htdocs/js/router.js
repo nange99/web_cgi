@@ -76,6 +76,79 @@ function inRange(obj, min, max) {
 	return ok;
 }
 
+/* Validate date in format dd/mm/yyyy */
+function verifyDate(obj) {
+	var x = obj.val();
+	var splitted = x.split("/");
+	var valid = true;
+	
+	if (splitted.length != 3)
+		valid = false;
+	
+	var day = splitted[0];
+	var mon = splitted[1];
+	var year = splitted[2];
+	
+	if ((day <= 0) || (day > 31))
+		valid = false;
+	
+	if ((mon <= 0) || (mon > 12))
+		valid = false;
+	
+	if ((year < 1970) || (year > 9999))
+		valid = false;
+	
+	if ((mon == 4) || (mon == 6) || (mon == 9) || (mon == 11)) {
+		if (day > 30)
+			valid = false;
+	}
+	
+	if (mon == 2) {
+		if ((year % 4) == 0) {
+			if (day > 29)
+				valid = false;
+		} else {
+			if (day > 28)
+				valid = false;
+		}
+	}
+			
+	if (!valid) {
+		obj.addClass("ui-state-error");
+	} else {
+		obj.removeClass("ui-state-error");
+	}
+	
+	return valid;
+}
+
+/* Validate time in format hh:mm:ss */
+function verifyTime(obj) {
+	var x = obj.val();
+	var splitted = x.split(":");
+	var valid = true;
+	
+	if (splitted.length != 3)
+		valid = false;
+	
+	if (splitted[0] < 0 || splitted[0] > 23)
+		valid = false;
+	
+	if (splitted[1] < 0 || splitted[1] > 59)
+		valid = false;
+	
+	if (splitted[2] < 0 || splitted[2] > 59)
+		valid = false;
+		
+	if (!valid) {
+		obj.addClass("ui-state-error");
+	} else {
+		obj.removeClass("ui-state-error");
+	}
+	
+	return valid;
+}
+
 /* IP address validation */
 function verifyIPAddress(obj) {
 	var x = obj.val();

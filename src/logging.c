@@ -41,7 +41,7 @@ int handle_status_logging(struct request *req, struct response *resp)
 	stat("/var/log/messages", &st);
 	buf = malloc(st.st_size);
 
-	web_dbg("File messages has size is %d\n", st.st_size);
+	web_dbg("/var/log/messages has size is %d\n", (int) st.st_size);
 
 	fread(buf, st.st_size, 1, f);
 	fclose(f);
