@@ -95,7 +95,7 @@ function verifyDate(obj) {
 	if ((mon <= 0) || (mon > 12))
 		valid = false;
 	
-	if ((year < 1970) || (year > 9999))
+	if ((year < 1970) || (year > 2037))
 		valid = false;
 	
 	if ((mon == 4) || (mon == 6) || (mon == 9) || (mon == 11)) {
