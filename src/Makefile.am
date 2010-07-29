@@ -13,7 +13,8 @@ web_digistar_SOURCES = \
 	ipsec.c \
 	logging.c \
 	cpu.c \
-	ntp.c
+	ntp.c \
+	auth.c
 
 htmlfilesdir = $(datadir)
 cssdir = $(datadir)/css
@@ -26,8 +27,8 @@ templatesdir = $(bindir)/templates
 htmlfiles_DATA = htdocs/index.html \
 		htdocs/index.wn
 
-css_DATA = htdocs/css/digistar_styles.css \
-		htdocs/css/jquery-ui-1.8.2.custom.css
+css_DATA = htdocs/css/*.css \
+	   htdocs/css/*.wn
 
 javascript_DATA = htdocs/js/*
 
