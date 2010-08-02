@@ -38,7 +38,8 @@ int handle_add_route(struct request *req, struct response *resp)
 	route->mask = _get_parameter(req, "mask");
 	route->gateway = _get_parameter(req, "gateway");
 	route->interface = _get_parameter(req, "interface");
-	route->metric = atoi(_get_parameter(req, "metric"));
+	if (_get_parameter(req, "metric") != NULL)
+		route->metric = atoi(_get_parameter(req, "metric"));
 
 	web_dbg("network = %s\n", route->network);
 	web_dbg("mask = %s\n", route->mask);
@@ -79,12 +80,11 @@ int handle_static_routes(struct request *req, struct response *resp)
 	while (next) {
 		web_dbg("dest = %s\n", next->network);
 		web_dbg("mask = %s\n", next->mask);
+
 		cgi_table_add_row(t);
-		web_dbg();
 		cgi_table_add_value(t, "dest", (char *) next->network, CGI_STRING);
-		web_dbg();
 		cgi_table_add_value(t, "mask", (char *) next->mask, CGI_STRING);
-		web_dbg();
+
 		if (next->gateway)
 			cgi_table_add_value(t, "gateway", (char *) next->gateway, CGI_STRING);
 		else

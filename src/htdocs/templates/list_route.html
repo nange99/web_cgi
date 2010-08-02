@@ -10,53 +10,59 @@
 <script type="text/javascript" src="/js/router.js"></script>
 <script type="text/javascript" src="/js/menu.js"></script>
 <script type="text/javascript">
-$(function() {
-
-var destination = $("#dest"), gateway = $("#gateway"), mask = $("#mask"), metric = $("#metric"), interface = $("#interface");
-var allFields = $([]).add(destination).add(gateway).add(mask).add(metric).add(interface);
-
 /* Route deletion */
 function deleteRoute(hash) {
-	
 	if (confirm("Delete this route?"))
 		$.ajax({url: "/app/config_static_routes?del=" + hash, success: function(data) { $("#table_wrapper").html(data)}});
 }
 
-/* Fetch route table */
-function updateRouteTable() {
-	$.ajax({url: "/app/config_static_routes?table=1", success: function(data) { $("#table_wrapper").html(data)}});
-}
+$(function() {
 
+	var destination = $("#dest");
+	var gateway = $("#gateway");
+	var mask = $("#mask");
+	var metric = $("#metric");
+	var interface = $("#interface");
+	var allFields = $([]).add(destination).add(gateway).add(mask).add(metric).add(interface);
+	
+	/* Set maximum length for text inputs */
+	$(':text').attr('maxlength','50');
 
-$("#dialog").dialog({
-	autoOpen: false,
-	position: "center",
-	width: 400,
-	modal: true,
-	buttons: {
-		"Add route": function() {
-			var ok = true;
-			var dialog = $(this);
-			ok = verifyIPAddress(destination) && ok;
-			ok = verifyIPAddress(gateway) && ok;
-			ok = verifyIPAddress(mask) && ok;
-
-			if (ok) {
-				var f = $("#routeForm");
-				$.post(f.get(0).action, f.serialize(), function (data) {
-					dialog.dialog('close');
-					updateRouteTable();
-				});
+	/* Fetch route table */
+	function updateRouteTable() {
+		$.ajax({url: "/app/config_static_routes?table=1", success: function(data) { $("#table_wrapper").html(data)}});
+	}
+	
+	
+	$("#dialog").dialog({
+		autoOpen: false,
+		position: "center",
+		width: 400,
+		modal: true,
+		buttons: {
+			"Add route": function() {
+				var ok = true;
+				var dialog = $(this);
+				ok = verifyIPAddress(destination) && ok;
+				ok = verifyIPAddress(gateway) && ok;
+				ok = verifyIPAddress(mask) && ok;
+	
+				if (ok) {
+					var f = $("#routeForm");
+					$.post(f.get(0).action, f.serialize(), function (data) {
+						dialog.dialog('close');
+						updateRouteTable();
+					});
+				}
+			},
+			"Cancel": function() {
+				$(this).dialog('close');
 			}
 		},
-		"Cancel": function() {
-			$(this).dialog('close');
+		open: function(event, ui) { 
+			allFields.removeClass("ui-state-error");
+			$("#routeForm").get(0).reset(); 
 		}
-	},
-	open: function(event, ui) { 
-		allFields.removeClass("ui-state-error");
-		$("#routeForm").get(0).reset(); 
-	}
 	});
 });
 

@@ -1,0 +1,20 @@
+<table style="margin-left:8px; margin-top:3px;">
+<thead>
+    <tr>
+        <th>Username</th>
+        <th></th>
+    </tr>
+</thead>
+<tbody>
+    <?foreach row in response.users_table?>
+		<?if odd_ then?>
+			<tr>
+		<?else?>
+			<tr class="odd">
+		<?endif?>
+				<td><?echo row.username?></td>
+				<td><a href="#" onclick="delUser('<?echo row.username?>');">remove</a></td>
+			</tr>
+	<?endforeach?>
+</tbody>
+</table>

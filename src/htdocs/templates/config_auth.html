@@ -6,12 +6,19 @@
 <link rel="stylesheet" type="text/css" href="/css/digistar_styles.css"/>
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.2.custom.css"/>
 <style type="text/css">
-#intfTabs {
+#authTabs {
 	width: 92%;
 	font-size: 10px;
 	margin-left: 30px;
 	margin-top: 25px;
 	float: none;
+}
+
+.inner {
+	border: 1px solid #aaaaaa;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
 }
 </style>
 <script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
@@ -19,30 +26,136 @@
 <script type="text/javascript" src="/js/router.js"></script>
 <script type="text/javascript" src="/js/menu.js"></script>
 <script type="text/javascript">
+/* User deletion */
+function delUser(user) {
+	if (confirm("Delete this user?"))
+		$.ajax({url: "/app/config_auth?del=" + user, success: function(data) { $("#table_wrapper").html(data)}});
+}
+
 $(function() {
-	$("#intfTabs").tabs();
+	var pw = $("#password");
+	var confirm = $("#confirmpw");
+	
+	$("#authTabs").tabs();
+
+	/* Set maximum length for text inputs */
+	$(':text').attr('maxlength','50');
+
+	/* Set correct input values */
+	$("#<?echo response.cli_auth_type?>").attr('selected','selected');
+	$("#<?echo response.web_auth_type?>").attr('selected','selected');
+
+	/* Fetch user table */
+	function updateUserTable() {
+		$.ajax({url: "/app/config_auth?table=1", success: function(data) { $("#table_wrapper").html(data)}});
+	}
+
+	/* Authentication Type Button */
+	$("#auth-type-apply").click(function () {
+		form = $(this).parents("form").get(0);
+		form_data = $(this).parents("form").serialize();
+
+		/* Send via AJAX and warn if configuration was successful */
+		$.post(form.action, form_data, function (data) {
+			$("#notificationDialog").html(data);
+			$("#notificationDialog").dialog("open");
+		});
+	});
+
+	/* RADIUS Button */
+	$("#radius-apply").click(function () {
+		var ok = true;
+
+		/* Empty IP fields are accepted. We only need to check
+		for a valid IP if something is written */
+		if (isTextFieldEmpty($("#radius-server-1")) == false)
+			ok = verifyIPAddress($("#radius-server-1")) && ok;
+		if (isTextFieldEmpty($("#radius-server-2")) == false)
+			ok = verifyIPAddress($("#radius-server-2")) && ok;
+		if (isTextFieldEmpty($("#radius-server-3")) == false)
+			ok = verifyIPAddress($("#radius-server-3")) && ok;
+
+		if (isTextFieldEmpty($("#radius-key-1")) == false)
+			ok = verifyIPAddress($("#radius-key-1")) && ok;
+		if (isTextFieldEmpty($("#radius-key-2")) == false)
+			ok = verifyIPAddress($("#radius-key-2")) && ok;
+		if (isTextFieldEmpty($("#radius-key-3")) == false)
+			ok = verifyIPAddress($("#radius-key-3")) && ok;
+
+		if (isTextFieldEmpty($("#radius-timeout-1")) == false)
+			ok = inRange($("#radius-timeout-1"), 1, 1000) && ok;
+		if (isTextFieldEmpty($("#radius-timeout-2")) == false)
+			ok = inRange($("#radius-timeout-2"), 1, 1000) && ok;
+		if (isTextFieldEmpty($("#radius-timeout-3")) == false)
+			ok = inRange($("#radius-timeout-3"), 1, 1000) && ok;
+
+		if (ok == false) {
+			setTimeout(function () {
+				$("#radius-server-1").removeClass("ui-state-error");
+				$("#radius-server-2").removeClass("ui-state-error");
+				$("#radius-server-3").removeClass("ui-state-error");
+				$("#radius-key-1").removeClass("ui-state-error");
+				$("#radius-key-2").removeClass("ui-state-error");
+				$("#radius-key-3").removeClass("ui-state-error");
+				$("#radius-timeout-1").removeClass("ui-state-error");
+				$("#radius-timeout-2").removeClass("ui-state-error");
+				$("#radius-timeout-3").removeClass("ui-state-error");
+			}, 3000);
+			return;
+		}
+		
+		form = $(this).parents("form").get(0);
+		form_data = $(this).parents("form").serialize();
+
+		/* Send via AJAX and warn if configuration was successful */
+		$.post(form.action, form_data, function (data) {
+			$("#notificationDialog").html(data);
+			$("#notificationDialog").dialog("open");
+		});
+	});
+
+	/*TACACS+ Button */
+	$("#tacacs-apply").click(function () {
+		form = $(this).parents("form").get(0);
+		form_data = $(this).parents("form").serialize();
+
+		/* Send via AJAX and warn if configuration was successful */
+		$.post(form.action, form_data, function (data) {
+			$("#notificationDialog").html(data);
+			$("#notificationDialog").dialog("open");
+		});
+	});
 
 	/* Define message dialog */
 	$("#userDialog").dialog({
 		autoOpen: false,
 		buttons: {
 			"Add user": function() {
-				ok = true;
+				var ok = stringMatch(pw, confirm);
 				var dialog = $(this);
 
-				if (ok) {
-					/*
-					var f = $("#routeForm");
-					$.post(f.get(0).action, f.serialize(), function (data) {
-						dialog.dialog('close');
-						updateRouteTable();
-					});
-					*/
+				if (ok == false) {
+					setTimeout(function () {
+						pw.removeClass("ui-state-error");
+						confirm.removeClass("ui-state-error");
+					}, 3000);
+					return;
 				}
+
+				var f = $("#userForm");
+				$.post(f.get(0).action, f.serialize(), function (data) {
+					dialog.dialog('close');
+					updateUserTable();
+				});
 			},
 			"Cancel": function() {
 				$(this).dialog('close');
 			}
+		},
+		open: function(event, ui) {
+			pw.removeClass("ui-state-error");
+			confirm.removeClass("ui-state-error");
+			$("#userForm").get(0).reset();
 		},
 		position: "center",
 		width: 400,
@@ -69,7 +182,7 @@ $(function() {
 	<div id="content">
 		<h1>Authentication Configuration</h1>
 
-<div id="intfTabs">
+<div id="authTabs">
 <ul>
 	<li><a href="#tab-users">Users</a></li>
 	<li><a href="#tab-auth">Authentication Type</a></li>
@@ -82,98 +195,217 @@ $(function() {
 <li class="context_item"><a href="#" onclick="$('#userDialog').dialog('open');">Add user</a></li>
 </ul>
 </div>
+<div id="table_wrapper">
 <table style="margin-left:8px; margin-top:3px;">
 <thead>
     <tr>
         <th>Username</th>
-        <th>Name</th>
         <th></th>
     </tr>
 </thead>
 <tbody>
-	<tr>
-		<td>asdf</td>
-		<td>Asdrubal</td>
-		<td><a href="#" onclick="deleteUser('asdf');">remove</a></td>
-	</tr>
-	<tr class="odd">
-		<td>asdf</td>
-		<td>Asdrubal</td>
-		<td><a href="#" onclick="deleteUser('asdf');">remove</a></td>
-	</tr>
-	<tr>
-		<td>asdf</td>
-		<td>Asdrubal</td>
-		<td><a href="#" onclick="deleteUser('asdf');">remove</a></td>
-	</tr>
+    <?foreach row in response.users_table?>
+		<?if odd_ then?>
+			<tr>
+		<?else?>
+			<tr class="odd">
+		<?endif?>
+				<td><?echo row.username?></td>
+				<td><a href="#" onclick="delUser('<?echo row.username?>');">remove</a></td>
+			</tr>
+	<?endforeach?>
 </tbody>
 </table>
 </div>
+</div>
 <div id="tab-auth">
-	<form id="form-timezone" action="/app/config_intf" method="post">
+	<form id="form-authtype" action="/app/apply_auth_type" method="post">
 		<fieldset>
 			<legend>Authentication Type</legend>
+			
 			<div>
-				<label for="timezone">Timezone: </label>
-				<select id="timezone" name="timezone" class="text ui-widget-content ui-corner-all">
-				<option>-- Select one --</option>
-				<option value="sp">Brazil / São Paulo</option>
-				</select>
+				<label for="cli-auth-type">CLI: </label>
+					<select id="cli-auth-type" name="cli_auth_type" class="text ui-widget-content ui-corner-all">
+					<option value="none" id="cli-none">None</option>
+					<option value="local" id="cli-local">Local</option>
+					<option value="radius" id="cli-radius">Radius</option>
+					<option value="radius_local" id="cli-radius-local">Radius/Local</option>
+					<option value="tacacs" id="cli-tacacs">TACACS+</option>
+					<option value="tacacs_local" id="cli-tacacs-local">TACACS+/Local</option>
+					</select>
 			</div>
+			
+			<div>
+				<label for="web-auth-type">Web: </label>
+					<select id="web-auth-type" name="web_auth_type" class="text ui-widget-content ui-corner-all">
+					<option value="none" id="web-none">None</option>
+					<option value="local" id="web-local">Local</option>
+					<option value="radius" id="web-radius">Radius</option>
+					<option value="radius_local" id="web-radius-local">Radius/Local</option>
+					<option value="tacacs" id="web-tacacs">TACACS+</option>
+					<option value="tacacs_local" id="web-tacacs-local">TACACS+/Local</option>
+					</select>
+					</select>
+			</div>
+			
 			<div style="float:right">		 
-				<input type="button" id="timezone-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
-			</div>
-		</fieldset>
-	</form>
-</div>
-<div id="tab-radius">
-	<form id="form-ntp" action="/app/config_intf" method="post">
-		<fieldset>
-			<legend>Radius Configuration</legend>
-			<div>
-				<label for="ntp-server">Enable: </label>
-				<input type="checkbox" name="enable_server" id="ntp-server" class="text ui-widget-content ui-corner-all" />
-			</div>
-			<div>
-				<label for="ipaddr">IP Address: </label>
-				<input type="text" name="ipaddr" id="ipaddr" value="" class="text ui-widget-content ui-corner-all" />
-			</div>
-			<div>
-				<label for="mask">Mask: </label>
-				<input type="text" name="mask" id="mask" value="" class="text ui-widget-content ui-corner-all" />
-			</div>
-			<div style="float:right">		 
-				<input type="button" id="timezone-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
-			</div>
-		</fieldset>
-	</form>
-</div>
-<div id="tab-tacacs">
-	<form id="form-ntp" action="/app/config_intf" method="post">
-		<fieldset>
-			<legend>TACACS Configuration</legend>
-			<div>
-				<label for="ntp-server">Enable: </label>
-				<input type="checkbox" name="enable_server" id="ntp-server" class="text ui-widget-content ui-corner-all" />
-			</div>
-			<div>
-				<label for="ipaddr">IP Address: </label>
-				<input type="text" name="ipaddr" id="ipaddr" value="" class="text ui-widget-content ui-corner-all" />
-			</div>
-			<div>
-				<label for="mask">Mask: </label>
-				<input type="text" name="mask" id="mask" value="" class="text ui-widget-content ui-corner-all" />
-			</div>
-			<div style="float:right">		 
-				<input type="button" id="timezone-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
+				<input type="button" id="auth-type-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
 			</div>
 		</fieldset>
 	</form>
 </div>
 
+<!-- RADIUS TAB	-->
+<div id="tab-radius">
+	<form id="form-radius" action="/app/apply_radius_settings" method="post">
+		<fieldset>
+			<legend>Radius Configuration</legend>
+			
+			<div>
+				<fieldset class="inner">
+				<legend> Server 1 Configuration</legend>
+				<div>
+					<label for="radius-server-1">IP Address: </label>
+					<input type="text" name="radius_server_1" id="radius-server-1" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				<div>
+					<label for="radius-key-1">Key: </label>
+					<input type="text" name="radius_key_1" id="radius-key-1" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				<div>
+					<label for="radius-timeout-1">Timeout: </label>
+					<input type="text" name="radius_timeout_1" id="radius-timeout-1" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				</fieldset>
+			</div>
+			
+			<div>
+				<fieldset class="inner">
+				<legend> Server 2 Configuration</legend>
+				<div>
+					<label for="radius-server-2">IP Address: </label>
+					<input type="text" name="radius_server_2" id="radius-server-2" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				<div>
+					<label for="radius-key-2">Key: </label>
+					<input type="text" name="radius_key_2" id="radius-key-2" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				<div>
+					<label for="radius-timeout-2">Timeout: </label>
+					<input type="text" name="radius_timeout_2" id="radius-timeout-2" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				</fieldset>
+			</div>
+			
+			<div>
+				<fieldset class="inner">
+				<legend> Server 3 Configuration</legend>
+				<div>
+					<label for="radius-server-3">IP Address: </label>
+					<input type="text" name="radius_server_3" id="radius-server-3" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				<div>
+					<label for="radius-key-3">Key: </label>
+					<input type="text" name="radius_key_3" id="radius-key-3" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				<div>
+					<label for="radius-timeout-3">Timeout: </label>
+					<input type="text" name="radius_timeout_3" id="radius-timeout-3" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				</fieldset>
+			</div>
+			
+			<div style="float:right">		 
+				<input type="button" id="radius-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
+			</div>
+		</fieldset>
+	</form>
+</div>
+
+<!-- TACACS TAB	-->
+<div id="tab-tacacs">
+	<form id="form-tacacs" action="/app/apply_tacacs_settings" method="post">
+		<fieldset>
+			<legend>TACACS+ Configuration</legend>
+			<div>
+				<fieldset class="inner">
+				<legend> Server 1 Configuration</legend>
+				<div>
+					<label for="tacacs-server-1">IP Address: </label>
+					<input type="text" name="tacacs_server_1" id="tacacs-server-1" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				<div>
+					<label for="tacacs-key-1">Key: </label>
+					<input type="text" name="tacacs_key_1" id="tacacs-key-1" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				<div>
+					<label for="tacacs-timeout-1">Timeout: </label>
+					<input type="text" name="tacacs_timeout_1" id="tacacs-timeout-1" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				</fieldset>
+			</div>
+			
+			<div>
+				<fieldset class="inner">
+				<legend> Server 2 Configuration</legend>
+				<div>
+					<label for="tacacs-server-2">IP Address: </label>
+					<input type="text" name="tacacs_server_2" id="tacacs-server-2" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				<div>
+					<label for="tacacs-key-2">Key: </label>
+					<input type="text" name="tacacs_key_2" id="tacacs-key-2" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				<div>
+					<label for="tacacs-timeout-2">Timeout: </label>
+					<input type="text" name="tacacs_timeout_2" id="tacacs-timeout-2" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				</fieldset>
+			</div>
+			
+			<div>
+				<fieldset class="inner">
+				<legend> Server 3 Configuration</legend>
+				<div>
+					<label for="tacacs-server-3">IP Address: </label>
+					<input type="text" name="tacacs_server_3" id="tacacs-server-3" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				<div>
+					<label for="tacacs-key-3">Key: </label>
+					<input type="text" name="tacacs_key_3" id="tacacs-key-3" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				<div>
+					<label for="tacacs-timeout-3">Timeout: </label>
+					<input type="text" name="tacacs_timeout_3" id="tacacs-timeout-3" value="" class="text ui-widget-content ui-corner-all" />
+				</div>
+				</fieldset>
+			</div>
+			<div style="float:right">		 
+				<input type="button" id="tacacs-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
+			</div>
+		</fieldset>
+	</form>
+</div>
 </div>		
 
 <div id="userDialog" title="Add User">
+<form id="userForm" action="/app/add_user" method="post">
+<fieldset>
+	<legend>User Information</legend>
+	<div>
+	<label for="username">Username: </label>
+	<input type="text" name="username" id="username" class="text ui-widget-content ui-corner-all"/>
+	</div>
+		<div>
+	<label for="password">Password: </label>
+	<input type="password" name="password" id="password" class="text ui-widget-content ui-corner-all"/>
+	</div>
+	<div>
+	<label for="confirmpw">Confirm Password: </label>
+	<input type="password" name="confirmpw" id="confirmpw" class="text ui-widget-content ui-corner-all"/>
+	</div>
+</fieldset>
+</form>
 </div>
 
 <div id="notificationDialog" title="Notification">

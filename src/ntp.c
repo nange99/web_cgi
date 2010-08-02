@@ -56,6 +56,7 @@ int handle_apply_date_settings(struct request *req, struct response *resp)
 
 	web_dbg("date is: %s\n", date);
 	web_dbg("time is: %s\n", time);
+
 	if (date && time) {
 		int day, mon, year;
 		int hour, min, sec;

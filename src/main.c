@@ -29,6 +29,7 @@
 #include "logging.h"
 #include "cpu.h"
 #include "ntp.h"
+#include "auth.h"
 
 /**
  * _get_parameter	Wrapper for cgi_request_get_parameter
@@ -258,19 +259,6 @@ int handle_config_snmp(struct request *req, struct response *resp)
 	return 1;
 }
 
-int handle_config_auth(struct request *req, struct response *resp)
-{
-	if (!cgi_session_exists(req)) {
-		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
-		return 0;
-	}
-
-	cgi_response_add_parameter(resp, "menu_config", (void *) 8, CGI_INTEGER);
-	cgi_response_set_html(resp, "/wn/cgi/templates/config_auth.html");
-
-	return 1;
-}
-
 int handle_status_interfaces(struct request *req, struct response *resp)
 {
 	if (!cgi_session_exists(req)) {
@@ -390,7 +378,12 @@ int main(int argc, char **argv)
 		{ .url = "/config_qos", .handler = handle_config_qos },
 		{ .url = "/config_ipsec", .handler = handle_config_ipsec },
 		{ .url = "/config_snmp", .handler = handle_config_snmp },
+
 		{ .url = "/config_auth", .handler = handle_config_auth },
+		{ .url = "/add_user", .handler = handle_add_user },
+		{ .url = "/apply_auth_type", .handler = handle_apply_auth_type },
+		{ .url = "/apply_radius_settings", .handler = handle_apply_radius_settings },
+		{ .url = "/apply_tacacs_settings", .handler = handle_apply_tacacs_settings },
 
 		{ .url = "/config_ntp", .handler = handle_config_ntp },
 		{ .url = "/apply_date_settings", .handler = handle_apply_date_settings },

@@ -171,3 +171,18 @@ function verifyIPAddress(obj) {
 	
 	return valid;
 }
+
+function stringMatch(str1, str2) {
+	var x = str1.val();
+	var y = str2.val();
+	
+	if (x == y) {
+		str1.removeClass("ui-state-error");
+		str2.removeClass("ui-state-error");
+		return true;
+	} else {
+		str1.addClass("ui-state-error");
+		str2.addClass("ui-state-error");
+		return false;
+	}
+}
