@@ -7,12 +7,25 @@
  */
 
 /**
- * jQuery handler to slide menus
+ * jQuery handlers at document ready
  */
 $(function () {
 	$(".lvl1").click( function() {
 		$(this).children().children().slideToggle();
 	});
+	
+	/* Set maximum length for text inputs */
+	$(':text').attr('maxlength','50');
+
+	/* Don't accept spaces in text boxes */
+	$(':text').keypress(function (event) {
+		if (event.which == 32) {
+			event.preventDefault();
+		}
+	});
+	
+	/* Use tabs if any */
+	$("#pageTabs").tabs();
 });
 
 /**
@@ -56,11 +69,28 @@ function verifyInterfaceType(name) {
  */
 function isTextFieldEmpty(obj) {
 	var x = obj.val();
-	
+		
 	if (x.length == 0)
-		return true;
+		return  true;
 	else
 		return false;
+}
+
+/**
+ * checkForWhiteSpaces		Check if jQuery object value begins with a white space
+ * 
+ * @param obj
+ * @return false if white space is first character
+ */
+function checkForWhiteSpaces(obj) {
+	var x = obj.val();
+	var y = new RegExp("^ ");
+	
+	if (y.test(x)) {
+		obj.addClass("ui-state-error");
+		return false;
+	}
+	return true;
 }
 
 /**
@@ -248,6 +278,9 @@ function authServerVerify(ip, key, timeout) {
 	
 	if (empty_ip == false)
 		ok = verifyIPAddress(ip) && ok;
+	
+	if (empty_key == false)
+		ok = checkForWhiteSpaces(key) && ok;
 	
 	if (empty_timeout == false)
 		ok = inRange(timeout, 1, 1000) && ok;
