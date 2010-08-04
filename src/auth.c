@@ -157,11 +157,9 @@ static int _handle_auth_servers(struct response *resp)
 		sprintf(key, "tacacs_key_%d", i+1);
 		sprintf(timeout, "tacacs_timeout_%d", i+1);
 
-		if (tacacs_servers[i].ipaddr) {
-			web_dbg("getting tacacs server %s\n", tacacs_servers[i].ipaddr);
+		if (tacacs_servers[i].ipaddr)
 			cgi_response_add_parameter(resp, server, tacacs_servers[i].ipaddr,
 			                CGI_STRING);
-		}
 
 		if (tacacs_servers[i].key)
 			cgi_response_add_parameter(resp, key, tacacs_servers[i].key, CGI_STRING);
@@ -176,11 +174,9 @@ static int _handle_auth_servers(struct response *resp)
 		sprintf(key, "radius_key_%d", i+1);
 		sprintf(timeout, "radius_timeout_%d", i+1);
 
-		if (radius_servers[i].ipaddr) {
-			web_dbg("getting radius server %s\n", radius_servers[i].ipaddr);
+		if (radius_servers[i].ipaddr)
 			cgi_response_add_parameter(resp, server, radius_servers[i].ipaddr,
 			                CGI_STRING);
-		}
 
 		if (radius_servers[i].key)
 			cgi_response_add_parameter(resp, key, radius_servers[i].key, CGI_STRING);
@@ -222,10 +218,6 @@ int handle_add_user(struct request *req, struct response *resp)
 	passwd = _get_parameter(req, "password");
 	confirm = _get_parameter(req, "confirmpw");
 
-	web_dbg("username : %s\n", username);
-	web_dbg("pw : %s\n", passwd);
-	web_dbg("confirm : %s\n", confirm);
-
 	/* Password match ? */
 	if (strcmp(passwd, confirm))
 		return -1;
@@ -233,7 +225,6 @@ int handle_add_user(struct request *req, struct response *resp)
 	if (librouter_pam_add_user(username, passwd) < 0)
 		return -1;
 
-	web_dbg();
 	return 0;
 }
 
