@@ -10,7 +10,7 @@
 
 #define CGI_MAX_PARAM_LEN	64
 
-//#define DEBUG
+#define DEBUG
 #ifdef DEBUG
 #define web_dbg(x,...) \
 		syslog(LOG_INFO, "%s : %d => "x , __FUNCTION__, __LINE__, ##__VA_ARGS__);
