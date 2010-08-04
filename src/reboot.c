@@ -44,10 +44,12 @@ int handle_reboot(struct request *req, struct response *resp)
 			exit(EXIT_FAILURE);
 		}
 		chdir("/");
-		/* wait 5 seconds and reboot */
-		popen("/sbin/reboot -d 5 -f", "r");
+		/* wait 3 seconds and reboot */
+		sleep(3);
+		sync();
+		reboot(0x1234567);
 
-		exit(0);
+		exit(0); /* Not reached */
 		break;
 	case -1: /* error */
 		break;
@@ -55,5 +57,5 @@ int handle_reboot(struct request *req, struct response *resp)
 		break;
 	}
 
-	return 0; /* Not reached */
+	return 0;
 }
