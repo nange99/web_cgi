@@ -16,6 +16,7 @@
 #include <libcgiservlet/cgi_table.h>
 
 #include <librouter/pam.h>
+#include <librouter/config_mapper.h>
 #include <librouter/config_fetcher.h>
 #include <librouter/defines.h>
 #include <librouter/nv.h>
@@ -151,22 +152,22 @@ int handle_logout(struct request *req, struct response *resp)
  */
 int handle_saveconf(struct request *req, struct response *resp)
 {
-	cish_config *cish_cfg;
+	struct router_config *router_cfg;
 
 	if (!cgi_session_exists(req)) {
 		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
 		return 0;
 	}
 
-	cish_cfg = librouter_config_mmap_cfg();
+	router_cfg = librouter_config_mmap_cfg();
 
-	if (cish_cfg == NULL) {
+	if (router_cfg == NULL) {
 		syslog(LOG_ERR, "Failed in mapping cish config\n");
 		goto saveconf_finish;
 	}
 
 	/* Store configuration in f */
-	if (librouter_config_write(TMP_CFG_FILE, cish_cfg) < 0) {
+	if (librouter_config_write(TMP_CFG_FILE, router_cfg) < 0) {
 		syslog(LOG_ERR, "Failed in writing to tmp file\n");
 		goto saveconf_finish;
 	}
@@ -181,7 +182,7 @@ saveconf_finish:
 	/* Remove temp file */
 	unlink(TMP_CFG_FILE);
 
-	librouter_config_munmap_cfg(cish_cfg);
+	librouter_config_munmap_cfg(router_cfg);
 
 	cgi_response_set_html(resp, "/wn/cgi/templates/do_show_config_saved.html");
 
