@@ -27,6 +27,8 @@
 #include "web_config.h"
 #include "interface.h"
 
+
+
 /**
  * _convert_string_web_to_linux		Convert web to linux string
  *
@@ -144,15 +146,21 @@ static int _apply_lo_settings(struct request *req, struct response *resp)
  */
 static int _apply_3g_settings(struct request *req, struct response *resp)
 {
-	char *interface, *apn, *user, *pass, *sim, *up;
+	char *interface, *apn0, *user0, *pass0, *apn1, *user1, *pass1, *backup_method, *backup_interface, *sim_order, *up;
 	char *linux_interface;
+	char * intf_return_backup_error = malloc(24);
 	int major;
 
 	interface = _get_parameter(req, "name");
-	apn = _get_parameter(req, "apn");
-	user = _get_parameter(req, "user");
-	pass = _get_parameter(req, "pass");
-	sim = _get_parameter(req, "sim");
+	apn0 = _get_parameter(req, "apn0");
+	user0 = _get_parameter(req, "user0");
+	pass0 = _get_parameter(req, "pass0");
+	apn1 = _get_parameter(req, "apn1");
+	user1 = _get_parameter(req, "user1");
+	pass1 = _get_parameter(req, "pass1");
+	sim_order = _get_parameter(req, "sim_order");
+	backup_method = _get_parameter(req,"backup_method");
+	backup_interface = _get_parameter(req,"backup_interface");
 	up = _get_parameter(req, "up");
 
 	web_dbg("interface is %s\n", interface);
@@ -164,15 +172,58 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 
 	major = librouter_device_get_major(linux_interface, str_linux);
 
-	web_dbg("Major is %d\n", major);
+	web_dbg("Major is %d, Linux Intf is %s\n", major, linux_interface);
 
-	librouter_modem3g_set_apn(apn, major);
-	librouter_modem3g_set_username(user, major);
-	librouter_modem3g_set_password(pass, major);
+	librouter_ppp_backupd_set_shutdown_3Gmodem(linux_interface);
+
+
+	if (major != 0){
+		librouter_modem3g_set_apn(apn0, major);
+		librouter_modem3g_set_username(user0, major);
+		librouter_modem3g_set_password(pass0, major);
+	}
+	else{
+		librouter_modem3g_sim_set_info_infile(0,"apn",apn0);
+		librouter_modem3g_sim_set_info_infile(0,"username",user0);
+		librouter_modem3g_sim_set_info_infile(0,"password",pass0);
+		librouter_modem3g_sim_set_info_infile(1,"apn",apn1);
+		librouter_modem3g_sim_set_info_infile(1,"username",user1);
+		librouter_modem3g_sim_set_info_infile(1,"password",pass1);
+
+		switch (atoi(sim_order)){
+			case 0:
+				librouter_modem3g_sim_order_set_allinfo(0, 1,linux_interface, major);
+				break;
+			case 1:
+				librouter_modem3g_sim_order_set_allinfo(1, 0,linux_interface, major);
+				break;
+			case 2:
+				librouter_modem3g_sim_order_set_allinfo(0, -1,linux_interface, major);
+				break;
+			case 3:
+				librouter_modem3g_sim_order_set_allinfo(1, -1,linux_interface, major);
+				break;
+			default:
+				break;
+		}
+	}
+
+	switch (atoi(backup_interface)){
+		case -1:
+			librouter_ppp_backupd_set_no_backup_interface(linux_interface);
+			break;
+		case 0:
+			librouter_ppp_backupd_set_backup_interface(linux_interface,"ethernet0",intf_return_backup_error);
+			break;
+		case 1:
+			librouter_ppp_backupd_set_backup_interface(linux_interface,"ethernet1",intf_return_backup_error);
+			break;
+	}
 
 	librouter_ppp_reload_backupd(); /* Tell backupd that configuration has changed */
 
 	free(linux_interface);
+	free(intf_return_backup_error);
 	return 0;
 }
 
@@ -375,11 +426,11 @@ int handle_config_interface(struct request *req, struct response *resp)
 		return -1;
 	}
 
-	lo_table = _fetch_lo_info();
-	if (lo_table == NULL) {
-		log_err("Failed to fetch loopback information\n");
-		return -1;
-	}
+//	lo_table = _fetch_lo_info();
+//	if (lo_table == NULL) {
+//		log_err("Failed to fetch loopback information\n");
+//		return -1;
+//	}
 
 	m3g_table = _fetch_3g_info();
 	if (m3g_table == NULL) {

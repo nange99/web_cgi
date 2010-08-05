@@ -24,6 +24,14 @@
 	text-decoration: none;
 	
 }
+
+.inner {
+	border: 1px solid #aaaaaa;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
 </style>
 
 <script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
@@ -231,44 +239,116 @@ $(function() {
 <?foreach row in response.m3g_table?>
 <div id="tab-<?echo row.name?>">
 	<form id="form-<?echo row.name?>" action="/app/apply_intf_settings" method="post">
-		<fieldset><legend>Interface Settings</legend>
-		
-			<input type="hidden" name="name" value="<?echo row.name?>"/>
-		
-			<div>
-				<label for="<?echo row.name?>-apn">APN</label> 
-				<input type="text" name="apn" id="<?echo row.name?>-apn" value="<?echo row.apn?>" class="text ui-widget-content ui-corner-all" />
-			</div>
+		<fieldset>
+			<legend>Interface Settings</legend>
+              
+				<input type="hidden" name="name" value="<?echo row.name?>"/>
+				
+				<?if row.name == "3GModem0" then?>
+					<div>
+						<fieldset class="inner">
+							<legend> SIM 1 Configuration</legend>
+							<div>
+								<label for="<?echo row.name?>-apn">APN</label> 
+								<input type="text" name="apn0" id="<?echo row.name?>-apn0" value="<?echo row.apn0?>" class="text ui-widget-content ui-corner-all" />
+							</div>
+							<div>
+								<label for="<?echo row.name?>-user">Username</label>
+								<input type="text" name="user0" id="<?echo row.name?>-user0" value="<?echo row.user0?>" class="text ui-widget-content ui-corner-all" />
+							</div>
+							<div>
+								<label for="<?echo row.name?>-pass">Password</label> 
+								<input type="text" name="pass0" id="<?echo row.name?>-pass0" value="<?echo row.pass0?>" class="text ui-widget-content ui-corner-all" />
+							</div>
+						</fieldset>
+					</div>
+					
+					<div>
+						<fieldset class="inner">
+							<legend> SIM 2 Configuration</legend>
+							<div>
+								<label for="<?echo row.name?>-apn">APN</label> 
+								<input type="text" name="apn0" id="<?echo row.name?>-apn0" value="<?echo row.apn0?>" class="text ui-widget-content ui-corner-all" />
+							</div>
+							<div>
+								<label for="<?echo row.name?>-user">Username</label>
+								<input type="text" name="user0" id="<?echo row.name?>-user0" value="<?echo row.user0?>" class="text ui-widget-content ui-corner-all" />
+							</div>
+							<div>
+								<label for="<?echo row.name?>-pass">Password</label> 
+								<input type="text" name="pass0" id="<?echo row.name?>-pass0" value="<?echo row.pass0?>" class="text ui-widget-content ui-corner-all" />
+							</div>
+						</fieldset>
+					</div>
+				
+					<fieldset class="inner">
+					<legend> SIM Order-Backup Configuration</legend>
+	
+						<div>
+							<label for="<?echo row.name?>-sim_order">SIM Order</label> 
+							<select name="sim_order" id="<?echo row.name?>-sim_order" class="text ui-widget-content ui-corner-all" style="width:270px">
+								<option value="0">Card 1 as MAIN SIM - Card 2 as BACKUP SIM</option>
+								<option value="1">Card 2 as MAIN SIM - Card 1 as BACKUP SIM</option>
+								<option value="2">Card 1 as MAIN SIM - NO BACKUP SIM</option>
+								<option value="3">Card 2 as MAIN SIM - NO BACKUP SIM</option>
+							</select>
+						</div>						
+					</fieldset>
+					
+				<?else?>
+					<div>
+						<fieldset class="inner">
+							<legend> SIM Configuration</legend>
+							<div>
+								<label for="<?echo row.name?>-apn">APN</label> 
+								<input type="text" name="apn0" id="<?echo row.name?>-apn0" value="<?echo row.apn0?>" class="text ui-widget-content ui-corner-all" />
+							</div>
+							<div>
+								<label for="<?echo row.name?>-user">Username</label>
+								<input type="text" name="user0" id="<?echo row.name?>-user0" value="<?echo row.user0?>" class="text ui-widget-content ui-corner-all" />
+							</div>
+							<div>
+								<label for="<?echo row.name?>-pass">Password</label> 
+								<input type="text" name="pass0" id="<?echo row.name?>-pass0" value="<?echo row.pass0?>" class="text ui-widget-content ui-corner-all" />
+							</div>
+																			
+						</fieldset>
+				<?endif?>
 			
-			<div>
-				<label for="<?echo row.name?>-user">User</label>
-				<input type="text" name="user" id="<?echo row.name?>-user" value="<?echo row.user?>" class="text ui-widget-content ui-corner-all" />
-			</div>
-			
-			<div>
-				<label for="<?echo row.name?>-pass">Pass</label> 
-				<input type="text" name="pass" id="<?echo row.name?>-pass" value="<?echo row.pass?>" class="text ui-widget-content ui-corner-all" />
-			</div>
-			
-			<?if row.name == "m3G0" then?>
-			<div>
-				<label for="<?echo row.name?>-sim">SIM Card Selection</label>
-				<select name="sim" id="<?echo row.name?>-sim" class="text ui-widget-content ui-corner-all">
-					<option value="1">Card 1</option>
-					<option value="2">Card 2</option>
-				</select>
-			</div>
-			<?endif?>
-		
-			<div>
-				<label for="<?echo row.name?>-up">Enable</label>
-				<input type="checkbox" name="up" id="<?echo row.name?>-up" <?if row.up then?>checked="checked"<?endif?> class="text ui-widget-content ui-corner-all" />
-			</div>
+				<fieldset class="inner">
+				<legend> Backup Configuration</legend>
+					<div>
+						<label for="<?echo row.name?>-backup_interface">Backup Interface</label> 
+						<select name="backup_interface" id="<?echo row.name?>-backup_interface" class="text ui-widget-content ui-corner-all" style="width:90px">
+							<option value="-1">--</option>
+							<option value="0">Ethernet 0</option>
+							<option value="1">Ethernet 1</option>
+						</select>
+					</div>
+					
+					<div>
+						<label for="<?echo row.name?>-backup_method">Backup Method</label> 
+						<select name="backup_method" id="<?echo row.name?>-backup_method" class="text ui-widget-content ui-corner-all" style="width:90px">
+							<option value="0">Link</option>
+							<option value="1">Ping</option> 
+							<label for="<?echo row.name?>-pass">Ping Address</label> 
+							<input type="text" name="ping_addr" id="<?echo row.name?>-ping_addr" value="<?echo row.ping_addr?>" class="text ui-widget-content ui-corner-all" style="width:100px" />					
+						</select>
+					</div>
+				</fieldset>
+				
+				<fieldset class="inner">
+					<div>
+						<label for="<?echo row.name?>-up">Enable Interface</label>
+						<input type="checkbox" name="up" id="<?echo row.name?>-up" <?if row.up then?>checked="checked"<?endif?> class="text ui-widget-content ui-corner-all" />
+					</div>
+				</fieldset>
 
-			<div style="float:right">		 
-				<input type="button" id="<?echo row.name?>-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
-			</div>
+				<div style="float:right">		 
+					<input type="button" id="<?echo row.name?>-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
+				</div>
 
+			</fieldset>
 		</fieldset>
 	</form>
 </div>
