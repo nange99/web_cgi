@@ -25,7 +25,9 @@ $(function () {
 	});
 	
 	/* Use tabs if any */
-	$("#pageTabs").tabs();
+	if ($("#pageTabs").length) {
+		$("#pageTabs").tabs();
+	}
 });
 
 /**
