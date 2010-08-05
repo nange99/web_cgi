@@ -6,27 +6,52 @@
  * Copyright 2010, PD3 Tecnologia
  */
 
-/* Global objects */
-var ethernet = new RegExp("^eth*");
-var loopback = new RegExp("^lo*");
-var m3g = new RegExp("^m3[Gg]*");
-var intf_type = {ethernet:1, loopback:2, m3g:3};
-
-/* Left menu sliding function */
+/**
+ * jQuery handlers at document ready
+ */
 $(function () {
 	$(".lvl1").click( function() {
 		$(this).children().children().slideToggle();
 	});
+	
+	/* Set maximum length for text inputs */
+	$(':text').attr('maxlength','50');
+
+	/* Don't accept spaces in text boxes */
+	$(':text').keypress(function (event) {
+		if (event.which == 32) {
+			event.preventDefault();
+		}
+	});
+	
+	/* Use tabs if any */
+	if ($("#pageTabs").length) {
+		$("#pageTabs").tabs();
+	}
 });
 
-/* Reboot confirmation */
+/**
+ * reboot_me	Ask for reboot confirmation
+ * 
+ * @return true if yes, false otherwise
+ */
 function reboot_me() {
     var rtn = confirm ("Reboot now?");
 
     return rtn;
 }
 
+/**
+ * verifyInterfaceType		Get interface type from name
+ * 
+ * @param name
+ * @return interface type
+ */
 function verifyInterfaceType(name) {
+	var ethernet = new RegExp("^eth*");
+	var loopback = new RegExp("^lo*");
+	var m3g = new RegExp("^m3[Gg]*");
+	var intf_type = {ethernet:1, loopback:2, m3g:3};
 	
 	if (ethernet.test(name))
 		return intf_type.ethernet;
@@ -46,17 +71,42 @@ function verifyInterfaceType(name) {
  */
 function isTextFieldEmpty(obj) {
 	var x = obj.val();
-	
+		
 	if (x.length == 0)
-		return true;
+		return  true;
 	else
 		return false;
 }
 
+/**
+ * checkForWhiteSpaces		Check if jQuery object value begins with a white space
+ * 
+ * @param obj
+ * @return false if white space is first character
+ */
+function checkForWhiteSpaces(obj) {
+	var x = obj.val();
+	var y = new RegExp("^ ");
+	
+	if (y.test(x)) {
+		obj.addClass("ui-state-error");
+		return false;
+	}
+	return true;
+}
+
+/**
+ * 
+ * inRange		Check if jQuery object has value between min and max
+ * 
+ * @param obj
+ * @param min
+ * @param max
+ * @return true if in range, false otherwise
+ */
 function inRange(obj, min, max) {
 	var ok = true;
 	var value = obj.val();
-	var bla;
 	
 	if (isNaN(value)) /* Test if entry is a valid number */
 		ok = false;
@@ -76,7 +126,14 @@ function inRange(obj, min, max) {
 	return ok;
 }
 
-/* Validate date in format dd/mm/yyyy */
+/**
+ * verifyDate	Validate jQuery object with date value
+ * 
+ * Time is valid when in format dd/mm/yyyy
+ * 
+ * @param obj
+ * @return true if valid, false otherwise
+ */
 function verifyDate(obj) {
 	var x = obj.val();
 	var splitted = x.split("/");
@@ -122,7 +179,12 @@ function verifyDate(obj) {
 	return valid;
 }
 
-/* Validate time in format hh:mm:ss */
+/**
+ * verifyTime	Validate jQuery object with time value
+ * 
+ * @param obj
+ * @return true if valid, false otherwise
+ */
 function verifyTime(obj) {
 	var x = obj.val();
 	var splitted = x.split(":");
@@ -149,7 +211,12 @@ function verifyTime(obj) {
 	return valid;
 }
 
-/* IP address validation */
+/**
+ * verifyIPAddress		Check if jQuery object has a valid IP address value
+ * 
+ * @param obj
+ * @return true if valid, false otherwise
+ */
 function verifyIPAddress(obj) {
 	var x = obj.val();
 	var splitted = x.split(".");
@@ -172,6 +239,16 @@ function verifyIPAddress(obj) {
 	return valid;
 }
 
+/**
+ * stringMatch	Check if two jQuery objects have the same string value 
+ * 
+ * When not the same, set the ui-state-error class
+ * to both objects. 
+ * 
+ * @param str1
+ * @param str2
+ * @return true if match, false otherwise
+ */
 function stringMatch(str1, str2) {
 	var x = str1.val();
 	var y = str2.val();
@@ -185,4 +262,44 @@ function stringMatch(str1, str2) {
 		str2.addClass("ui-state-error");
 		return false;
 	}
+}
+
+/**
+ * authServerVerify		Validate authentication server information
+ * 
+ * @param ip
+ * @param key
+ * @param timeout
+ * @return true if ok, false if not ok
+ */
+function authServerVerify(ip, key, timeout) {
+	var ok = true;
+	var empty_ip = isTextFieldEmpty(ip);
+	var empty_key = isTextFieldEmpty(key);
+	var empty_timeout = isTextFieldEmpty(timeout);
+	
+	if (empty_ip == false)
+		ok = verifyIPAddress(ip) && ok;
+	
+	if (empty_key == false)
+		ok = checkForWhiteSpaces(key) && ok;
+	
+	if (empty_timeout == false)
+		ok = inRange(timeout, 1, 1000) && ok;
+	
+	/* If ip field is blank and others are field, show error */
+	if (empty_ip) {
+		if (!empty_key || !empty_timeout) {
+			ip.addClass("ui-state-error");
+			ok = false;
+		}
+	/* else if empty key, no timeout is accepted */
+	} else if (empty_key) {
+		if (!empty_timeout) {
+			key.addClass("ui-state-error");
+			ok = false;
+		}
+	}
+
+	return ok;
 }

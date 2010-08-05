@@ -1,8 +1,16 @@
 <?if (response.success == 0) then?>
 <p> Changes were applied successfully!</p>
 <?elseif (response.success < 0) then?>
-<p> An error happened when applying changes. <br/>
-Please contact support.</p>
+	<?if (response.err_msg) then?>
+		<p>
+		<?echo response.err_msg?>
+		</p>
+	<?else?>
+		<p>
+		An error happened when applying changes!<br/>
+		Please contact support.
+		</p>
+	<?endif?>
 <?else?>
 <p> No return value defined!</p>
 <?endif?>

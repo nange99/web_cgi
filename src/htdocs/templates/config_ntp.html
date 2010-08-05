@@ -6,7 +6,7 @@
 <link rel="stylesheet" type="text/css" href="/css/digistar_styles.css"/>
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.2.custom.css"/>
 <style type="text/css">
-#intfTabs {
+#pageTabs {
 	width: 92%;
 	font-size: 10px;
 	margin-left: 30px;
@@ -20,13 +20,9 @@
 <script type="text/javascript" src="/js/menu.js"></script>
 <script type="text/javascript">
 $(function() {
-	$("#intfTabs").tabs();
 	$("#datepicker").datepicker({
 			dateFormat: 'dd/mm/yy'
 	});
-
-	/* Set maximum length for text inputs */
-	$(':text').attr('maxlength','50');
 
 	$("#gmt<?echo response.tzvalue?>").attr('selected','selected');
 		
@@ -131,7 +127,7 @@ $(function() {
 	<div id="content">
 		<h1>Time Configuration</h1>
 
-<div id="intfTabs">
+<div id="pageTabs">
 <ul>
 	<li><a href="#tab-date">Date</a></li>
 	<li><a href="#tab-timezone">Time Zone</a></li>

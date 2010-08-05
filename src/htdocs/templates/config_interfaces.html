@@ -7,7 +7,7 @@
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.2.custom.css" />
 <style type="text/css">
 
-#intfTabs {
+#pageTabs {
 	width: 92%;
 	font-size: 10px;
 	margin-left: 30px;
@@ -40,9 +40,6 @@
 <script type="text/javascript" src="/js/menu.js"></script>
 <script type="text/javascript">
 $(function() {
-	/* Creates interface tabs */
-	$("#intfTabs").tabs();
-
 	/* Define message dialog */
 	$("#notificationDialog").dialog({
 		autoOpen: false,
@@ -55,6 +52,13 @@ $(function() {
 
 	/* Set maximum length for text inputs */
 	$(':text').attr('maxlength','50');
+
+	/* Don't accept spaces in text boxes */
+	$(':text').keypress(function (event) {
+		if (event.which == 32) {
+			event.preventDefault();
+		}
+	});
 	
 	/* ETHERNET FUNCTIONS */
 	<?foreach row in response.eth_table?>
@@ -154,7 +158,7 @@ $(function() {
 
 <div id="content">
 <h1>Interface Configuration</h1>
-<div id="intfTabs">
+<div id="pageTabs">
 <ul>
 	<?foreach row in response.eth_table?>
 	<li><a href="#tab-<?echo row.name?>"><?echo row.name?></a></li>

@@ -256,3 +256,7 @@ select {
 	width:20em;
 }
 
+input[type="checkbox"] {
+	float: left;
+	width: 20px;
+}

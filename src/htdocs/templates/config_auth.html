@@ -6,7 +6,7 @@
 <link rel="stylesheet" type="text/css" href="/css/digistar_styles.css"/>
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.2.custom.css"/>
 <style type="text/css">
-#authTabs {
+#pageTabs {
 	width: 92%;
 	font-size: 10px;
 	margin-left: 30px;
@@ -36,11 +36,6 @@ $(function() {
 	var pw = $("#password");
 	var confirm = $("#confirmpw");
 	
-	$("#authTabs").tabs();
-
-	/* Set maximum length for text inputs */
-	$(':text').attr('maxlength','50');
-
 	/* Set correct input values */
 	$("#<?echo response.cli_auth_type?>").attr('selected','selected');
 	$("#<?echo response.web_auth_type?>").attr('selected','selected');
@@ -68,26 +63,9 @@ $(function() {
 
 		/* Empty IP fields are accepted. We only need to check
 		for a valid IP if something is written */
-		if (isTextFieldEmpty($("#radius-server-1")) == false)
-			ok = verifyIPAddress($("#radius-server-1")) && ok;
-		if (isTextFieldEmpty($("#radius-server-2")) == false)
-			ok = verifyIPAddress($("#radius-server-2")) && ok;
-		if (isTextFieldEmpty($("#radius-server-3")) == false)
-			ok = verifyIPAddress($("#radius-server-3")) && ok;
-
-		if (isTextFieldEmpty($("#radius-key-1")) == false)
-			ok = verifyIPAddress($("#radius-key-1")) && ok;
-		if (isTextFieldEmpty($("#radius-key-2")) == false)
-			ok = verifyIPAddress($("#radius-key-2")) && ok;
-		if (isTextFieldEmpty($("#radius-key-3")) == false)
-			ok = verifyIPAddress($("#radius-key-3")) && ok;
-
-		if (isTextFieldEmpty($("#radius-timeout-1")) == false)
-			ok = inRange($("#radius-timeout-1"), 1, 1000) && ok;
-		if (isTextFieldEmpty($("#radius-timeout-2")) == false)
-			ok = inRange($("#radius-timeout-2"), 1, 1000) && ok;
-		if (isTextFieldEmpty($("#radius-timeout-3")) == false)
-			ok = inRange($("#radius-timeout-3"), 1, 1000) && ok;
+		ok = authServerVerify($("#radius-server-1"),$("#radius-key-1"),$("#radius-timeout-1")) && ok;
+		ok = authServerVerify($("#radius-server-2"),$("#radius-key-2"),$("#radius-timeout-2")) && ok;
+		ok = authServerVerify($("#radius-server-3"),$("#radius-key-3"),$("#radius-timeout-3")) && ok;
 
 		if (ok == false) {
 			setTimeout(function () {
@@ -116,6 +94,29 @@ $(function() {
 
 	/*TACACS+ Button */
 	$("#tacacs-apply").click(function () {
+		var ok = true;
+
+		/* Empty IP fields are accepted. We only need to check
+		for a valid IP if something is written */
+		ok = authServerVerify($("#tacacs-server-1"),$("#tacacs-key-1"),$("#tacacs-timeout-1")) && ok;
+		ok = authServerVerify($("#tacacs-server-2"),$("#tacacs-key-2"),$("#tacacs-timeout-2")) && ok;
+		ok = authServerVerify($("#tacacs-server-3"),$("#tacacs-key-3"),$("#tacacs-timeout-3")) && ok;
+
+		if (ok == false) {
+			setTimeout(function () {
+				$("#tacacs-server-1").removeClass("ui-state-error");
+				$("#tacacs-server-2").removeClass("ui-state-error");
+				$("#tacacs-server-3").removeClass("ui-state-error");
+				$("#tacacs-key-1").removeClass("ui-state-error");
+				$("#tacacs-key-2").removeClass("ui-state-error");
+				$("#tacacs-key-3").removeClass("ui-state-error");
+				$("#tacacs-timeout-1").removeClass("ui-state-error");
+				$("#tacacs-timeout-2").removeClass("ui-state-error");
+				$("#tacacs-timeout-3").removeClass("ui-state-error");
+			}, 3000);
+			return;
+		}
+		
 		form = $(this).parents("form").get(0);
 		form_data = $(this).parents("form").serialize();
 
@@ -182,7 +183,7 @@ $(function() {
 	<div id="content">
 		<h1>Authentication Configuration</h1>
 
-<div id="authTabs">
+<div id="pageTabs">
 <ul>
 	<li><a href="#tab-users">Users</a></li>
 	<li><a href="#tab-auth">Authentication Type</a></li>
@@ -266,15 +267,15 @@ $(function() {
 				<legend> Server 1 Configuration</legend>
 				<div>
 					<label for="radius-server-1">IP Address: </label>
-					<input type="text" name="radius_server_1" id="radius-server-1" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="radius_server_1" id="radius-server-1" value="<?echo response.radius_server_1?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				<div>
 					<label for="radius-key-1">Key: </label>
-					<input type="text" name="radius_key_1" id="radius-key-1" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="radius_key_1" id="radius-key-1" value="<?echo response.radius_key_1?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				<div>
 					<label for="radius-timeout-1">Timeout: </label>
-					<input type="text" name="radius_timeout_1" id="radius-timeout-1" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="radius_timeout_1" id="radius-timeout-1" value="<?echo response.radius_timeout_1?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				</fieldset>
 			</div>
@@ -284,15 +285,15 @@ $(function() {
 				<legend> Server 2 Configuration</legend>
 				<div>
 					<label for="radius-server-2">IP Address: </label>
-					<input type="text" name="radius_server_2" id="radius-server-2" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="radius_server_2" id="radius-server-2" value="<?echo response.radius_server_2?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				<div>
 					<label for="radius-key-2">Key: </label>
-					<input type="text" name="radius_key_2" id="radius-key-2" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="radius_key_2" id="radius-key-2" value="<?echo response.radius_key_2?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				<div>
 					<label for="radius-timeout-2">Timeout: </label>
-					<input type="text" name="radius_timeout_2" id="radius-timeout-2" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="radius_timeout_2" id="radius-timeout-2" value="<?echo response.radius_timeout_3?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				</fieldset>
 			</div>
@@ -302,15 +303,15 @@ $(function() {
 				<legend> Server 3 Configuration</legend>
 				<div>
 					<label for="radius-server-3">IP Address: </label>
-					<input type="text" name="radius_server_3" id="radius-server-3" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="radius_server_3" id="radius-server-3" value="<?echo response.radius_server_3?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				<div>
 					<label for="radius-key-3">Key: </label>
-					<input type="text" name="radius_key_3" id="radius-key-3" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="radius_key_3" id="radius-key-3" value="<?echo response.radius_key_3?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				<div>
 					<label for="radius-timeout-3">Timeout: </label>
-					<input type="text" name="radius_timeout_3" id="radius-timeout-3" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="radius_timeout_3" id="radius-timeout-3" value="<?echo response.radius_timeout_3?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				</fieldset>
 			</div>
@@ -332,15 +333,15 @@ $(function() {
 				<legend> Server 1 Configuration</legend>
 				<div>
 					<label for="tacacs-server-1">IP Address: </label>
-					<input type="text" name="tacacs_server_1" id="tacacs-server-1" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="tacacs_server_1" id="tacacs-server-1" value="<?echo response.tacacs_server_1?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				<div>
 					<label for="tacacs-key-1">Key: </label>
-					<input type="text" name="tacacs_key_1" id="tacacs-key-1" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="tacacs_key_1" id="tacacs-key-1" value="<?echo response.tacacs_key_1?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				<div>
 					<label for="tacacs-timeout-1">Timeout: </label>
-					<input type="text" name="tacacs_timeout_1" id="tacacs-timeout-1" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="tacacs_timeout_1" id="tacacs-timeout-1" value="<?echo response.tacacs_timeout_1?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				</fieldset>
 			</div>
@@ -350,15 +351,15 @@ $(function() {
 				<legend> Server 2 Configuration</legend>
 				<div>
 					<label for="tacacs-server-2">IP Address: </label>
-					<input type="text" name="tacacs_server_2" id="tacacs-server-2" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="tacacs_server_2" id="tacacs-server-2" value="<?echo response.tacacs_server_2?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				<div>
 					<label for="tacacs-key-2">Key: </label>
-					<input type="text" name="tacacs_key_2" id="tacacs-key-2" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="tacacs_key_2" id="tacacs-key-2" value="<?echo response.tacacs_key_2?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				<div>
 					<label for="tacacs-timeout-2">Timeout: </label>
-					<input type="text" name="tacacs_timeout_2" id="tacacs-timeout-2" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="tacacs_timeout_2" id="tacacs-timeout-2" value="<?echo response.tacacs_timeout_2?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				</fieldset>
 			</div>
@@ -368,15 +369,15 @@ $(function() {
 				<legend> Server 3 Configuration</legend>
 				<div>
 					<label for="tacacs-server-3">IP Address: </label>
-					<input type="text" name="tacacs_server_3" id="tacacs-server-3" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="tacacs_server_3" id="tacacs-server-3" value="<?echo response.tacacs_server_3?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				<div>
 					<label for="tacacs-key-3">Key: </label>
-					<input type="text" name="tacacs_key_3" id="tacacs-key-3" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="tacacs_key_3" id="tacacs-key-3" value="<?echo response.tacacs_key_3?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				<div>
 					<label for="tacacs-timeout-3">Timeout: </label>
-					<input type="text" name="tacacs_timeout_3" id="tacacs-timeout-3" value="" class="text ui-widget-content ui-corner-all" />
+					<input type="text" name="tacacs_timeout_3" id="tacacs-timeout-3" value="<?echo response.tacacs_timeout_3?>" class="text ui-widget-content ui-corner-all" />
 				</div>
 				</fieldset>
 			</div>

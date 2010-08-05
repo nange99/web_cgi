@@ -139,6 +139,59 @@ static int _handle_auth_type(struct response *resp)
 	return 0;
 }
 
+static int _handle_auth_servers(struct response *resp)
+{
+	int i;
+	char server[32], key[32], timeout[32];
+	struct auth_server tacacs_servers[AUTH_MAX_SERVERS];
+	struct auth_server radius_servers[AUTH_MAX_SERVERS];
+
+	memset(tacacs_servers, 0, sizeof(tacacs_servers));
+	memset(radius_servers, 0, sizeof(radius_servers));
+
+	librouter_pam_get_tacacs_servers(tacacs_servers);
+	librouter_pam_get_radius_servers(radius_servers);
+
+	for (i = 0; i < AUTH_MAX_SERVERS; i++) {
+		sprintf(server, "tacacs_server_%d", i+1);
+		sprintf(key, "tacacs_key_%d", i+1);
+		sprintf(timeout, "tacacs_timeout_%d", i+1);
+
+		if (tacacs_servers[i].ipaddr)
+			cgi_response_add_parameter(resp, server, tacacs_servers[i].ipaddr,
+			                CGI_STRING);
+
+		if (tacacs_servers[i].key)
+			cgi_response_add_parameter(resp, key, tacacs_servers[i].key, CGI_STRING);
+
+		if (tacacs_servers[i].timeout)
+			cgi_response_add_parameter(resp, timeout,
+			                (void *) tacacs_servers[i].timeout, CGI_INTEGER);
+	}
+
+	for (i = 0; i < AUTH_MAX_SERVERS; i++) {
+		sprintf(server, "radius_server_%d", i+1);
+		sprintf(key, "radius_key_%d", i+1);
+		sprintf(timeout, "radius_timeout_%d", i+1);
+
+		if (radius_servers[i].ipaddr)
+			cgi_response_add_parameter(resp, server, radius_servers[i].ipaddr,
+			                CGI_STRING);
+
+		if (radius_servers[i].key)
+			cgi_response_add_parameter(resp, key, radius_servers[i].key, CGI_STRING);
+
+		if (radius_servers[i].timeout)
+			cgi_response_add_parameter(resp, timeout,
+			                (void *) radius_servers[i].timeout, CGI_INTEGER);
+	}
+
+	librouter_pam_free_servers(AUTH_MAX_SERVERS, tacacs_servers);
+	librouter_pam_free_servers(AUTH_MAX_SERVERS, radius_servers);
+
+	return 0;
+}
+
 /*
  *
  * EXPORTED HANDLERS
@@ -165,10 +218,6 @@ int handle_add_user(struct request *req, struct response *resp)
 	passwd = _get_parameter(req, "password");
 	confirm = _get_parameter(req, "confirmpw");
 
-	web_dbg("username : %s\n", username);
-	web_dbg("pw : %s\n", passwd);
-	web_dbg("confirm : %s\n", confirm);
-
 	/* Password match ? */
 	if (strcmp(passwd, confirm))
 		return -1;
@@ -176,7 +225,6 @@ int handle_add_user(struct request *req, struct response *resp)
 	if (librouter_pam_add_user(username, passwd) < 0)
 		return -1;
 
-	web_dbg();
 	return 0;
 }
 
@@ -225,10 +273,32 @@ int handle_apply_auth_type(struct request *req, struct response *resp)
 int handle_apply_radius_settings(struct request *req, struct response *resp)
 {
 	int ret = 0;
+	struct auth_server radius_server[AUTH_MAX_SERVERS];
+	int i;
+
+	memset(radius_server, 0, sizeof(radius_server));
 
 	if (!cgi_session_exists(req)) {
 		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
 		return 0;
+	}
+
+	librouter_pam_del_radius_server(NULL); /* Delete all configured servers */
+
+	for (i=0; i< AUTH_MAX_SERVERS;i++) {
+		char server[32], key[32], timeout[32];
+		sprintf(server, "radius_server_%d", i+1);
+		sprintf(key, "radius_key_%d", i+1);
+		sprintf(timeout, "radius_timeout_%d", i+1);
+
+		radius_server[i].ipaddr = _get_parameter(req, server);
+		radius_server[i].key = _get_parameter(req, key);
+		if (_get_parameter(req, timeout) != NULL)
+			radius_server[i].timeout = atoi(_get_parameter(req, timeout));
+
+		/* Apply settings if ip is defined */
+		if (radius_server[i].ipaddr != NULL)
+			librouter_pam_add_radius_server(&radius_server[i]);
 	}
 
 	cgi_response_add_parameter(resp, "success", (void *) ret, CGI_INTEGER);
@@ -247,10 +317,32 @@ int handle_apply_radius_settings(struct request *req, struct response *resp)
 int handle_apply_tacacs_settings(struct request *req, struct response *resp)
 {
 	int ret = 0;
+	struct auth_server tacacs_server[AUTH_MAX_SERVERS];
+	int i;
+
+	memset(tacacs_server, 0, sizeof(tacacs_server));
 
 	if (!cgi_session_exists(req)) {
 		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
 		return 0;
+	}
+
+	librouter_pam_del_tacacs_server(NULL); /* Delete all configured servers */
+
+	for (i=0; i< AUTH_MAX_SERVERS;i++) {
+		char server[32], key[32], timeout[32];
+		sprintf(server, "tacacs_server_%d", i+1);
+		sprintf(key, "tacacs_key_%d", i+1);
+		sprintf(timeout, "tacacs_timeout_%d", i+1);
+
+		tacacs_server[i].ipaddr = _get_parameter(req, server);
+		tacacs_server[i].key = _get_parameter(req, key);
+		if (_get_parameter(req, timeout) != NULL)
+			tacacs_server[i].timeout = atoi(_get_parameter(req, timeout));
+
+		/* Apply settings if ip is defined */
+		if (tacacs_server[i].ipaddr != NULL)
+			librouter_pam_add_tacacs_server(&tacacs_server[i]);
 	}
 
 	cgi_response_add_parameter(resp, "success", (void *) ret, CGI_INTEGER);
@@ -312,6 +404,9 @@ int handle_config_auth(struct request *req, struct response *resp)
 
 	/* Get auth type */
 	_handle_auth_type(resp);
+
+	/* Get servers */
+	_handle_auth_servers(resp);
 
 	cgi_response_add_parameter(resp, "menu_config", (void *) 8, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/config_auth.html");

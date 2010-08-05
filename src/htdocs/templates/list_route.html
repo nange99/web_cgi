@@ -25,9 +25,6 @@ $(function() {
 	var interface = $("#interface");
 	var allFields = $([]).add(destination).add(gateway).add(mask).add(metric).add(interface);
 	
-	/* Set maximum length for text inputs */
-	$(':text').attr('maxlength','50');
-
 	/* Fetch route table */
 	function updateRouteTable() {
 		$.ajax({url: "/app/config_static_routes?table=1", success: function(data) { $("#table_wrapper").html(data)}});
