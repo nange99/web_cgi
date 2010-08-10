@@ -190,10 +190,11 @@ body {
 
 #content table
 {
-	font-size: 12px;
-    margin-top: 15px;
-	margin-left: 50px;
-	width: 580px;
+	font-size: 10px;
+    margin-top: 1px;
+	margin-left: 35px;
+	height:70px;
+	width: 460px;
 	text-align: left;
 	border-collapse: collapse;
 }
