@@ -23,9 +23,35 @@
 #include <librouter/dev.h>
 #include <librouter/ppp.h>
 #include <librouter/modem3G.h>
+#include <librouter/usb.h>
 
 #include "web_config.h"
 #include "interface.h"
+
+
+/**
+ * _convert_string_web_to_linux		Convert linux to web string
+ *
+ * @param type
+ * @param linux_interface
+ * @return Pointer to web string, needs to be free'd after use
+ */
+static char *_convert_string_linux_to_web(device_type type, char *linux_interface)
+{
+	char * web_interface;
+	dev_family *fam = librouter_device_get_family_by_type(type);
+
+	if (fam == NULL)
+		return NULL;
+
+	web_interface = malloc(32);
+
+	/* Position the string at the index */
+	linux_interface += strlen(fam->linux_string);
+	snprintf(web_interface, 32, "%s%s", fam->web_string, linux_interface);
+
+	return web_interface;
+}
 
 /**
  * _convert_string_web_to_linux		Convert web to linux string
@@ -144,35 +170,138 @@ static int _apply_lo_settings(struct request *req, struct response *resp)
  */
 static int _apply_3g_settings(struct request *req, struct response *resp)
 {
-	char *interface, *apn, *user, *pass, *sim, *up;
-	char *linux_interface;
-	int major;
+	char *apn0, *user0, *pass0, *apn1, *user1, *pass1;
+	char *backup_method, *backup_interface, *ping_addr, *sim_order, *up;
+	char *linux_interface, *interface;
+	char * intf_return_backup_error = malloc(24);
+	char * warning_string = malloc(256);
+	int major=-1, ret=-1, warning_intf=0;
+
 
 	interface = _get_parameter(req, "name");
-	apn = _get_parameter(req, "apn");
-	user = _get_parameter(req, "user");
-	pass = _get_parameter(req, "pass");
-	sim = _get_parameter(req, "sim");
+	apn0 = _get_parameter(req, "apn0");
+	user0 = _get_parameter(req, "user0");
+	pass0 = _get_parameter(req, "pass0");
+	apn1 = _get_parameter(req, "apn1");
+	user1 = _get_parameter(req, "user1");
+	pass1 = _get_parameter(req, "pass1");
+	sim_order = _get_parameter(req, "sim_order");
+	backup_method = _get_parameter(req,"backup_method");
+	ping_addr = _get_parameter(req,"ping_addr");
+	backup_interface = _get_parameter(req,"backup_interface");
 	up = _get_parameter(req, "up");
 
+
 	web_dbg("interface is %s\n", interface);
+
 	linux_interface = _convert_string_web_to_linux(ppp, interface);
 	if (linux_interface == NULL) {
 		log_err("Linux interface not found\n");
 		return -1;
 	}
-
 	major = librouter_device_get_major(linux_interface, str_linux);
 
-	web_dbg("Major is %d\n", major);
+	web_dbg("Major is %d, Linux Intf is %s\n", major, linux_interface);
 
-	librouter_modem3g_set_apn(apn, major);
-	librouter_modem3g_set_username(user, major);
-	librouter_modem3g_set_password(pass, major);
 
-	librouter_ppp_reload_backupd(); /* Tell backupd that configuration has changed */
+	/* Realiza o shutdown da interface 3G para aplicar as configurações */
+	librouter_ppp_backupd_set_shutdown_3Gmodem(linux_interface);
+	librouter_ppp_reload_backupd();
+
+
+	if (major != 0){
+		librouter_modem3g_set_apn(apn0, major);
+		web_dbg("PASSOU NO APN SIMPLES\n");
+		librouter_modem3g_set_username(user0, major);
+		librouter_modem3g_set_password(pass0, major);
+	}
+	else{
+		librouter_modem3g_sim_set_info_infile(0,"apn",apn0);
+		librouter_modem3g_sim_set_info_infile(0,"username",user0);
+		librouter_modem3g_sim_set_info_infile(0,"password",pass0);
+		librouter_modem3g_sim_set_info_infile(1,"apn",apn1);
+		librouter_modem3g_sim_set_info_infile(1,"username",user1);
+		librouter_modem3g_sim_set_info_infile(1,"password",pass1);
+
+		switch (atoi(sim_order)){
+			case 0:
+				librouter_modem3g_sim_order_set_allinfo(0, 1,linux_interface, major);
+				break;
+			case 1:
+				librouter_modem3g_sim_order_set_allinfo(1, 0,linux_interface, major);
+				break;
+			case 2:
+				librouter_modem3g_sim_order_set_allinfo(0, -1,linux_interface, major);
+				break;
+			case 3:
+				librouter_modem3g_sim_order_set_allinfo(1, -1,linux_interface, major);
+				break;
+		}
+	}
+
+	switch (atoi(backup_method)){
+		case 0:
+			ret = librouter_ppp_backupd_set_backup_method(linux_interface,"link",NULL);
+			break;
+		case 1:
+			ret = librouter_ppp_backupd_set_backup_method(linux_interface,"ping",ping_addr);
+			break;
+	}
+
+
+	if (ret < 0)
+		goto end;
+
+
+	switch (atoi(backup_interface)){
+		case -1:
+			ret = librouter_ppp_backupd_set_no_backup_interface(linux_interface);
+			intf_return_backup_error = NULL;
+			break;
+		case 0:
+			ret = librouter_ppp_backupd_set_backup_interface(linux_interface,"ethernet0",intf_return_backup_error);
+			web_dbg("RET in backup set ethernet0 is %d\n\n", ret);
+
+			break;
+		case 1:
+			ret = librouter_ppp_backupd_set_backup_interface(linux_interface,"ethernet1",intf_return_backup_error);
+			web_dbg("RET in backup set ethernet1 is %d\n\n", ret);
+			break;
+	}
+
+
+	web_dbg("Interface RETURN BACK ERROR is %s\n", intf_return_backup_error);
+
+	if ((intf_return_backup_error != NULL) && (ret < 0) )
+		sprintf(warning_string,"<br/> An error happened when applying changes!<br/> <br/> The backup interface selected is already set by %s! ",_convert_string_linux_to_web(ppp,intf_return_backup_error) );
+
+
+	if (up != NULL){
+		if (!librouter_usb_device_is_modem(major+1)){
+			if (ret < 0)
+				strcat(warning_string, "<br/><br/> The interface is not connected or is not a modem!");
+			else{
+				strcpy(warning_string,"<br/> The interface is not connected or is not a modem!");
+				warning_intf = -1;
+			}
+		}
+		librouter_ppp_backupd_set_no_shutdown_3Gmodem(linux_interface);
+	}
+
+
+end:
+	if (ret == 0)
+		librouter_ppp_reload_backupd(); /* Tell backupd that configuration has changed */
+
+	if (warning_intf < 0)
+		ret = -1;
+
+	cgi_response_add_parameter(resp, "err_msg", (void *) warning_string, CGI_STRING);
+	cgi_response_add_parameter(resp, "success", (void *) ret, CGI_INTEGER);
 
 	free(linux_interface);
+	free(intf_return_backup_error);
+	free(warning_string);
 	return 0;
 }
 
@@ -375,11 +504,11 @@ int handle_config_interface(struct request *req, struct response *resp)
 		return -1;
 	}
 
-	lo_table = _fetch_lo_info();
-	if (lo_table == NULL) {
-		log_err("Failed to fetch loopback information\n");
-		return -1;
-	}
+//	lo_table = _fetch_lo_info();
+//	if (lo_table == NULL) {
+//		log_err("Failed to fetch loopback information\n");
+//		return -1;
+//	}
 
 	m3g_table = _fetch_3g_info();
 	if (m3g_table == NULL) {
