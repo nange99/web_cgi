@@ -14,7 +14,9 @@ web_digistar_SOURCES = \
 	logging.c \
 	cpu.c \
 	ntp.c \
-	auth.c
+	auth.c \
+	qos.c \
+	snmp.c
 
 htmlfilesdir = $(datadir)
 cssdir = $(datadir)/css
