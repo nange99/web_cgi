@@ -10,6 +10,7 @@
 #include <syslog.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <errno.h>
 
 #include <libcgiservlet/cgi_servlet.h>
 #include <libcgiservlet/cgi_session.h>
@@ -31,6 +32,8 @@
 #include "cpu.h"
 #include "ntp.h"
 #include "auth.h"
+#include "firewall.h"
+#include "nat.h"
 
 /**
  * _get_parameter	Wrapper for cgi_request_get_parameter
@@ -195,32 +198,6 @@ saveconf_finish:
  * Temporary Handlers
  *
  */
-int handle_config_firewall(struct request *req, struct response *resp)
-{
-	if (!cgi_session_exists(req)) {
-		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
-		return 0;
-	}
-
-	cgi_response_add_parameter(resp, "menu_config", (void *) 3, CGI_INTEGER);
-	cgi_response_set_html(resp, "/wn/cgi/templates/config_firewall.html");
-
-	return 1;
-}
-
-int handle_config_nat(struct request *req, struct response *resp)
-{
-	if (!cgi_session_exists(req)) {
-		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
-		return 0;
-	}
-
-	cgi_response_add_parameter(resp, "menu_config", (void *) 4, CGI_INTEGER);
-	cgi_response_set_html(resp, "/wn/cgi/templates/config_nat.html");
-
-	return 1;
-}
-
 int handle_config_qos(struct request *req, struct response *resp)
 {
 	if (!cgi_session_exists(req)) {
@@ -370,29 +347,46 @@ int main(int argc, char **argv)
 		{.url = "/config_interfaces", .handler = handle_config_interface},
 		{.url = "/apply_intf_settings", .handler = handle_apply_intf_settings},
 
-
+		/* Routes */
 		{.url = "/config_static_routes", .handler = handle_static_routes},
 		{.url = "/add_route", .handler = handle_add_route},
 
+		/* Firewall */
 		{ .url = "/config_firewall", .handler = handle_config_firewall },
+		{ .url = "/apply_fw_general_settings", .handler = handle_apply_fw_general_settings },
+		{ .url = "/add_fw_rule", .handler = handle_fw_add_rule},
+
+		/* NAT */
 		{ .url = "/config_nat", .handler = handle_config_nat },
+		{ .url = "/apply_nat_general_settings", .handler = handle_apply_nat_general_settings },
+		{ .url = "/app/apply_nat_rules_settings", .handler = handle_apply_nat_rules_settings },
+
+		/* QoS */
 		{ .url = "/config_qos", .handler = handle_config_qos },
+
+		/* IPSec */
 		{ .url = "/config_ipsec", .handler = handle_config_ipsec },
+
+		/* SNMP */
 		{ .url = "/config_snmp", .handler = handle_config_snmp },
 
+		/* Authentication */
 		{ .url = "/config_auth", .handler = handle_config_auth },
 		{ .url = "/add_user", .handler = handle_add_user },
 		{ .url = "/apply_auth_type", .handler = handle_apply_auth_type },
 		{ .url = "/apply_radius_settings", .handler = handle_apply_radius_settings },
 		{ .url = "/apply_tacacs_settings", .handler = handle_apply_tacacs_settings },
 
+		/* NTP */
 		{ .url = "/config_ntp", .handler = handle_config_ntp },
 		{ .url = "/apply_date_settings", .handler = handle_apply_date_settings },
 		{ .url = "/apply_timezone_settings", .handler = handle_apply_timezone_settings },
 
+		/* DHCP Server */
 		{ .url = "/config_dhcpd", .handler = handle_config_dhcpd },
 		{ .url = "/apply_dhcp_settings", .handler = handle_apply_dhcpd_settings },
 
+		/* Status Pages */
 		{ .url = "/status_interfaces", .handler = handle_status_interfaces },
 		{ .url = "/status_firewall", .handler = handle_status_firewall },
 		{ .url = "/status_nat", .handler = handle_status_nat },
@@ -404,13 +398,13 @@ int main(int argc, char **argv)
 		{ .url = "/status_cpu", .handler = handle_status_cpu },
 		{ .url = "/status_memory", .handler = handle_status_memory },
 
-
 		/* Firmware */
 		{.url ="/firmware_info", .handler = handle_firmware_version},
 		{.url ="/firmware_upgrade", .handler = handle_firmware_upgrade},
 		{.url ="/firmware_upgrade_frame", .handler = handle_firmware_upgrade_frame },
 		{.url ="/firmware_upgrade_save", .handler = handle_firmware_receive_file}
 	};
+
 	struct url_mapping **map_p = (struct url_mapping **)((void *) &map);
 
 	struct config conf = {
@@ -420,7 +414,13 @@ int main(int argc, char **argv)
 
 	int size = sizeof(map) / sizeof(struct url_mapping);
 
-	web_dbg("web_digistar is running as %d UID. Config size is %d\n", geteuid(), size);
+	/* Run with effective UID */
+	if (setuid(geteuid()) < 0) {
+		log_err("Could not set UID with effective : %s\n", strerror(errno));
+		return -1;
+	}
+
+	web_dbg("web_digistar is running as %d UID. Config size is %d\n", getuid(), size);
 
 	cgi_servlet_init (&conf, map_p, size, NULL);
 

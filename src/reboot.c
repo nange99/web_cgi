@@ -44,10 +44,9 @@ int handle_reboot(struct request *req, struct response *resp)
 			exit(EXIT_FAILURE);
 		}
 		chdir("/");
+
 		/* wait 3 seconds and reboot */
-		sleep(3);
-		sync();
-		reboot(0x1234567);
+		popen("/sbin/reboot -d 3 -f ", "r");
 
 		exit(0); /* Not reached */
 		break;
