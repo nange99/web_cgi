@@ -133,6 +133,11 @@ $(function() {
 
 	/* 3G FUNCTIONS */
 	<?foreach row in response.m3g_table?>
+
+	$("#<?echo row.name?>-<?echo row.sim_order?>").attr('selected','selected');
+	$("#<?echo row.name?>-<?echo row.backup_interface?>").attr('selected','selected');
+	$("#<?echo row.name?>-<?echo row.backup_method?>").attr('selected','selected');
+	 
 	$("#<?echo row.name?>-apply").click(function () {
 		/* Check for valid IPs */
 		var ok = true;
@@ -305,14 +310,13 @@ $(function() {
 				
 					<fieldset class="inner">
 					<legend> SIM Order-Backup Configuration</legend>
-	
 						<div>
 							<label for="<?echo row.name?>-sim_order">SIM Order</label> 
 							<select name="sim_order" id="<?echo row.name?>-sim_order" class="text ui-widget-content ui-corner-all" style="width:270px">
-								<option value="0">Card 1 as MAIN SIM - Card 2 as BACKUP SIM</option>
-								<option value="1">Card 2 as MAIN SIM - Card 1 as BACKUP SIM</option>
-								<option value="2">Card 1 as MAIN SIM - NO BACKUP SIM</option>
-								<option value="3">Card 2 as MAIN SIM - NO BACKUP SIM</option>
+								<option value="0" id="<?echo row.name?>-sim-order-0">Card 1 as MAIN SIM - Card 2 as BACKUP SIM</option>
+								<option value="1" id="<?echo row.name?>-sim-order-1">Card 2 as MAIN SIM - Card 1 as BACKUP SIM</option>
+								<option value="2" id="<?echo row.name?>-sim-order-2">Card 1 as MAIN SIM - NO BACKUP SIM</option>
+								<option value="3" id="<?echo row.name?>-sim-order-3">Card 2 as MAIN SIM - NO BACKUP SIM</option>
 							</select>
 						</div>						
 					</fieldset>
@@ -344,9 +348,9 @@ $(function() {
 							<td>
 								<label for="<?echo row.name?>-backup_interface">Backup Interface</label> 
 								<select name="backup_interface" id="<?echo row.name?>-backup_interface" class="text ui-widget-content ui-corner-all" style="width:90px">
-									<option value="-1">--</option>
-									<option value="0">Ethernet 0</option>
-									<option value="1">Ethernet 1</option><t><label for="<?echo row.name?>-pass">Ping Address</label> </t>
+									<option value="-1" id="<?echo row.name?>-backup-intf-">--</option>
+									<option value="0"  id="<?echo row.name?>-backup-intf-ethernet0">Ethernet 0</option>
+									<option value="1"  id="<?echo row.name?>-backup-intf-ethernet1">Ethernet 1</option>
 								</select>
 							</td>
 						</tr>
@@ -354,8 +358,8 @@ $(function() {
 							<td> 
 								<label for="<?echo row.name?>-backup_method">Backup Method</label> 
 								<select name="backup_method" id="<?echo row.name?>-backup_method" class="text ui-widget-content ui-corner-all" style="width:90px">
-									<option value="0">Link</option>
-									<option value="1">Ping</option> 
+									<option value="0" id="<?echo row.name?>-backup_method-link">Link</option>
+									<option value="1" id="<?echo row.name?>-backup_method-ping">Ping</option> 
 								</select>
 							</td>
 							<td>
