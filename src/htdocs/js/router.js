@@ -25,9 +25,13 @@ $(function () {
 	});
 	
 	/* Use tabs if any */
-	if ($("#pageTabs").length) {
+	if ($("#pageTabs").length)
 		$("#pageTabs").tabs();
-	}
+	
+	/* UI Buttons */
+	if ($(":button").length)
+		$(':button').button();
+	
 });
 
 /**
