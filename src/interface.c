@@ -209,16 +209,16 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 
 	/* Realiza o shutdown da interface 3G para aplicar as configurações */
 	ret = librouter_ppp_backupd_set_shutdown_3Gmodem(linux_interface);
-	web_dbg("(3) - Check for problems after shutdown 3Gmodem for config. (ret = %d)\n", ret);
+	web_dbg("(3) - Check for problems after shutdown 3Gmodem for config. (ret = %s)\n", ret < 0 ? "fail" : "ok" );
 	ret = librouter_ppp_reload_backupd();
-	web_dbg("(4) - Check for problems after reload backupd (ret = %d)\n", ret);
+	web_dbg("(4) - Check for problems after reload backupd (ret = %s)\n", ret < 0 ? "fail" : "ok" );
 
 	/* Verificação necessaria para confirmar que a interface 3G realmente foi desativada antes de configura-la*/
 	while (librouter_dev_exists(linux_interface) == 1)
 		usleep (4800000);
 
 	ret = librouter_ppp_backupd_set_no_backup_interface(linux_interface);
-	web_dbg("(5) - Check for problems after set no backup interface - shutdown intf (ret = %d)\n", ret);
+	web_dbg("(5) - Check for problems after set no backup interface - shutdown intf (ret = %s)\n", ret < 0 ? "fail" : "ok" );
 
 	if (ret < 0)
 		goto end;
@@ -230,7 +230,7 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 		ret = librouter_modem3g_set_apn(apn0, major);
 		ret = librouter_modem3g_set_username(user0, major);
 		ret = librouter_modem3g_set_password(pass0, major);
-		web_dbg("(6) - Check for problems after set APN,USER,PASS [simple sim] (ret = %d)\n", ret);
+		web_dbg("(6) - Check for problems after set APN,USER,PASS [simple sim] (ret = %s)\n", ret < 0 ? "fail" : "ok" );
 
 		if (ret < 0)
 			goto end;
@@ -241,11 +241,11 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 		ret = librouter_modem3g_sim_set_info_infile(0,"apn",apn0);
 		ret = librouter_modem3g_sim_set_info_infile(0,"username",user0);
 		ret = librouter_modem3g_sim_set_info_infile(0,"password",pass0);
-		web_dbg("(6) - Check for problems after set APN,USER,PASS [dual sim-0] (ret = %d)\n", ret);
+		web_dbg("(6) - Check for problems after set APN,USER,PASS [dual sim-0] (ret = %s)\n", ret < 0 ? "fail" : "ok" );
 		ret = librouter_modem3g_sim_set_info_infile(1,"apn",apn1);
 		ret = librouter_modem3g_sim_set_info_infile(1,"username",user1);
 		ret = librouter_modem3g_sim_set_info_infile(1,"password",pass1);
-		web_dbg("(6) - Check for problems after set APN,USER,PASS [dual sim-1] (ret = %d)\n", ret);
+		web_dbg("(6) - Check for problems after set APN,USER,PASS [dual sim-1] (ret = %s)\n", ret < 0 ? "fail" : "ok" );
 
 		if (ret < 0)
 			goto end;
@@ -266,7 +266,7 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 				ret = librouter_modem3g_sim_order_set_allinfo(1, -1,linux_interface, major);
 				break;
 		}
-		web_dbg("(6.1) - Check for problems after set SIM Order (ret = %d)\n", ret);
+		web_dbg("(6.1) - Check for problems after set SIM Order (ret = %s)\n", ret < 0 ? "fail" : "ok" );
 
 		if (ret < 0)
 				goto end;
@@ -283,7 +283,7 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 			ret = librouter_ppp_backupd_set_backup_method(linux_interface,"ping",ping_addr);
 			break;
 	}
-	web_dbg("(7) - Check for problems after set backup method (ret = %d)\n", ret);
+	web_dbg("(7) - Check for problems after set backup method (ret = %s)\n", ret < 0 ? "fail" : "ok" );
 
 	if (ret < 0)
 		goto end;
@@ -295,25 +295,25 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 		case -1:
 			ret = librouter_ppp_backupd_set_no_backup_interface(linux_interface);
 			intf_return_backup_error = NULL;
-			web_dbg("(8) - Check for problems after set no backup interface - (ret = %d)\n\n", ret);
+			web_dbg("(8) - Check for problems after set no backup interface - (ret = %s)\n", ret < 0 ? "fail" : "ok" );
 			break;
 		case 0:
 			ret = librouter_ppp_backupd_set_backup_interface(linux_interface,"ethernet0",intf_return_backup_error);
-			web_dbg("(8) - Check for problems after set backup interface - ethernet0 - (ret = %d)\n\n", ret);
+			web_dbg("(8) - Check for problems after set backup interface - ethernet0 - (ret = %s)\n", ret < 0 ? "fail" : "ok");
 			break;
 		case 1:
 			ret = librouter_ppp_backupd_set_backup_interface(linux_interface,"ethernet1",intf_return_backup_error);
-			web_dbg("(8) - Check for problems after set backup interface - ethernet1 - (ret = %d)\n\n", ret);
+			web_dbg("(8) - Check for problems after set backup interface - ethernet1 - (ret = %s)\n", ret < 0 ? "fail" : "ok");
 			break;
 	}
-	web_dbg("(9) - Check for problems after set backup interface (ret = %d) - Returned interface error = %s\n", ret, intf_return_backup_error);
+	web_dbg("(9) - Check for problems after set backup interface (ret = %s) - Returned interface error = %s\n", ret < 0 ? "fail" : "ok", intf_return_backup_error);
 
 
 	if ((intf_return_backup_error != NULL) && (ret < 0)){
 		warning_string = malloc(256);
 		sprintf(warning_string,"<br/> An error happened when applying changes!<br/> <br/> The backup interface selected is already set by %s! ",_convert_string_linux_to_web(ppp,intf_return_backup_error) );
 	}
-	web_dbg("(10) - Check for interface status during configuration = %d",librouter_ppp_backupd_is_interface_3G_enable(linux_interface));
+	web_dbg("(10) - Check for interface status during configuration = %s",librouter_ppp_backupd_is_interface_3G_enable(linux_interface) == 1 ? "ON" : "OFF");
 
 
 	if (up != NULL){
@@ -328,7 +328,7 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 		}
 		if (librouter_ppp_backupd_set_no_shutdown_3Gmodem(linux_interface) < 0)
 			ret = -1;
-		web_dbg("(11) - Check for problems after set no shutdown 3gmodem (ret = %d) && (warning_intf = %d)\n", ret, warning_intf);
+		web_dbg("(11) - Check for problems after set no shutdown 3gmodem (ret = %s) && (warning_intf = %d)\n", ret < 0 ? "fail" : "ok", warning_intf);
 	}
 
 
@@ -339,7 +339,7 @@ end:
 	if (warning_intf)
 		ret = -1;
 
-	web_dbg("(F-12) - Check for problems after all setted (ret = %d) && (warning_intf = %d)\n", ret, warning_intf);
+	web_dbg("(F-12) - Check for problems after all setted (ret = %s) && (warning_intf = %d)\n", ret < 0 ? "fail" : "ok", warning_intf);
 
 	if (warning_string != NULL)
 		cgi_response_add_parameter(resp, "err_msg", (void *) warning_string, CGI_STRING);
@@ -418,9 +418,10 @@ static cgi_table * _fetch_eth_info(void)
 
 	fam = librouter_device_get_family_by_type(eth);
 
-	if (fam == NULL)
+	if (fam == NULL){
+		web_dbg("result NULL after librouter_device_get_family_by_type");
 		return NULL;
-
+	}
 	/* Create ethernet table */
 	t = cgi_table_create(6, "name", "speed", "ipaddr", "ipmask", "dhcpc", "up");
 
@@ -587,9 +588,9 @@ int handle_config_interface(struct request *req, struct response *resp)
 		return 0;
 	}
 
-	eth_table = cgi_table_create(6, "name", "speed", "ipaddr", "ipmask", "dhcpc", "up");
-	lo_table = cgi_table_create(4, "name", "ipaddr", "ipmask", "up");
-	m3g_table = cgi_table_create(5, "name", "apn", "username", "password", "up");
+	/* Pode ser apagado depois de o Lo_table abaixo ter sido ativado */
+	/*FIXME*/ lo_table = cgi_table_create(4, "name", "ipaddr", "ipmask", "up");
+
 
 	eth_table = _fetch_eth_info();
 	if (eth_table == NULL) {
