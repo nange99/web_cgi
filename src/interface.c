@@ -347,7 +347,9 @@ end:
 	cgi_response_add_parameter(resp, "success", (void *) ret, CGI_INTEGER);
 
 	free(linux_interface);
+	linux_interface=NULL;
 	free(intf_return_backup_error);
+	intf_return_backup_error=NULL;
 	if (warning_string)
 		free(warning_string);
 	return 0;

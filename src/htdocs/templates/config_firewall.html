@@ -6,6 +6,21 @@
 <link rel="stylesheet" type="text/css" href="/css/digistar_styles.css"/>
 <link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.2.custom.css"/>
 <style type="text/css">
+
+div#qTip {
+ padding: 3px;
+ border: 1px solid #666;
+ border-right-width: 2px;
+ border-bottom-width: 2px;
+ display: none;
+ background: #999;
+ color: #FFF;
+ font: bold 9px Verdana, Arial, Helvetica, sans-serif;
+ text-align: left;
+ position: absolute;
+ z-index: 1000;
+}
+
 select {
 	width: 100px;
 }
@@ -20,12 +35,55 @@ select {
 <script type="text/javascript" src="/js/jquery-ui-1.8.2.custom.min.js"></script>
 <script type="text/javascript" src="/js/router.js"></script>
 <script type="text/javascript" src="/js/menu.js"></script>
+<script type="text/JavaScript" src="/js/qTip.js"></script>
 <script type="text/javascript">
+
 /* Local script go here! */
+
 function deleteFwRule(hash) {
 	if (confirm("Delete this rule?"))
 		$.ajax({url: "/app/config_firewall?del=" + hash, success: function(data) { $("#table_wrapper").html(data)}});
 }
+
+function makeDisable_PortRange(flag){
+	if (flag == 1){
+		var x=document.getElementById("portnstart");
+    	x.disabled=true;
+	    x=document.getElementById("portnend");
+    	x.disabled=true;
+	}
+	else{
+		var x=document.getElementById("portnstart");
+		x.disabled=false;
+   		x=document.getElementById("portnend");
+		x.disabled=false;
+	}
+}
+
+
+function analyze_PortRange(){
+	var ok = true;
+	var portnStart = $("#portnstart").val();
+	var portnEnd = $("#portnend").val();
+
+	if ( isNaN(portnStart) || isNaN(portnEnd) ) 
+		ok = false;
+
+	if ( parseInt(portnStart) > parseInt(portnEnd) )
+		ok = false;
+	
+	if (ok == true){
+		set_ui_state_error_onObj($("#portnstart"),0);
+		set_ui_state_error_onObj($("#portnend"),0);
+	}
+	else{
+		set_ui_state_error_onObj($("#portnstart"),1);
+		set_ui_state_error_onObj($("#portnend"),1);
+	}
+		
+	return ok;
+}
+
 
 $(function() {
 
@@ -34,12 +92,12 @@ $(function() {
 
 	/* Print some javascript from CGI if necessary */
 	<?echo response.javascript?>
-	
+		
 	/* Fetch route table */
 	function updateRuleTable() {
 		$.ajax({url: "/app/config_firewall?table=1", success: function(data) { $("#table_wrapper").html(data)}});
 	}
-	
+		
 	$("#dialog").dialog({
 		autoOpen: false,
 		position: "center",
@@ -49,28 +107,72 @@ $(function() {
 			"Add Rule": function() {
 				var ok = true;
 				var dialog = $(this);
-				ok = verifyIPAddress(destination) && ok;
-				ok = verifyIPAddress(gateway) && ok;
-				ok = verifyIPAddress(mask) && ok;
-	
+
+				/* Check textbox (rulename and IPs) for regularity */
+				ok = !isTextFieldEmpty($("#rulename")) && ok;
+				if (ok == false)
+					set_ui_state_error_onObj($("#rulename"),1);		
+				ok = verify_IPAddress_Mask_AnyAddr($("#src1")) && ok;
+				ok = verify_IPAddress_Mask_AnyAddr($("#dest1")) && ok;
+
+				
+				/* Check PortRange textbox for regularity */
+				if ( !isTextFieldEmpty($("#portnstart")) ){
+					ok = inRange($("#portnstart"),1,65534) && ok;
+					
+					if ( isTextFieldEmpty($("#portnend")) ){
+							set_ui_state_error_onObj($("#portnend"),1);		
+							ok = false;
+					}
+					else {
+						ok = inRange($("#portnend"),1,65534) && ok;
+						ok = analyze_PortRange() && ok;
+					}
+				}
+				else
+					if ( !isTextFieldEmpty($("#portnend")) ){
+						ok = inRange($("#portnend"),1,65534) && ok;
+						if ( isTextFieldEmpty($("#portnstart")) ){
+							set_ui_state_error_onObj($("#portnstart"),1);		
+							ok = false;
+						}
+						else {
+							ok = inRange($("#portnstart"),1,65534) && ok;
+							ok = analyze_PortRange() && ok;
+						}
+					}
+					
 				if (ok) {
 					var f = $("#fwRuleForm");
 					$.post(f.get(0).action, f.serialize(), function (data) {
 						dialog.dialog('close');
 						updateRuleTable();
+						makeDisable_PortRange(1);
 					});
 				}
+				else{
+						setTimeout(function () {
+							$("#rulename").removeClass("ui-state-error");
+							$("#src1").removeClass("ui-state-error");
+							$("#dest1").removeClass("ui-state-error");
+							$("#portnstart").removeClass("ui-state-error");
+							$("#portnend").removeClass("ui-state-error");
+						}, 3000);
+						return;
+					}
 			},
 			"Cancel": function() {
+				makeDisable_PortRange(1);
 				$(this).dialog('close');
 			}
 		},
 		open: function(event, ui) { 
-			allFields.removeClass("ui-state-error");
+			//allFields.removeClass("ui-state-error");
 			$("#fwRuleForm").get(0).reset(); 
 		}
+	
 	});
-
+	
 	/* Apply settings for first tab */
 	$("#fw-general-settings-apply").click(function () {
 		form = $(this).parents("form").get(0);
@@ -178,7 +280,7 @@ $(function() {
 <!-- 3G Internal -->
 <tr class="odd">
 	<td>
-		Internal 3G Modem
+		Internal 3G Modem 0
 	</td>
 	 <td>
 		<select name="m3g0-input">
@@ -201,7 +303,7 @@ $(function() {
 <!-- 3G Externals -->
 <tr>
 	<td>
-		External 3G Modem 0
+		External 3G Modem 1
 	</td>
 	 <td>
 		<select name="m3g1-input">
@@ -223,7 +325,7 @@ $(function() {
 
 <tr class="odd">
 	<td>
-		External 3G Modem 1
+		External 3G Modem 2
 	</td>
 	 <td>
 		<select name="m3g2-input">
@@ -242,6 +344,7 @@ $(function() {
 		</select>
 	</td>
 </tr>
+
 </tbody>
 </table>
 
@@ -258,7 +361,7 @@ $(function() {
 <div id="tab-fw-rules-settings">
 	<div id="context_menu">
 		<ul>
-			<li class="context_item"><a href="#" onclick="$('#dialog').dialog('open');">Add rule</a></li>
+			<li class="context_item"><a href="#" onclick="$('#dialog').dialog('open');"><b><u>Add rule</u></b></a></li>
 		</ul>
 	</div>
 	<div id="table_wrapper">
@@ -278,7 +381,6 @@ $(function() {
 				<?endif?>
 					  <td><?echo row.rulename?></td>
 					  <td><a href="#" onclick="deleteRoute('<?echo row.hash?>');">View Details</a></td>
-					  <td><a href="#" onclick="deleteRoute('<?echo row.hash?>');">Edit Rule</a></td>
 					  <td><a href="#" onclick="deleteRoute('<?echo row.hash?>');">Delete Rule</a></td>
 					</tr>
 			<?endforeach?>
@@ -292,33 +394,62 @@ $(function() {
 	<legend>Rule Configuration</legend>
 	
 	<div>
-	<label for="name">Name: </label>
-	<input type="text" name="name" id="name" class="text ui-widget-content ui-corner-all"/>
+		<label for="name">Name: </label>
+		<input type="text" name="rulename" id="rulename" class="text ui-widget-content ui-corner-all"/>
 	</div>
 	
 	
 	<table>
 	<!-- entry 1 -->
-	<tr>
-	<td>
-		<div>
-		<label for="policy">Policy: </label>
-		<select name="policy" id="policy" style="width:120px" class="text ui-widget-content ui-corner-all">
-				<option value="drop" id="rule-policy-drop">Drop</option>
-				<option value="accept" id="rule-policy-accept">Accept</option>
-				<option value="reject" id="rule-policy-reject">Reject</option>
-		</select>
-		</div>
-	</td>
-	
-	<td><div>
-	<label for="src1">Source:</label>
-	<input type="text" name="src1" id="src1" style="width:120px" class="text ui-widget-content ui-corner-all"/>
-	</div></td>
+		<tr>
+			<td>
+				<div>
+					<label for="policy">Policy: </label>
+					<select name="policy" id="policy" style="width:120px" class="text ui-widget-content ui-corner-all">
+							<option value="accept" id="rule-policy-accept">Accept</option>
+							<option value="drop"   id="rule-policy-drop">Drop</option>
+							<option value="reject" id="rule-policy-reject">Reject</option>
+					</select>
+				</div>
+			</td>
+			
+			<td>
+				<div>
+					<label for="protocol">Protocol: </label>
+					<select name="protocol" id="protocol" style="width:120px" class="text ui-widget-content ui-corner-all">
+							<option value="ip"  id="rule-protocol-ip"  onclick="makeDisable_PortRange(1)">IP</option>
+							<option value="tcp" id="rule-protocol-tcp" onclick="makeDisable_PortRange(0)">TCP</option>
+							<option value="udp" id="rule-protocol-udp" onclick="makeDisable_PortRange(0)">UDP</option>
+					</select>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div>
+					<label for="src1">Source:</label>
+					<input type="text" name="src1" id="src1" style="width:120px" title="IP[/Mask] or just IP - Ex: 192.168.0.1/255.255.255.255 -- For any addr. put (*)" class="text ui-widget-content ui-corner-all"/>
+				</div>
+			</td>
 
-	<td><div>
-	<label for="dest1">Destination:</label><input type="text" name="dest1" id="dest1" style="width:120px" class="text ui-widget-content ui-corner-all"/>
-	</div></td></tr>
+			<td>
+				<div>
+					<label for="dest1">Destination:</label>
+					<input type="text" name="dest1" id="dest1" style="width:120px" title="IP[/Mask] or just IP - Ex: 192.168.0.1/255.255.255.255 -- For any addr. put (*)" class="text ui-widget-content ui-corner-all"/>
+				</div>
+			</td>
+		</tr>
+		
+		<tr>	
+			<td>
+				<div>
+					<label for="portn" title="Numbers between 1-65534, or blank - [For a unique port, put the same number at the fields]">Port Range:</label>
+					<input type="text" name="portnstart" id="portnstart" disabled=true style="width:50px" title="Value1 < Value2" class="text ui-widget-content ui-corner-all"/>
+					-
+					<input type="text" name="portnend" id="portnend" disabled=true style="width:50px" title="Value1 < Value2" class="text ui-widget-content ui-corner-all"/>
+				</div>
+			</td>
+		</tr>
 	</table>
 
 	

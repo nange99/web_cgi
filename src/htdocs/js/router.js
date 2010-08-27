@@ -99,6 +99,25 @@ function checkForWhiteSpaces(obj) {
 	return true;
 }
 
+
+/**
+ * set_ui_state_error_onObj		Add or remove ui-state-error for object     
+ * 
+ * @param obj
+ * @param flag
+ * @return true if ok
+ */
+function set_ui_state_error_onObj(obj,flag){
+	
+	if (flag)
+		obj.addClass("ui-state-error");
+	else 
+		obj.removeClass("ui-state-error");
+	
+	return true;
+}
+
+
 /**
  * 
  * inRange		Check if jQuery object has value between min and max
@@ -214,6 +233,57 @@ function verifyTime(obj) {
 	
 	return valid;
 }
+
+/**
+ * verifyIPAddress_and_Mask		Check if jQuery object has a valid IP address and mask values
+ * 
+ * @param obj
+ * @return true if valid, false otherwise
+ */
+function verify_IPAddress_Mask_AnyAddr(obj) {
+	var x = obj.val();
+	var valid = true;
+
+	if (x != "*"){
+			
+		var splitteddot = x.split(".");
+		var splittedslash = x.split("/");
+				
+		if (splittedslash.length == 2){
+			var splittedip = splittedslash[0].split(".");
+			var splittedmask = splittedslash[1].split(".");
+			
+			for ( var i = 0; i < splittedip.length; i++) {
+				if ((splittedip[i] < 0)  || (splittedip[i] > 255))
+					valid = false;
+			}
+			
+			for ( var i = 0; i < splittedmask.length; i++) {
+				if ((splittedmask[i] < 0)  || (splittedmask[i] > 255))
+					valid = false;
+			}
+		}
+		else { 
+			if (splitteddot.length != 4)
+				valid = false;
+			
+			for ( var i = 0; i < splitteddot.length; i++) {
+				if ((splitteddot[i] < 0)  || (splitteddot[i] > 255))
+					valid = false;
+			}	
+		
+		}
+	}
+	
+	if (!valid) {
+		obj.addClass("ui-state-error");
+	} else {
+		obj.removeClass("ui-state-error");
+	}
+	
+	return valid;
+}
+
 
 /**
  * verifyIPAddress		Check if jQuery object has a valid IP address value

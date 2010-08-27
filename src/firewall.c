@@ -20,6 +20,7 @@
 #include <librouter/args.h>
 #include <librouter/iptc.h>
 #include <librouter/device.h>
+#include <librouter/ip.h>
 
 #include "web_config.h"
 #include "interface.h"
@@ -147,6 +148,8 @@ int handle_apply_fw_general_settings(struct request *req, struct response *resp)
 		return 0;
 	}
 
+
+
 	cgi_response_add_parameter(resp, "success", (void *) ret, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/msgs.html");
 
@@ -156,7 +159,8 @@ int handle_apply_fw_general_settings(struct request *req, struct response *resp)
 int handle_fw_add_rule(struct request *req, struct response *resp)
 {
 	int ret = 0;
-	char *name, *ip_src, *ip_dst;
+	char *name, *ip_src, *ip_dst, *policy, *portrange_start, *portrange_end, *protocol;
+	char *mask_temp, *ip_temp;
 	struct acl_config acl;
 
 	if (!cgi_session_exists(req)) {
@@ -167,20 +171,97 @@ int handle_fw_add_rule(struct request *req, struct response *resp)
 	memset(&acl, 0, sizeof(acl));
 
 	name = _get_parameter(req, "rulename");
-
 	if (name == NULL) {
 		log_err("rule named is not specified\n");
 		return -1;
 	}
 
-	ip_src = _get_parameter(req, "src");
-	ip_dst = _get_parameter(req, "dst");
+	policy = _get_parameter(req, "policy");
+	protocol = _get_parameter(req, "protocol");
+
+	ip_src = _get_parameter(req, "src1");
+	ip_dst = _get_parameter(req, "dest1");
+
+	portrange_start = _get_parameter(req, "portnstart");
+	portrange_end = _get_parameter(req, "portnend");
+
 
 	acl.name = name;
 
 	/* Create new ACL if one does not exist */
 	if (!librouter_acl_exists(acl.name))
 		librouter_acl_create_new(acl.name);
+
+	/* Check for policy */
+	if (!strcmp(policy, "accept"))
+		acl.action = acl_accept;
+	else
+		if (!strcmp(policy, "drop"))
+			acl.action = acl_drop;
+		else
+			if (!strcmp(policy, "reject"))
+				acl.action = acl_reject;
+
+	/* Check for protocol and port range*/
+	if (!strcmp(protocol, "ip"))
+		acl.protocol = ip;
+	else {
+
+		if (!strcmp(protocol, "tcp"))
+			acl.protocol = tcp;
+		else
+			if (!strcmp(protocol, "udp"))
+				acl.protocol = udp;
+
+		if ( portrange_start != NULL && portrange_end != NULL )
+			sprintf(acl.dst_portrange, "%s:%s ", portrange_start, portrange_end);
+	}
+
+	/* Check for addrs SRC and DEST */
+	if (!strcmp(ip_src, "*"))
+		strcpy(acl.src_address, "0.0.0.0/0 ");
+	else {
+		if (strchr(ip_src,'/') == NULL){
+			snprintf(acl.src_address,strlen(ip_src)+4, "%s/32 ", ip_src);
+		}
+		else {
+			ip_temp = strtok(ip_src,"/");
+			mask_temp = strtok(NULL,"");
+
+			acl.src_cidr = librouter_ip_netmask2cidr(mask_temp);
+			if (acl.src_cidr < 0) {
+				log_err("Invalid netmask in ip_src");
+				return -1;
+			}
+			sprintf(acl.src_address, "%s/%d ", ip_temp, acl.src_cidr);
+
+			ip_temp=NULL;
+			mask_temp=NULL;
+		}
+	}
+	if (!strcmp(ip_dst, "*"))
+			strcpy(acl.dst_address, "0.0.0.0/0 ");
+	else {
+		if (strchr(ip_dst,'/') == NULL){
+			snprintf(acl.dst_address,strlen(ip_dst)+4, "%s/32 ", ip_dst);
+		}
+		else {
+			ip_temp = strtok(ip_dst,"/");
+			mask_temp = strtok(NULL,"");
+
+			acl.dst_cidr = librouter_ip_netmask2cidr(mask_temp);
+			if (acl.dst_cidr < 0) {
+				log_err("Invalid netmask in ip_src");
+				return -1;
+			}
+
+			sprintf(acl.dst_address, "%s/%d ", ip_temp, acl.dst_cidr);
+
+			ip_temp=NULL;
+			mask_temp=NULL;
+		}
+	}
+
 
 	librouter_acl_apply(&acl);
 
@@ -192,16 +273,28 @@ int handle_fw_add_rule(struct request *req, struct response *resp)
 
 int handle_config_firewall(struct request *req, struct response *resp)
 {
+	char *table, *del;
+
 	if (!cgi_session_exists(req)) {
 		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
 		return 0;
 	}
+
+
+	/* Check if returning just table (AJAX) */
+	table = _get_parameter(req, "table");
 
 	_get_default_policy(resp);
 
 	_get_rules_table(resp);
 
 	_print_page_javascript(resp);
+
+	/* Return just table in case of AJAX request */
+	if (table || del) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/config_firewall_table.html");
+		return 0;
+	}
 
 	cgi_response_add_parameter(resp, "menu_config", (void *) 3, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/config_firewall.html");
