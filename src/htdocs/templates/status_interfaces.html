@@ -9,6 +9,40 @@
 <script type="text/javascript" src="/js/jquery-ui-1.8.2.custom.min.js"></script>
 <script type="text/javascript" src="/js/router.js"></script>
 <script type="text/javascript" src="/js/menu.js"></script>
+<style type="text/css">
+
+span.title_status {color:#29306C;font-weight:bold;font-size: 13px}
+span.data_status {padding: 40px; font-size: 12px;}
+span.data_status_value {font-size: 12px}
+
+#content table
+{
+	font-size: 10px;
+    margin-top: 1px;
+	margin-left: 35px;
+	height:70px;
+	width: 600px;
+	text-align: left;
+	border-collapse: collapse;
+	cellpadding=0;
+	cellspacing=0;
+	
+}
+
+#intf_status
+{
+	margin-top: 20px; 
+	margin-left: 10px; 
+	font-size: 10px; 
+	overflow:auto;
+	width: 670px;
+	height: 630px;
+}
+
+</style>
+
+<script type="text/javascript">
+</script>
 </head>
 
 <body>
@@ -16,13 +50,266 @@
 <?include "/wn/cgi/templates/topmenu"?>
 <?include "/wn/cgi/templates/leftmenu" ?>
 	<div id="content">
-		<h1>Inteface Status</h1>
-		<div style="margin-top: 40px;">
-		<center>
-			<img src="/images/underconst.gif" />
-		</center>
+		<h1>Interface Status</h1>
+		<div id="intf_status">
+			<table>
+				<thead>
+					<tr>
+						<td><br></br></td>
+					</tr>
+				</thead>
+				<tbody>
+					
+					<tr>
+						<td>
+							<span class="title_status">General Information</span>
+							<br></br>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<span class="data_status">Up Time</span>
+						</td>
+						<td>
+							<span class="data_status_value"><?echo response.uptime?></span>
+						</td>
+					</tr>
+					<tr><td><br></br></td></tr>
+					
+					
+					<!-- Ethernet -->
+					<?foreach row in response.eth_table?>
+						<tr>
+							<td>
+							<span class="title_status"><?echo row.name?></span>
+							<br></br>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span class="data_status">IP Address</span>
+							</td>
+							
+							<td>
+								<span class="data_status_value"><?echo row.ipaddr?></span>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span class="data_status">Mask Address</span>
+							</td>
+							
+							<td>
+								<span class="data_status_value"><?echo row.ipmask?></span>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span class="data_status">DHCP Client</span>
+							</td>
+							
+							<td>
+								<span class="data_status_value">
+									<?if row.dhcpc == 1 then?>
+										Enable
+									<?else?>
+										Disable
+									<?endif?>
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span class="data_status">Interface Enable</span>
+							</td>
+							
+							<td>
+								<span class="data_status_value">
+									<?if row.up == 1 then?>
+										Enable
+									<?else?>
+										Disable
+									<?endif?>
+								</span>
+							</td>
+						</tr>
+					
+						<tr><td><br></br></td></tr>
+					<?endforeach?>
+					
+					<!-- Loopback -->
+					<?foreach row in response.lo_table?>
+						<tr>
+							<td>
+							<span class="title_status"><?echo row.name?></span>
+							<br></br>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span class="data_status">IP Address</span>
+							</td>
+							
+							<td>
+								<span class="data_status_value"><?echo row.ipaddr?></span>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span class="data_status">Mask Address</span>
+							</td>
+							
+							<td>
+								<span class="data_status_value"><?echo row.ipmask?></span>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span class="data_status">Interface Enable</span>
+							</td>
+							
+							<td>
+								<span class="data_status_value">
+									<?if row.up == 1 then?>
+										Enable
+									<?else?>
+										Disable
+									<?endif?>
+								</span>
+							</td>
+						</tr>
+						<tr><td><br></br></td></tr>
+					<?endforeach?>
+					
+					<!--  Modem3g -->
+					<?foreach row in response.m3g_table?>
+						<tr>
+							<td>
+							<span class="title_status"><?echo row.name?></span>
+							<br></br>
+							</td>
+						</tr>
+						<?if row.name == "3GModem0" then?>
+							<tr>
+								<td>
+									<span class="data_status">APN - SIM 1</span>
+								</td>
+								
+								<td>
+									<span class="data_status_value"><?echo row.apn0?></span>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<span class="data_status">APN - SIM 2</span>
+								</td>
+								
+								<td>
+									<span class="data_status_value"><?echo row.apn1?></span>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<span class="data_status">SIM Order</span>
+								</td>
+								
+								<td>
+									<span class="data_status_value">
+										<?if row.sim_order == "sim-order-0" then?>
+											Card 1 -MAIN SIM | Card 2 -BACKUP SIM
+										<?else?>
+											<?if row.sim_order == "sim-order-1" then?>
+												Card 2 -MAIN SIM | Card 1 -BACKUP SIM
+											<?else?>
+												<?if row.sim_order == "sim-order-2" then?>
+													Card 1 -MAIN SIM | No BACKUP SIM
+												<?else?>
+													Card 2 -MAIN SIM | No BACKUP SIM
+												<?endif?>
+											<?endif?>
+										<?endif?>						
+									</span>
+								</td>
+							</tr>
+						<?else?>
+							<tr>
+								<td>
+									<span class="data_status">APN</span>
+								</td>
+								
+								<td>
+									<span class="data_status_value"><?echo row.apn0?></span>
+								</td>
+							</tr>
+						<?endif?>
+					
+						<tr>
+							<td>
+								<span class="data_status">Backup Interface</span>
+							</td>
+							
+							<td>
+								<span class="data_status_value">
+									<?if row.backup_interface == "backup-intf-ethernet0" then?>
+										Ethernet0
+									<?else?>
+										<?if row.backup_interface == "backup-intf-ethernet1" then?>
+											Ethernet1
+										<?endif?>
+									<?endif?>					
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span class="data_status">Backup Method</span>
+							</td>
+							
+							<td>
+								<span class="data_status_value">
+									<?if row.backup_method == "backup_method-link" then?>
+										Link
+									<?else?>
+										<?if row.backup_method == "backup_method-ping" then?>
+											Ping
+										<?endif?>
+									<?endif?>					
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span class="data_status">Ping Address</span>
+							</td>
+							
+							<td>
+								<span class="data_status_value"><?echo row.ping_addr?></span>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span class="data_status">Interface Enable</span>
+							</td>
+							
+							<td>
+								<span class="data_status_value">
+									<?if row.up == 1 then?>
+										Enable
+									<?else?>
+										Disable
+									<?endif?>
+								</span>
+							</td>
+						</tr>
+					
+						<tr><td><br></br></td></tr>
+					<?endforeach?>
+				
+				</tbody>
+			</table>
 		</div>
 	</div>
 </div>
 </body>
 </html>
+	

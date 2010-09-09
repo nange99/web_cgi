@@ -38,28 +38,10 @@ select {
 <script type="text/JavaScript" src="/js/qTip.js"></script>
 <script type="text/javascript">
 
-/* Local script go here! */
-
-function deleteFwRule(hash) {
-	if (confirm("Delete this rule?"))
-		$.ajax({url: "/app/config_firewall?del=" + hash, success: function(data) { $("#table_wrapper").html(data)}});
-}
-
 function makeDisable_PortRange(flag){
-	if (flag == 1){
-		var x=document.getElementById("portnstart");
-    	x.disabled=true;
-	    x=document.getElementById("portnend");
-    	x.disabled=true;
-	}
-	else{
-		var x=document.getElementById("portnstart");
-		x.disabled=false;
-   		x=document.getElementById("portnend");
-		x.disabled=false;
-	}
+	makeDisable_obj_byid(flag,("portnstart"));
+	makeDisable_obj_byid(flag,("portnend"));
 }
-
 
 function analyze_PortRange(){
 	var ok = true;
@@ -84,20 +66,77 @@ function analyze_PortRange(){
 	return ok;
 }
 
+/* Fetch route table */
+function updateRuleTable() {
+	$.ajax({url: "/app/config_firewall?table=1", success: function(data) { $("#table_wrapper").html(data)}});
+}
+
+function deleteRule(hash) {
+	if (confirm("Delete this rule?")){
+		$.ajax({url: "/app/del_fw_rule?del=" + hash, success: function(data) {
+			updateRuleTable();
+			$("#notificationDialog").html(data);
+			$("#notificationDialog").dialog("open");
+		}});
+	}
+}
+
+function viewRule(rule) {
+	$.ajax({url: "/app/view_fw_rule?view=" + rule, success: function(data){
+		 	$('#view_rule_text').attr('value',data);
+		 	$('#view_dialog').dialog('open');
+		
+	}});
+
+}
+
+function refreshGeneral_Settings(){
+	$("#table-applyrule_intf").load('/app/config_firewall #table-applyrule_intf');
+	$.ajax({url: "/app/config_firewall", success: function(data){ 
+			<?echo response.javascript?>
+	}});
+}
+
 
 $(function() {
-
+	
+	/* Define message dialog */
+	$("#notificationDialog").dialog({
+		autoOpen: false,
+		buttons: { "OK" : function() { $(this).dialog("close"); } },
+		position: "center",
+		width: 400,
+		height: 230,
+		modal: true
+	});
+	
 	/* Accept or Drop */
 	$("#policy-<?echo response.policy_type?>").attr("selected", "selected");
 
+	
+	/* Lock Down text box for Port Range if protocol is IP */
+	$("#protocol").attr('selected',function (){
+		var protocol = $("#protocol").val();
+		if (protocol != "ip")
+			makeDisable_PortRange(0);
+		else
+			makeDisable_PortRange(1);
+	});
+	$("#protocol").click(function (){
+		var protocol = $("#protocol").val();
+		if (protocol != "ip")
+			makeDisable_PortRange(0);
+		else{
+			makeDisable_PortRange(1);
+			$("#portnstart").attr('value','');
+			$("#portnend").attr('value','');
+		}
+	});	
+
+	
 	/* Print some javascript from CGI if necessary */
 	<?echo response.javascript?>
-		
-	/* Fetch route table */
-	function updateRuleTable() {
-		$.ajax({url: "/app/config_firewall?table=1", success: function(data) { $("#table_wrapper").html(data)}});
-	}
-		
+				
 	$("#dialog").dialog({
 		autoOpen: false,
 		position: "center",
@@ -110,8 +149,9 @@ $(function() {
 
 				/* Check textbox (rulename and IPs) for regularity */
 				ok = !isTextFieldEmpty($("#rulename")) && ok;
+				ok = !valueCompare($("#rulename"), ("-")) && ok;	
 				if (ok == false)
-					set_ui_state_error_onObj($("#rulename"),1);		
+					set_ui_state_error_onObj($("#rulename"),1);
 				ok = verify_IPAddress_Mask_AnyAddr($("#src1")) && ok;
 				ok = verify_IPAddress_Mask_AnyAddr($("#dest1")) && ok;
 
@@ -141,13 +181,16 @@ $(function() {
 							ok = analyze_PortRange() && ok;
 						}
 					}
-					
+
+				
 				if (ok) {
 					var f = $("#fwRuleForm");
 					$.post(f.get(0).action, f.serialize(), function (data) {
 						dialog.dialog('close');
 						updateRuleTable();
 						makeDisable_PortRange(1);
+						$("#notificationDialog").html(data);
+						$("#notificationDialog").dialog("open");
 					});
 				}
 				else{
@@ -174,7 +217,7 @@ $(function() {
 	});
 	
 	/* Apply settings for first tab */
-	$("#fw-general-settings-apply").click(function () {
+	$("#fw-general-settings-apply").click(function() {
 		form = $(this).parents("form").get(0);
 		form_data = $(this).parents("form").serialize();
 
@@ -185,6 +228,23 @@ $(function() {
 			$("#notificationDialog").html(data);
 			$("#notificationDialog").dialog("open");
 		});
+	});
+
+
+	$("#view_dialog").dialog({
+		autoOpen: false,
+		position: "center",
+		width: 700,
+		modal: true,
+		buttons: {
+			"Ok": function() {
+				$(this).dialog('close');
+			}
+		},
+		open: function(event, ui) { 
+			
+		}
+
 	});
 	
 });
@@ -202,7 +262,7 @@ $(function() {
 
 <div id="pageTabs">
 <ul>
-	<li><a href="#tab-fw-general-settings"> General Settings </a></li>
+	<li><a href="#tab-fw-general-settings" onclick="refreshGeneral_Settings()"> General Settings </a></li>
 	<li><a href="#tab-fw-rules-settings"> Rules Settings </a></li>
 </ul>
 
@@ -211,7 +271,7 @@ $(function() {
 <fieldset>
 	<div>
 		<label for="policy-type">Default Policy:</label>
-			<select id="policy-type" name="policy_type">
+			<select name="policy-type" id="policy-type">
 			<option value="drop" id="policy-drop">Drop</option>
 			<option value="accept" id="policy-accept">Accept</option>
 			</select>
@@ -220,7 +280,7 @@ $(function() {
 
 
 <fieldset>
-<div>
+<div id="table-applyrule_intf">
 <table>
 <thead class="ui-widget">
     <tr>
@@ -236,17 +296,17 @@ $(function() {
 	<td>
 		Ethernet 0 (LAN)
 	</td>
-	 <td>
-		<select name="ethernet0-input">
-			<option value="none" id="ethernet0-input-none">None</option>
+	 <td id="teste">
+		<select name="ethernet0-input" id="ethernet0-input">
+			<option value="--1" id="ethernet0-input-none">None</option>
 			<?foreach row in response.rules_table?>
 			<option value="<?echo row.rulename?>" id="ethernet0-input-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
 	<td>
-		<select name="ethernet0-output">
-			<option value="none" id="ethernet0-output-none">None</option>
+		<select name="ethernet0-output" id="ethernet0-output">
+			<option value="--1" id="ethernet0-output-none">None</option>
 			<?foreach row in response.rules_table?>
 			<option value="<?echo row.rulename?>" id="ethernet0-output-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
@@ -260,16 +320,16 @@ $(function() {
 		Ethernet 1 (WAN)
 	</td>
 	 <td>
-		<select name="ethernet1-input">
-			<option value="none" id="ethernet1-input-none">None</option>
+		<select name="ethernet1-input" id="ethernet1-input">
+			<option value="--1" id="ethernet1-input-none">None</option>
 			<?foreach row in response.rules_table?>
 			<option value="<?echo row.rulename?>" id="ethernet1-input-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
 	<td>
-		<select name="ethernet1-output">
-			<option value="none" id="ethernet1-output-none">None</option>
+		<select name="ethernet1-output" id="ethernet1-output">
+			<option value="--1" id="ethernet1-output-none">None</option>
 			<?foreach row in response.rules_table?>
 			<option value="<?echo row.rulename?>" id="ethernet1-output-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
@@ -283,16 +343,16 @@ $(function() {
 		Internal 3G Modem 0
 	</td>
 	 <td>
-		<select name="m3g0-input">
-			<option value="none" id="m3g0-input-none">None</option>
+		<select name="m3g0-input" id="m3g0-input">
+			<option value="--1" id="m3g0-input-none">None</option>
 			<?foreach row in response.rules_table?>
 			<option value="<?echo row.rulename?>" id="m3g0-intput-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
 	<td>
-		<select name="m3g0-output">
-			<option value="none" id="m3g0-output-none">None</option>
+		<select name="m3g0-output" id="m3g0-output">
+			<option value="--1" id="m3g0-output-none">None</option>
 			<?foreach row in response.rules_table?>
 			<option value="<?echo row.rulename?>" id="m3g0-output-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
@@ -306,16 +366,16 @@ $(function() {
 		External 3G Modem 1
 	</td>
 	 <td>
-		<select name="m3g1-input">
-			<option value="none" id="m3g1-input-none">None</option>
+		<select name="m3g1-input" id="m3g1-input">
+			<option value="--1" id="m3g1-input-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3g1-intput-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="m3g1-input-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
 	<td>
-		<select name="m3g1-output">
-			<option value="none" id="m3g1-output-none">None</option>
+		<select name="m3g1-output" id="m3g1-output">
+			<option value="--1" id="m3g1-output-none">None</option>
 			<?foreach row in response.rules_table?>
 			<option value="<?echo row.rulename?>" id="m3g1-output-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
@@ -328,16 +388,16 @@ $(function() {
 		External 3G Modem 2
 	</td>
 	 <td>
-		<select name="m3g2-input">
-			<option value="none" id="m3g2-input-none">None</option>
+		<select name="m3g2-input" id="m3g2-input">
+			<option value="--1" id="m3g2-input-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3g2-intput-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="m3g2-input-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
 	<td>
-		<select name="m3g2-output">
-			<option value="none" id="m3g2-output-none">None</option>
+		<select name="m3g2-output" id="m3g2-output">
+			<option value="--1" id="m3g2-output-none">None</option>
 			<?foreach row in response.rules_table?>
 			<option value="<?echo row.rulename?>" id="m3g2-output-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
@@ -380,8 +440,8 @@ $(function() {
 					<tr class="odd">
 				<?endif?>
 					  <td><?echo row.rulename?></td>
-					  <td><a href="#" onclick="deleteRoute('<?echo row.hash?>');">View Details</a></td>
-					  <td><a href="#" onclick="deleteRoute('<?echo row.hash?>');">Delete Rule</a></td>
+					  <td><a href="#" onclick="viewRule('<?echo row.rulename?>');">View Details</a></td>
+					  <td><a href="#" onclick="deleteRule('<?echo row.rulename?>');">Delete Rule</a></td>
 					</tr>
 			<?endforeach?>
 		</tbody>
@@ -407,7 +467,7 @@ $(function() {
 					<label for="policy">Policy: </label>
 					<select name="policy" id="policy" style="width:120px" class="text ui-widget-content ui-corner-all">
 							<option value="accept" id="rule-policy-accept">Accept</option>
-							<option value="drop"   id="rule-policy-drop">Drop</option>
+							<option value="drop"   id="rule-policy-drop"  >Drop</option>
 							<option value="reject" id="rule-policy-reject">Reject</option>
 					</select>
 				</div>
@@ -417,9 +477,9 @@ $(function() {
 				<div>
 					<label for="protocol">Protocol: </label>
 					<select name="protocol" id="protocol" style="width:120px" class="text ui-widget-content ui-corner-all">
-							<option value="ip"  id="rule-protocol-ip"  onclick="makeDisable_PortRange(1)">IP</option>
-							<option value="tcp" id="rule-protocol-tcp" onclick="makeDisable_PortRange(0)">TCP</option>
-							<option value="udp" id="rule-protocol-udp" onclick="makeDisable_PortRange(0)">UDP</option>
+							<option value="ip"  id="rule-protocol-ip" >IP</option>
+							<option value="tcp" id="rule-protocol-tcp">TCP</option>
+							<option value="udp" id="rule-protocol-udp">UDP</option>
 					</select>
 				</div>
 			</td>
@@ -456,6 +516,17 @@ $(function() {
 </fieldset>
 </form>
 </div> <!-- tab-gw-rules-settings -->
+
+
+<div id="view_dialog" title="View Rule">
+	<form id="ViewForm" method="post">
+		<fieldset>
+			<legend>Rule Configuration</legend>
+				<textarea id = "view_rule_text" readonly="1" rows="10" cols="80" >		
+				</textarea>	
+		</fieldset>
+	</form>
+</div> <!-- view_dialog -->
 
 
 </div> <!-- pageTabs -->

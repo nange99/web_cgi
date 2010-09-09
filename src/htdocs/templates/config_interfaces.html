@@ -39,6 +39,7 @@
 <script type="text/javascript" src="/js/router.js"></script>
 <script type="text/javascript" src="/js/menu.js"></script>
 <script type="text/javascript">
+
 $(function() {
 	/* Define message dialog */
 	$("#notificationDialog").dialog({
@@ -137,13 +138,62 @@ $(function() {
 	$("#<?echo row.name?>-<?echo row.sim_order?>").attr('selected','selected');
 	$("#<?echo row.name?>-<?echo row.backup_interface?>").attr('selected','selected');
 	$("#<?echo row.name?>-<?echo row.backup_method?>").attr('selected','selected');
-	 
+
+	
+	$("#<?echo row.name?>-<?echo row.backup_interface?>").attr('selected',function (){
+		var bckup_intf = $("#<?echo row.name?>-backup_interface").val();
+		if (bckup_intf != -1){
+			makeDisable_obj_byid(0,("<?echo row.name?>-backup_method"));
+			$("#<?echo row.name?>-<?echo row.backup_method?>").attr('selected',function (){
+				var bckup_method = $("#<?echo row.name?>-backup_method").val();
+				if (bckup_method == 1)
+					makeDisable_obj_byid(0,("<?echo row.name?>-ping_addr"));
+				else
+					makeDisable_obj_byid(1,("<?echo row.name?>-ping_addr"));
+			});
+			
+		}
+		else {
+			makeDisable_obj_byid(1,("<?echo row.name?>-ping_addr"));
+			makeDisable_obj_byid(1,("<?echo row.name?>-backup_method"));
+		}
+	});
+
+	$("#<?echo row.name?>-backup_interface").click(function () {
+		var bckup_intf = $("#<?echo row.name?>-backup_interface").val();
+		if (bckup_intf != -1){
+			makeDisable_obj_byid(0,("<?echo row.name?>-backup_method"));
+			$("#<?echo row.name?>-<?echo row.backup_method?>").attr('selected',function (){
+				var bckup_method = $("#<?echo row.name?>-backup_method").val();
+				if (bckup_method == 1)
+					makeDisable_obj_byid(0,("<?echo row.name?>-ping_addr"));
+				else
+					makeDisable_obj_byid(1,("<?echo row.name?>-ping_addr"));
+			});
+			
+		}
+		else {
+			makeDisable_obj_byid(1,("<?echo row.name?>-ping_addr"));
+			makeDisable_obj_byid(1,("<?echo row.name?>-backup_method"));
+		}
+	});
+
+	$("#<?echo row.name?>-backup_method").click(function () {
+		var bckup_method = $("#<?echo row.name?>-backup_method").val();
+		if (bckup_method == 1)
+			makeDisable_obj_byid(0,("<?echo row.name?>-ping_addr"));
+		else{
+			makeDisable_obj_byid(1,("<?echo row.name?>-ping_addr"));
+			$("#<?echo row.name?>-ping_addr").attr('value','');
+		}
+	});
+	
 	$("#<?echo row.name?>-apply").click(function () {
 		/* Check for valid IPs */
 		var ok = true;
 		var backup_intf = $("#<?echo row.name?>-backup_interface").val();
 		var backup_method = $("#<?echo row.name?>-backup_method").val();
-			
+		
 		if (backup_intf == 0 || backup_intf == 1){
 			if (backup_method == 1){
 				ok = verifyIPAddress($("#<?echo row.name?>-ping_addr")) && ok;
@@ -357,14 +407,14 @@ $(function() {
 						<tr>
 							<td> 
 								<label for="<?echo row.name?>-backup_method">Backup Method</label> 
-								<select name="backup_method" id="<?echo row.name?>-backup_method" class="text ui-widget-content ui-corner-all" style="width:90px">
+								<select name="backup_method" id="<?echo row.name?>-backup_method" disabled=true class="text ui-widget-content ui-corner-all" style="width:90px">
 									<option value="0" id="<?echo row.name?>-backup_method-link">Link</option>
 									<option value="1" id="<?echo row.name?>-backup_method-ping">Ping</option> 
 								</select>
 							</td>
 							<td>
 								<label for="<?echo row.name?>-ping_addr">Ping Address</label> 
-								<input type="text" name="ping_addr" id="<?echo row.name?>-ping_addr" value="<?echo row.ping_addr?>" class="text ui-widget-content ui-corner-all" style="width:100px" />		
+								<input type="text" name="ping_addr" id="<?echo row.name?>-ping_addr" disabled=true value="<?echo row.ping_addr?>" class="text ui-widget-content ui-corner-all" style="width:100px" />		
 							</td>
 						</tr>
 					</table> 

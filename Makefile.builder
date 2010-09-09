@@ -3,7 +3,7 @@ include ../../common.mk
 CFLAGS= -O2 -Wall -I. -I$(ROOTDIR)/include \
 	-I$(ROOTDIR)/$(FSDIR)/include
 
-LDFLAGS= -L$(ROOTDIR)/$(FSDIR)/lib
+LDFLAGS= -L$(ROOTDIR)/$(FSDIR)/lib -L$(ROOTDIR)/lib
 
 all: config
 	$(MAKE)

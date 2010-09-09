@@ -99,6 +99,24 @@ function checkForWhiteSpaces(obj) {
 	return true;
 }
 
+/**
+ * makeDisable_obj_byid		Set attribute Disable on a given obj. by ID
+ * @param flag
+ * @param id
+ * @return
+ */
+function makeDisable_obj_byid(flag, id){
+	if (flag == 1){
+		var x=document.getElementById(id);
+    	x.disabled=true;
+	}
+	else{
+		var x=document.getElementById(id);
+		x.disabled=false;
+	}
+	return true;
+}
+
 
 /**
  * set_ui_state_error_onObj		Add or remove ui-state-error for object     
@@ -337,6 +355,24 @@ function stringMatch(str1, str2) {
 		return false;
 	}
 }
+
+/**
+ * valueCompare		Compare a value stored in an obj with a given value 
+ * 
+ * @param obj
+ * @param value
+ * @return true if the same, false if not
+ */
+function valueCompare(obj, value){
+	var val_obj = obj.val();
+	
+	if (val_obj.search(/value/) != -1)
+		return true;
+	else
+		return false;
+	
+}
+
 
 /**
  * authServerVerify		Validate authentication server information

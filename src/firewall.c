@@ -2,7 +2,7 @@
  * firewall.c
  *
  *  Created on: Jul 19, 2010
- *      Author: Thomás Alimena Del Grande (tgrande@pd3.com.br)
+ *      Author: Igor Kramer Pinotti (ipinotti@pd3.com.br)
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -141,14 +141,68 @@ static void _print_page_javascript(struct response *resp)
 
 int handle_apply_fw_general_settings(struct request *req, struct response *resp)
 {
-	int ret = 0;
+	int ret = 0, in=1, out=0, i=0;
+	char interface[32];
+	dev_family *fam;
 
+	/* Clean buffers */
+	memset(interface, 0, sizeof(interface));
+
+	char *policy_type;
+	char *ethernet0_in, *ethernet0_out;
+	char *ethernet1_in, *ethernet1_out;
+	char *m3g0_in, *m3g0_out;
+	char *m3g1_in, *m3g1_out;
+	char *m3g2_in, *m3g2_out;
+
+	policy_type = _get_parameter(req, "policy-type");
+
+	ethernet0_in  = _get_parameter(req, "ethernet0-input");
+	ethernet0_out = _get_parameter(req, "ethernet0-output");
+	ethernet1_in  = _get_parameter(req, "ethernet1-input");
+	ethernet1_out = _get_parameter(req, "ethernet1-output");
+
+	m3g0_in  = _get_parameter(req, "m3g0-input");
+	m3g0_out = _get_parameter(req, "m3g0-output");
+	m3g1_in  = _get_parameter(req, "m3g1-input");
+	m3g1_out = _get_parameter(req, "m3g1-output");
+	m3g2_in  = _get_parameter(req, "m3g2-input");
+	m3g2_out = _get_parameter(req, "m3g2-output");
+
+	for (i = 0; i < ETHERNET_IFACE_NUM; i++) {
+		fam = librouter_device_get_family_by_type(eth);
+		sprintf(interface, "%s%d", fam->linux_string, i);
+
+		ret = librouter_acl_clean_iface_acls(interface);
+		if (ret < 0)
+			goto end;
+
+		switch(i){
+			case 0:
+				if (strcmp(ethernet0_in,"--1")  != 0)
+					ret = librouter_acl_apply_exist_chain_in_intf(interface,ethernet0_in,in);
+				if (strcmp(ethernet0_out,"--1") != 0)
+					ret = librouter_acl_apply_exist_chain_in_intf(interface,ethernet0_out,out);
+				break;
+			case 1:
+				if (strcmp(ethernet1_in,"--1")  != 0)
+					ret = librouter_acl_apply_exist_chain_in_intf(interface,ethernet1_in,in);
+				if (strcmp(ethernet1_out,"--1") != 0)
+					ret = librouter_acl_apply_exist_chain_in_intf(interface,ethernet1_out,out);
+				break;
+			default:
+				break;
+		}
+	}
+
+
+	ret = librouter_acl_apply_access_policy(policy_type);
+
+end:
 	if (!cgi_session_exists(req)) {
 		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
 		return 0;
 	}
-
-
 
 	cgi_response_add_parameter(resp, "success", (void *) ret, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/msgs.html");
@@ -271,15 +325,59 @@ int handle_fw_add_rule(struct request *req, struct response *resp)
 	return ret;
 }
 
+int handle_fw_del_rule (struct request *req, struct response *resp)
+{
+	int ret = 0;
+	char * rule;
+	char * warning_string = NULL;
+	char cmd[256];
+
+	memset(cmd, 0, sizeof(cmd));
+
+	rule = _get_parameter(req, "del");
+
+	if (!librouter_acl_exists(rule)) {
+		ret = -1;
+		goto end;
+	}
+
+	if (librouter_acl_get_refcount(rule)) {
+		ret = -1;
+		warning_string = malloc(115+strlen(rule));
+		snprintf(warning_string,115+strlen(rule),"<br/> Rule (<b>%s</b>) in use, can't be deleted!<br/> <br/> First is necessary to disable rule on the interface!",rule);
+		goto end;
+	}
+
+	sprintf(cmd, "/bin/iptables -F %s", rule); /* flush */
+	if (system(cmd) != 0)
+		ret = -1;
+
+	sprintf(cmd, "/bin/iptables -X %s", rule); /* delete */
+	if (system(cmd) != 0)
+		ret = -1;
+
+end:
+	if (warning_string){
+		cgi_response_add_parameter(resp, "err_msg", (void *) warning_string, CGI_STRING);
+		free(warning_string);
+		warning_string = NULL;
+	}
+
+	cgi_response_add_parameter(resp, "success", (void *) ret, CGI_INTEGER);
+	cgi_response_set_html(resp, "/wn/cgi/templates/msgs.html");
+
+	return ret;
+}
+
+
 int handle_config_firewall(struct request *req, struct response *resp)
 {
-	char *table, *del;
+	char *table;
 
 	if (!cgi_session_exists(req)) {
 		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
 		return 0;
 	}
-
 
 	/* Check if returning just table (AJAX) */
 	table = _get_parameter(req, "table");
@@ -291,7 +389,7 @@ int handle_config_firewall(struct request *req, struct response *resp)
 	_print_page_javascript(resp);
 
 	/* Return just table in case of AJAX request */
-	if (table || del) {
+	if (table) {
 		cgi_response_set_html(resp, "/wn/cgi/templates/config_firewall_table.html");
 		return 0;
 	}
@@ -301,3 +399,47 @@ int handle_config_firewall(struct request *req, struct response *resp)
 
 	return 0;
 }
+
+int handle_fw_view_rule(struct request *req, struct response *resp)
+{
+	char file[]="/var/rule_acl.conf";
+	int ret = 0;
+	FILE * acl_file;
+	char * rule, * buffer;
+	long lSize;
+	size_t result;
+
+	rule = _get_parameter(req, "view");
+
+	acl_file = fopen (file, "w" );
+	librouter_acl_dump(rule,acl_file,0);
+	fclose(acl_file);
+
+	acl_file = fopen(file, "r");
+
+	// obtain file size:
+	fseek (acl_file , 0 , SEEK_END);
+	lSize = ftell (acl_file);
+	rewind (acl_file);
+
+	// allocate memory to contain the whole file:
+	buffer = (char*) malloc (sizeof(char)*lSize);
+	if (buffer == NULL)
+		ret = -1;
+
+	// copy the file into the buffer:
+	result = fread (buffer,1,lSize,acl_file);
+	if (result != lSize)
+		ret = -1;
+
+	fclose(acl_file);
+
+	cgi_response_add_parameter(resp, "view_rule_buf", (void *) buffer, CGI_STRING);
+	cgi_response_set_html(resp, "/wn/cgi/templates/fw_rules.html");
+
+	free (buffer);
+	return ret;
+
+}
+
+

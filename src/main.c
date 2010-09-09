@@ -22,6 +22,7 @@
 #include <librouter/defines.h>
 #include <librouter/nv.h>
 
+#include "interface_status.h"
 #include "web_config.h"
 #include "reboot.h"
 #include "route.h"
@@ -198,58 +199,6 @@ saveconf_finish:
  * Temporary Handlers
  *
  */
-int handle_config_qos(struct request *req, struct response *resp)
-{
-	if (!cgi_session_exists(req)) {
-		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
-		return 0;
-	}
-
-	cgi_response_add_parameter(resp, "menu_config", (void *) 5, CGI_INTEGER);
-	cgi_response_set_html(resp, "/wn/cgi/templates/config_qos.html");
-
-	return 1;
-}
-
-int handle_config_ipsec(struct request *req, struct response *resp)
-{
-	if (!cgi_session_exists(req)) {
-		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
-		return 0;
-	}
-
-	cgi_response_add_parameter(resp, "menu_config", (void *) 6, CGI_INTEGER);
-	cgi_response_set_html(resp, "/wn/cgi/templates/config_ipsec.html");
-
-	return 1;
-}
-
-int handle_config_snmp(struct request *req, struct response *resp)
-{
-	if (!cgi_session_exists(req)) {
-		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
-		return 0;
-	}
-
-	cgi_response_add_parameter(resp, "menu_config", (void *) 7, CGI_INTEGER);
-	cgi_response_set_html(resp, "/wn/cgi/templates/config_snmp.html");
-
-	return 1;
-}
-
-int handle_status_interfaces(struct request *req, struct response *resp)
-{
-	if (!cgi_session_exists(req)) {
-		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
-		return 0;
-	}
-
-	cgi_response_add_parameter(resp, "menu_status", (void *) 1, CGI_INTEGER);
-	cgi_response_set_html(resp, "/wn/cgi/templates/status_interfaces.html");
-
-	return 1;
-}
-
 int handle_status_firewall(struct request *req, struct response *resp)
 {
 	if (!cgi_session_exists(req)) {
@@ -328,6 +277,45 @@ int handle_status_auth(struct request *req, struct response *resp)
 	return 1;
 }
 
+int handle_config_qos(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_add_parameter(resp, "menu_config", (void *) 5, CGI_INTEGER);
+	cgi_response_set_html(resp, "/wn/cgi/templates/config_qos.html");
+
+	return 1;
+}
+
+int handle_config_ipsec(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_add_parameter(resp, "menu_config", (void *) 6, CGI_INTEGER);
+	cgi_response_set_html(resp, "/wn/cgi/templates/config_ipsec.html");
+
+	return 1;
+}
+
+int handle_config_snmp(struct request *req, struct response *resp)
+{
+	if (!cgi_session_exists(req)) {
+		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
+		return 0;
+	}
+
+	cgi_response_add_parameter(resp, "menu_config", (void *) 7, CGI_INTEGER);
+	cgi_response_set_html(resp, "/wn/cgi/templates/config_snmp.html");
+
+	return 1;
+}
+
 
 
 int main(int argc, char **argv)
@@ -354,12 +342,17 @@ int main(int argc, char **argv)
 		/* Firewall */
 		{ .url = "/config_firewall", .handler = handle_config_firewall },
 		{ .url = "/apply_fw_general_settings", .handler = handle_apply_fw_general_settings },
-		{ .url = "/add_fw_rule", .handler = handle_fw_add_rule},
+		{ .url = "/add_fw_rule", .handler = handle_fw_add_rule },
+		{ .url = "/del_fw_rule", .handler = handle_fw_del_rule },
+		{ .url = "/view_fw_rule", .handler = handle_fw_view_rule },
 
 		/* NAT */
 		{ .url = "/config_nat", .handler = handle_config_nat },
 		{ .url = "/apply_nat_general_settings", .handler = handle_apply_nat_general_settings },
 		{ .url = "/app/apply_nat_rules_settings", .handler = handle_apply_nat_rules_settings },
+		{ .url = "/add_nat_rule", .handler = handle_nat_add_rule },
+		{ .url = "/del_nat_rule", .handler = handle_nat_del_rule },
+		{ .url = "/view_nat_rule", .handler = handle_nat_view_rule },
 
 		/* QoS */
 		{ .url = "/config_qos", .handler = handle_config_qos },
@@ -388,12 +381,16 @@ int main(int argc, char **argv)
 
 		/* Status Pages */
 		{ .url = "/status_interfaces", .handler = handle_status_interfaces },
+
+#ifdef OTHER_STATUS
+		/* Funções desativadas no presente momento */
 		{ .url = "/status_firewall", .handler = handle_status_firewall },
 		{ .url = "/status_nat", .handler = handle_status_nat },
 		{ .url = "/status_qos", .handler = handle_status_qos },
 		{ .url = "/status_ipsec", .handler = handle_status_ipsec },
 		{ .url = "/status_snmp", .handler = handle_status_snmp },
 		{ .url = "/status_auth", .handler = handle_status_auth },
+#endif
 		{ .url = "/status_logging", .handler = handle_status_logging },
 		{ .url = "/status_cpu", .handler = handle_status_cpu },
 		{ .url = "/status_memory", .handler = handle_status_memory },

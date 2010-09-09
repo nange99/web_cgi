@@ -14,5 +14,7 @@
 
 int handle_apply_intf_settings(struct request *req, struct response *resp);
 int handle_config_interface(struct request *req, struct response *resp);
+int handle_config_interface_status(struct request *req, struct response *resp);
+
 
 #endif /* INTERFACE_H_ */

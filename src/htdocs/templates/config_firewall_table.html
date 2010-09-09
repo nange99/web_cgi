@@ -1,0 +1,21 @@
+<table>
+	<thead>
+	    <tr>
+	        <th>Rule Name</th>
+	        <th></th>
+	    </tr>
+	</thead>
+	<tbody>
+	    <?foreach row in response.rules_table?>
+			<?if odd_ then?>
+				<tr>
+			<?else?>
+				<tr class="odd">
+			<?endif?>
+				  <td><?echo row.rulename?></td>
+				  <td><a href="#" onclick="viewRule('<?echo row.rulename?>');">View Details</a></td>
+				  <td><a href="#" onclick="deleteRule('<?echo row.rulename?>');">Delete Rule</a></td>
+				</tr>
+		<?endforeach?>
+	</tbody>
+</table>
