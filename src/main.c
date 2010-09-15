@@ -349,7 +349,6 @@ int main(int argc, char **argv)
 		/* NAT */
 		{ .url = "/config_nat", .handler = handle_config_nat },
 		{ .url = "/apply_nat_general_settings", .handler = handle_apply_nat_general_settings },
-		{ .url = "/app/apply_nat_rules_settings", .handler = handle_apply_nat_rules_settings },
 		{ .url = "/add_nat_rule", .handler = handle_nat_add_rule },
 		{ .url = "/del_nat_rule", .handler = handle_nat_del_rule },
 		{ .url = "/view_nat_rule", .handler = handle_nat_view_rule },

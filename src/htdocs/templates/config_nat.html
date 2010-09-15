@@ -38,9 +38,31 @@ select {
 </style>
 <script type="text/javascript">
 
-function makeDisable_PortRange(flag){
+function removeClassValue_inObjs(){
+	$("#rulename").removeClass("ui-state-error");
+	$("#src1").removeClass("ui-state-error");
+	$("#dest1").removeClass("ui-state-error");
+	$("#portnstart").removeClass("ui-state-error");
+	$("#portnend").removeClass("ui-state-error");
+	$("#portnat_start").removeClass("ui-state-error");
+	$("#portnat_end").removeClass("ui-state-error");
+	$("#nat_addr1").removeClass("ui-state-error");
+	$("#nat_addr2").removeClass("ui-state-error");
+}
+
+function clearValue_PortRanges(){
+	$("#portnstart").attr('value','');
+	$("#portnend").attr('value','');
+	$("#portnat_start").attr('value','');
+	$("#portnat_end").attr('value','');
+}
+
+function makeDisable_PortRanges(flag){
 	makeDisable_obj_byid(flag,("portnstart"));
 	makeDisable_obj_byid(flag,("portnend"));
+	makeDisable_obj_byid(flag,("portnat_start"));
+	makeDisable_obj_byid(flag,("portnat_end"));
+	
 }
 
 function analyze_PortRange(){
@@ -66,14 +88,98 @@ function analyze_PortRange(){
 	return ok;
 }
 
+function analyze_PortRange_NAT(){
+	var ok = true;
+	var portnat_Start = $("#portnat_start").val();
+	var portnat_End = $("#portnat_end").val();
+
+	if ( isNaN(portnat_Start) || isNaN(portnat_End) ) 
+		ok = false;
+
+	if ( parseInt(portnat_Start) > parseInt(portnat_End) )
+		ok = false;
+	
+	if (ok == true){
+		set_ui_state_error_onObj($("#portnat_start"),0);
+		set_ui_state_error_onObj($("#portnat_end"),0);
+	}
+	else{
+		set_ui_state_error_onObj($("#portnat_start"),1);
+		set_ui_state_error_onObj($("#portnat_end"),1);
+	}
+		
+	return ok;
+}
+
+function verify_Values_PortRanges(){
+
+	var ok = true;
+
+	/* Verify Values in Port Range */
+	if ( !isTextFieldEmpty($("#portnstart")) ){
+		ok = inRange($("#portnstart"),1,65534) && ok;
+		
+		if ( isTextFieldEmpty($("#portnend")) ){
+				set_ui_state_error_onObj($("#portnend"),1);		
+				ok = false;
+		}
+		else {
+			ok = inRange($("#portnend"),1,65534) && ok;
+			ok = analyze_PortRange() && ok;
+		}
+	}
+	else
+		if ( !isTextFieldEmpty($("#portnend")) ){
+			ok = inRange($("#portnend"),1,65534) && ok;
+			if ( isTextFieldEmpty($("#portnstart")) ){
+				set_ui_state_error_onObj($("#portnstart"),1);		
+				ok = false;
+			}
+			else {
+				ok = inRange($("#portnstart"),1,65534) && ok;
+				ok = analyze_PortRange() && ok;
+			}
+		}
+
+	/* Verify Values in Port Range NAT */
+	if ( !isTextFieldEmpty($("#portnat_start")) ){
+		ok = inRange($("#portnat_start"),1,65534) && ok;
+		
+		if ( isTextFieldEmpty($("#portnat_end")) ){
+				set_ui_state_error_onObj($("#portnat_end"),1);		
+				ok = false;
+		}
+		else {
+			ok = inRange($("#portnat_end"),1,65534) && ok;
+			ok = analyze_PortRange_NAT() && ok;
+		}
+	}
+	else
+		if ( !isTextFieldEmpty($("#portnat_end")) ){
+			ok = inRange($("#portnat_end"),1,65534) && ok;
+			if ( isTextFieldEmpty($("#portnat_start")) ){
+				set_ui_state_error_onObj($("#portnat_start"),1);		
+				ok = false;
+			}
+			else {
+				ok = inRange($("#portnat_start"),1,65534) && ok;
+				ok = analyze_PortRange_NAT() && ok;
+			}
+		}
+	
+	return ok;
+	
+}
+
+
 /* Fetch route table */
 function updateRuleTable() {
-	$.ajax({url: "/app/config_firewall?table=1", success: function(data) { $("#table_wrapper").html(data)}});
+	$.ajax({url: "/app/config_nat?table=1", success: function(data) { $("#table_wrapper_nat").html(data)}});
 }
 
 function deleteRule(hash) {
 	if (confirm("Delete this rule?")){
-		$.ajax({url: "/app/del_fw_rule?del=" + hash, success: function(data) {
+		$.ajax({url: "/app/del_nat_rule?del=" + hash, success: function(data) {
 			updateRuleTable();
 			$("#notificationDialog").html(data);
 			$("#notificationDialog").dialog("open");
@@ -82,7 +188,7 @@ function deleteRule(hash) {
 }
 
 function viewRule(rule) {
-	$.ajax({url: "/app/view_rule?view=" + rule, success: function(data){
+	$.ajax({url: "/app/view_nat_rule?view=" + rule, success: function(data){
 		 	$('#view_rule_text').attr('value',data);
 		 	$('#view_dialog').dialog('open');
 		
@@ -91,8 +197,8 @@ function viewRule(rule) {
 }
 
 function refreshGeneral_Settings(){
-	$("#table-applyrule_intf").load('/app/config_firewall #table-applyrule_intf');
-	$.ajax({url: "/app/config_firewall", success: function(data){ 
+	$("#table-applyrule_intf").load('/app/config_nat #table-applyrule_intf');
+	$.ajax({url: "/app/config_nat", success: function(data){ 
 			<?echo response.javascript?>
 	}});
 }
@@ -110,28 +216,62 @@ $(function() {
 		modal: true
 	});
 	
-	/* Accept or Drop */
-	$("#policy-<?echo response.policy_type?>").attr("selected", "selected");
-
-	
-	/* Lock Down text box for Port Range if protocol is IP */
+	/* Lock Down text box for all Port Ranges if protocol is IP */
 	$("#protocol").attr('selected',function (){
 		var protocol = $("#protocol").val();
 		if (protocol != "ip")
-			makeDisable_PortRange(0);
+			makeDisable_PortRanges(0);
 		else
-			makeDisable_PortRange(1);
+			makeDisable_PortRanges(1);
 	});
 	$("#protocol").click(function (){
 		var protocol = $("#protocol").val();
 		if (protocol != "ip")
-			makeDisable_PortRange(0);
+			makeDisable_PortRanges(0);
 		else{
-			makeDisable_PortRange(1);
-			$("#portnstart").attr('value','');
-			$("#portnend").attr('value','');
+			makeDisable_PortRanges(1);
+			clearValue_PortRanges();
 		}
 	});	
+
+	/* Lock Down text box for all Port Ranges if protocol is IP */
+	$("#translate").attr('selected',function (){
+		var translate = $("#translate").val();
+		if (translate == "change-destination-to"){
+			$("#interface_address").attr('disabled','disabled');
+			$("#interface_address").removeAttr('checked');
+			$("#nat_addr1").removeAttr('disabled');
+			$("#nat_addr2").removeAttr('disabled');		
+		}
+		else
+			$("#interface_address").removeAttr('disabled');
+	});
+	$("#translate").click(function (){
+		var translate = $("#translate").val();
+		if (translate == "change-destination-to"){
+			$("#interface_address").attr('disabled','disabled');
+			$("#interface_address").removeAttr('checked');
+			$("#nat_addr1").removeAttr('disabled');
+			$("#nat_addr2").removeAttr('disabled');
+		}
+		else
+			$("#interface_address").removeAttr('disabled');
+	});	
+	
+	
+	/* Disable NAT address field in case Interface Address is selected */
+	$("#interface_address").change(function () {
+		if ($(this).attr('checked')) {
+			$("#nat_addr1").attr('disabled','disabled');
+			$("#nat_addr2").attr('disabled','disabled');
+			$("#nat_addr1").attr('value','');
+			$("#nat_addr2").attr('value','');
+		} 
+		else {
+			$("#nat_addr1").removeAttr('disabled');
+			$("#nat_addr2").removeAttr('disabled');
+		}
+	});
 
 	
 	/* Print some javascript from CGI if necessary */
@@ -146,78 +286,60 @@ $(function() {
 			"Add Rule": function() {
 				var ok = true;
 				var dialog = $(this);
+				var intf_addr = $("#interface_address").attr('checked');
 
 				/* Check textbox (rulename and IPs) for regularity */
 				ok = !isTextFieldEmpty($("#rulename")) && ok;
 				ok = !valueCompare($("#rulename"), ("-")) && ok;	
+
 				if (ok == false)
 					set_ui_state_error_onObj($("#rulename"),1);
+
 				ok = verify_IPAddress_Mask_AnyAddr($("#src1")) && ok;
 				ok = verify_IPAddress_Mask_AnyAddr($("#dest1")) && ok;
 
-				
-				/* Check PortRange textbox for regularity */
-				if ( !isTextFieldEmpty($("#portnstart")) ){
-					ok = inRange($("#portnstart"),1,65534) && ok;
-					
-					if ( isTextFieldEmpty($("#portnend")) ){
-							set_ui_state_error_onObj($("#portnend"),1);		
-							ok = false;
-					}
-					else {
-						ok = inRange($("#portnend"),1,65534) && ok;
-						ok = analyze_PortRange() && ok;
-					}
+				if (!intf_addr){
+					ok = verifyIPAddress($("#nat_addr1")) && ok;
+					ok = verifyIPAddress($("#nat_addr2")) && ok;
 				}
-				else
-					if ( !isTextFieldEmpty($("#portnend")) ){
-						ok = inRange($("#portnend"),1,65534) && ok;
-						if ( isTextFieldEmpty($("#portnstart")) ){
-							set_ui_state_error_onObj($("#portnstart"),1);		
-							ok = false;
-						}
-						else {
-							ok = inRange($("#portnstart"),1,65534) && ok;
-							ok = analyze_PortRange() && ok;
-						}
-					}
-
+				
+				ok = verify_Values_PortRanges() && ok;
 				
 				if (ok) {
-					var f = $("#fwRuleForm");
+					var f = $("#natRuleForm");
 					$.post(f.get(0).action, f.serialize(), function (data) {
 						dialog.dialog('close');
 						updateRuleTable();
-						makeDisable_PortRange(1);
+						makeDisable_PortRanges(1);
+						$("#nat_addr1").removeAttr('disabled');
+						$("#nat_addr2").removeAttr('disabled');
 						$("#notificationDialog").html(data);
 						$("#notificationDialog").dialog("open");
 					});
 				}
 				else{
 						setTimeout(function () {
-							$("#rulename").removeClass("ui-state-error");
-							$("#src1").removeClass("ui-state-error");
-							$("#dest1").removeClass("ui-state-error");
-							$("#portnstart").removeClass("ui-state-error");
-							$("#portnend").removeClass("ui-state-error");
+							removeClassValue_inObjs();
 						}, 3000);
 						return;
 					}
 			},
 			"Cancel": function() {
-				makeDisable_PortRange(1);
+				makeDisable_PortRanges(1);
+				$("#nat_addr1").removeAttr('disabled');
+				$("#nat_addr2").removeAttr('disabled');
 				$(this).dialog('close');
 			}
 		},
 		open: function(event, ui) { 
 			//allFields.removeClass("ui-state-error");
-			$("#fwRuleForm").get(0).reset(); 
+			$("#natRuleForm").get(0).reset(); 
 		}
 	
 	});
 	
 	/* Apply settings for first tab */
-	$("#fw-general-settings-apply").click(function() {
+	$("#nat-general-settings-apply").click(function() {
 		form = $(this).parents("form").get(0);
 		form_data = $(this).parents("form").serialize();
 
@@ -261,23 +383,12 @@ $(function() {
 
 <div id="pageTabs">
 <ul>
-	<li><a href="#tab-fw-general-settings" onclick="refreshGeneral_Settings()"> General Settings </a></li>
-	<li><a href="#tab-fw-rules-settings"> Rules Settings </a></li>
+	<li><a href="#tab-nat-general-settings" onclick="refreshGeneral_Settings()"> General Settings </a></li>
+	<li><a href="#tab-nat-rules-settings"> Rules Settings </a></li>
 </ul>
 
-<div id="tab-fw-general-settings">
-<form id="form-general-fw-settings" action="/app/apply_fw_general_settings" method="post">
-<fieldset>
-	<div>
-		<label for="policy-type">Default Policy:</label>
-			<select name="policy-type" id="policy-type">
-			<option value="drop" id="policy-drop">Drop</option>
-			<option value="accept" id="policy-accept">Accept</option>
-			</select>
-	</div>
-</fieldset>
-
-
+<div id="tab-nat-general-settings">
+<form id="form-general-nat-settings" action="/app/apply_nat_general_settings" method="post">
 <fieldset>
 <div id="table-applyrule_intf">
 <table>
@@ -342,18 +453,18 @@ $(function() {
 		Internal 3G Modem 0
 	</td>
 	 <td>
-		<select name="m3g0-input" id="m3g0-input">
-			<option value="--1" id="m3g0-input-none">None</option>
+		<select name="m3GModem0-input" id="m3GModem0-input">
+			<option value="--1" id="m3GModem0-input-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3g0-intput-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="m3GModem0-input-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
 	<td>
-		<select name="m3g0-output" id="m3g0-output">
-			<option value="--1" id="m3g0-output-none">None</option>
+		<select name="m3GModem0-output" id="m3GModem0-output">
+			<option value="--1" id="m3GModem0-output-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3g0-output-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="m3GModem0-output-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
@@ -365,18 +476,18 @@ $(function() {
 		External 3G Modem 1
 	</td>
 	 <td>
-		<select name="m3g1-input" id="m3g1-input">
-			<option value="--1" id="m3g1-input-none">None</option>
+		<select name="m3GModem1-input" id="m3GModem1-input">
+			<option value="--1" id="m3GModem1-input-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3g1-input-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="m3GModem1-input-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
 	<td>
-		<select name="m3g1-output" id="m3g1-output">
-			<option value="--1" id="m3g1-output-none">None</option>
+		<select name="m3GModem1-output" id="m3GModem1-output">
+			<option value="--1" id="m3GModem1-output-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3g1-output-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="m3GModem1-output-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
@@ -387,18 +498,18 @@ $(function() {
 		External 3G Modem 2
 	</td>
 	 <td>
-		<select name="m3g2-input" id="m3g2-input">
-			<option value="--1" id="m3g2-input-none">None</option>
+		<select name="m3GModem2-input" id="m3GModem2-input">
+			<option value="--1" id="m3GModem2-input-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3g2-input-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="m3GModem2-input-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
 	<td>
-		<select name="m3g2-output" id="m3g2-output">
-			<option value="--1" id="m3g2-output-none">None</option>
+		<select name="m3GModem2-output" id="m3GModem2-output">
+			<option value="--1" id="m3GModem2-output-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3g2-output-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="m3GModem2-output-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
@@ -409,7 +520,7 @@ $(function() {
 
 </div>
 <div style="float:right;padding-top:50px;padding-right:50px">		 
-	<input type="button" id="fw-general-settings-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
+	<input type="button" id="nat-general-settings-apply" value="Apply Settings" class="text ui-widget-content ui-corner-all"/>
 </div>
 	
 </fieldset>
@@ -417,13 +528,13 @@ $(function() {
 </div> <!-- tab-gw-general-settings -->
 
 
-<div id="tab-fw-rules-settings">
+<div id="tab-nat-rules-settings">
 	<div id="context_menu">
 		<ul>
 			<li class="context_item"><a href="#" onclick="$('#dialog').dialog('open');"><b><u>Add rule</u></b></a></li>
 		</ul>
 	</div>
-	<div id="table_wrapper">
+	<div id="table_wrapper_nat">
 		<table>
 		<thead>
 		    <tr>
@@ -447,8 +558,8 @@ $(function() {
 </table>
 </div>
 
-<div id="dialog" title="Add Firewall Rule">
-<form id="fwRuleForm" action="/app/add_fw_rule" method="post">
+<div id="dialog" title="Add NAT Rule">
+<form id="natRuleForm" action="/app/add_nat_rule" method="post">
 <fieldset>
 	<legend>Rule Configuration</legend>
 	
@@ -461,17 +572,6 @@ $(function() {
 	<table>
 	<!-- entry 1 -->
 		<tr>
-			<td>
-				<div>
-					<label for="policy">Policy: </label>
-					<select name="policy" id="policy" style="width:120px" class="text ui-widget-content ui-corner-all">
-							<option value="accept" id="rule-policy-accept">Accept</option>
-							<option value="drop"   id="rule-policy-drop"  >Drop</option>
-							<option value="reject" id="rule-policy-reject">Reject</option>
-					</select>
-				</div>
-			</td>
-			
 			<td>
 				<div>
 					<label for="protocol">Protocol: </label>
@@ -509,12 +609,66 @@ $(function() {
 				</div>
 			</td>
 		</tr>
+		
+		<tr>
+			<td>
+				<br />
+			</td>
+		
+		</tr>
+		
+		<tr>
+			<td>
+				<div>
+					<label for="translate">Translate: </label>
+					<select name="translate" id="translate" style="width:160px" class="text ui-widget-content ui-corner-all">
+							<option value="change-source-to"  id="translate-source" >Change-source-to</option>
+							<option value="change-destination-to" id="translate-destination">Change-destination-to</option>
+					</select>
+				</div>
+			</td>
+			
+			<td>
+				<div>
+					<label for="intf_addr" padding="3px">Interface Address </label>
+					<input type="checkbox" name="interface_address" id="interface_address" <?if interface_address then?> checked="checked"<?endif?> class="text ui-widget-content ui-corner-all"/>
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<div>
+					<label for="nat_addr1">NAT First Address:</label>
+					<input type="text" name="nat_addr1" id="nat_addr1" style="width:120px" title="IP - Ex: 192.168.0.1" class="text ui-widget-content ui-corner-all"/>
+				</div>
+			</td>
+
+			<td>
+				<div>
+					<label for="nat_addr2">NAT Last Address:</label>
+					<input type="text" name="nat_addr2" id="nat_addr2" style="width:120px" title="IP - Ex: 192.168.0.1" class="text ui-widget-content ui-corner-all"/>
+				</div>
+			</td>
+		</tr>
+		
+		<tr>	
+			<td>
+				<div>
+					<label for="portnat" title="Numbers between 1-65534, or blank - [For a unique port, put the same number at the fields]">NAT Port Range:</label>
+					<input type="text" name="portnat_start" id="portnat_start" disabled=true style="width:50px" title="Value1 < Value2" class="text ui-widget-content ui-corner-all"/>
+					-
+					<input type="text" name="portnat_end" id="portnat_end" disabled=true style="width:50px" title="Value1 < Value2" class="text ui-widget-content ui-corner-all"/>
+				</div>
+			</td>
+		</tr>
+		
 	</table>
 
 	
 </fieldset>
 </form>
-</div> <!-- tab-gw-rules-settings -->
+</div> <!-- tab-nat-rules-settings -->
 
 
 <div id="view_dialog" title="View Rule">

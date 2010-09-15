@@ -211,6 +211,7 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 	/* Realiza o shutdown da interface 3G para aplicar as configurações */
 	ret = librouter_ppp_backupd_set_shutdown_3Gmodem(linux_interface);
 	web_dbg("(3) - Check for problems after shutdown 3Gmodem for config. (ret = %s)\n", ret < 0 ? "fail" : "ok" );
+
 	ret = librouter_ppp_reload_backupd();
 	web_dbg("(4) - Check for problems after reload backupd (ret = %s)\n", ret < 0 ? "fail" : "ok" );
 
@@ -351,10 +352,13 @@ end:
 
 	free(linux_interface);
 	linux_interface=NULL;
+
 	free(intf_return_backup_error);
 	intf_return_backup_error=NULL;
+
 	if (warning_string)
 		free(warning_string);
+
 	return 0;
 }
 

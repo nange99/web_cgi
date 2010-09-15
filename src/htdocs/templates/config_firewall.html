@@ -38,6 +38,19 @@ select {
 <script type="text/JavaScript" src="/js/qTip.js"></script>
 <script type="text/javascript">
 
+function removeClassValue_inObjs(){
+	$("#rulename").removeClass("ui-state-error");
+	$("#src1").removeClass("ui-state-error");
+	$("#dest1").removeClass("ui-state-error");
+	$("#portnstart").removeClass("ui-state-error");
+	$("#portnend").removeClass("ui-state-error");
+}
+
+function clearValue_PortRanges(){
+	$("#portnstart").attr('value','');
+	$("#portnend").attr('value','');
+}
+
 function makeDisable_PortRange(flag){
 	makeDisable_obj_byid(flag,("portnstart"));
 	makeDisable_obj_byid(flag,("portnend"));
@@ -66,6 +79,42 @@ function analyze_PortRange(){
 	return ok;
 }
 
+function verify_Values_PortRanges(){
+
+	var ok = true;
+
+	/* Verify Values in Port Range */
+	if ( !isTextFieldEmpty($("#portnstart")) ){
+		ok = inRange($("#portnstart"),1,65534) && ok;
+		
+		if ( isTextFieldEmpty($("#portnend")) ){
+				set_ui_state_error_onObj($("#portnend"),1);		
+				ok = false;
+		}
+		else {
+			ok = inRange($("#portnend"),1,65534) && ok;
+			ok = analyze_PortRange() && ok;
+		}
+	}
+	else
+		if ( !isTextFieldEmpty($("#portnend")) ){
+			ok = inRange($("#portnend"),1,65534) && ok;
+			if ( isTextFieldEmpty($("#portnstart")) ){
+				set_ui_state_error_onObj($("#portnstart"),1);		
+				ok = false;
+			}
+			else {
+				ok = inRange($("#portnstart"),1,65534) && ok;
+				ok = analyze_PortRange() && ok;
+			}
+		}
+
+	return ok;
+	
+}
+
+
+
 /* Fetch route table */
 function updateRuleTable() {
 	$.ajax({url: "/app/config_firewall?table=1", success: function(data) { $("#table_wrapper").html(data)}});
@@ -92,8 +141,8 @@ function viewRule(rule) {
 
 function refreshGeneral_Settings(){
 	$("#table-applyrule_intf").load('/app/config_firewall #table-applyrule_intf');
-	$.ajax({url: "/app/config_firewall", success: function(data){ 
-			<?echo response.javascript?>
+	$.ajax({url: "/app/config_firewall", success: function(data){
+		<?echo response.javascript?>
 	}});
 }
 
@@ -128,8 +177,7 @@ $(function() {
 			makeDisable_PortRange(0);
 		else{
 			makeDisable_PortRange(1);
-			$("#portnstart").attr('value','');
-			$("#portnend").attr('value','');
+			clearValue_PortRanges();
 		}
 	});	
 
@@ -150,37 +198,13 @@ $(function() {
 				/* Check textbox (rulename and IPs) for regularity */
 				ok = !isTextFieldEmpty($("#rulename")) && ok;
 				ok = !valueCompare($("#rulename"), ("-")) && ok;	
+
 				if (ok == false)
 					set_ui_state_error_onObj($("#rulename"),1);
+
 				ok = verify_IPAddress_Mask_AnyAddr($("#src1")) && ok;
 				ok = verify_IPAddress_Mask_AnyAddr($("#dest1")) && ok;
-
-				
-				/* Check PortRange textbox for regularity */
-				if ( !isTextFieldEmpty($("#portnstart")) ){
-					ok = inRange($("#portnstart"),1,65534) && ok;
-					
-					if ( isTextFieldEmpty($("#portnend")) ){
-							set_ui_state_error_onObj($("#portnend"),1);		
-							ok = false;
-					}
-					else {
-						ok = inRange($("#portnend"),1,65534) && ok;
-						ok = analyze_PortRange() && ok;
-					}
-				}
-				else
-					if ( !isTextFieldEmpty($("#portnend")) ){
-						ok = inRange($("#portnend"),1,65534) && ok;
-						if ( isTextFieldEmpty($("#portnstart")) ){
-							set_ui_state_error_onObj($("#portnstart"),1);		
-							ok = false;
-						}
-						else {
-							ok = inRange($("#portnstart"),1,65534) && ok;
-							ok = analyze_PortRange() && ok;
-						}
-					}
+				ok = verify_Values_PortRanges() && ok;
 
 				
 				if (ok) {
@@ -195,11 +219,7 @@ $(function() {
 				}
 				else{
 						setTimeout(function () {
-							$("#rulename").removeClass("ui-state-error");
-							$("#src1").removeClass("ui-state-error");
-							$("#dest1").removeClass("ui-state-error");
-							$("#portnstart").removeClass("ui-state-error");
-							$("#portnend").removeClass("ui-state-error");
+							removeClassValue_inObjs();
 						}, 3000);
 						return;
 					}
@@ -343,18 +363,18 @@ $(function() {
 		Internal 3G Modem 0
 	</td>
 	 <td>
-		<select name="m3g0-input" id="m3g0-input">
-			<option value="--1" id="m3g0-input-none">None</option>
+		<select name="m3GModem0-input" id="m3GModem0-input">
+			<option value="--1" id="m3GModem0-input-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3g0-intput-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="m3GModem0-input-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
 	<td>
-		<select name="m3g0-output" id="m3g0-output">
-			<option value="--1" id="m3g0-output-none">None</option>
+		<select name="m3GModem0-output" id="m3GModem0-output">
+			<option value="--1" id="m3GModem0-output-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3g0-output-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="m3GModem0-output-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
@@ -366,18 +386,18 @@ $(function() {
 		External 3G Modem 1
 	</td>
 	 <td>
-		<select name="m3g1-input" id="m3g1-input">
-			<option value="--1" id="m3g1-input-none">None</option>
+		<select name="m3GModem1-input" id="m3GModem1-input">
+			<option value="--1" id="m3GModem1-input-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3g1-input-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="m3GModem1-input-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
 	<td>
-		<select name="m3g1-output" id="m3g1-output">
-			<option value="--1" id="m3g1-output-none">None</option>
+		<select name="m3GModem1-output" id="m3GModem1-output">
+			<option value="--1" id="m3GModem1-output-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3g1-output-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="m3GModem1-output-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
@@ -388,18 +408,18 @@ $(function() {
 		External 3G Modem 2
 	</td>
 	 <td>
-		<select name="m3g2-input" id="m3g2-input">
-			<option value="--1" id="m3g2-input-none">None</option>
+		<select name="m3GModem2-input" id="m3GModem2-input">
+			<option value="--1" id="m3GModem2-input-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3g2-input-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="m3GModem2-input-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
 	<td>
-		<select name="m3g2-output" id="m3g2-output">
-			<option value="--1" id="m3g2-output-none">None</option>
+		<select name="m3GModem2-output" id="m3GModem2-output">
+			<option value="--1" id="m3GModem2-output-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3g2-output-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="m3GModem2-output-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>

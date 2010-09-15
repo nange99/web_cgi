@@ -318,7 +318,7 @@ function verifyIPAddress(obj) {
 		valid = false;
 	
 	for ( var i = 0; i < splitted.length; i++) {
-		if ((splitted[i] < 0)  || (splitted[i] > 255))
+		if ((splitted[i] < 0)  || (splitted[i] > 255) || (splitted[i] == ""))
 			valid = false;
 	}	
 		

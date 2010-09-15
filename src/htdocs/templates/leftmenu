@@ -11,9 +11,9 @@
 			<li> <a href="/app/config_static_routes" <?if response.menu_config == 2 then?>class="cur_menu"<?endif?>>Static Routes</a></li>
 			<li> <a href="/app/config_firewall" <?if response.menu_config == 3 then?>class="cur_menu"<?endif?>>Firewall</a> </li>
 			<li> <a href="/app/config_nat" <?if response.menu_config == 4 then?>class="cur_menu"<?endif?>>Nat</a> </li>
-			<li> <a href="/app/config_qos" <?if response.menu_config == 5 then?>class="cur_menu"<?endif?>>QoS</a> </li>
+	<!--	<li> <a href="/app/config_qos" <?if response.menu_config == 5 then?>class="cur_menu"<?endif?>>QoS</a> </li>
 			<li> <a href="/app/config_ipsec" <?if response.menu_config == 6 then?>class="cur_menu"<?endif?>>IPSec</a> </li>
-			<li> <a href="/app/config_snmp" <?if response.menu_config == 7 then?>class="cur_menu"<?endif?>>SNMP</a> </li>
+			<li> <a href="/app/config_snmp" <?if response.menu_config == 7 then?>class="cur_menu"<?endif?>>SNMP</a> </li>	-->
 			<li> <a href="/app/config_auth" <?if response.menu_config == 8 then?>class="cur_menu"<?endif?>>Authentication</a> </li>
 			<li> <a href="/app/config_ntp" <?if response.menu_config == 9 then?>class="cur_menu"<?endif?>>NTP</a> </li>
 			<li> <a href="/app/config_dhcpd" <?if response.menu_config == 10 then?>class="cur_menu"<?endif?>>DHCP Server</a> </li>
