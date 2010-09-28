@@ -317,18 +317,18 @@ $(function() {
 		Ethernet 0 (LAN)
 	</td>
 	 <td id="teste">
-		<select name="ethernet0-input" id="ethernet0-input">
-			<option value="--1" id="ethernet0-input-none">None</option>
+		<select name="eth0-input" id="eth0-input">
+			<option value="--1" id="eth0-input-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="ethernet0-input-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="eth0-input-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
 	<td>
-		<select name="ethernet0-output" id="ethernet0-output">
-			<option value="--1" id="ethernet0-output-none">None</option>
+		<select name="eth0-output" id="eth0-output">
+			<option value="--1" id="eth0-output-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="ethernet0-output-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="eth0-output-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
@@ -340,18 +340,18 @@ $(function() {
 		Ethernet 1 (WAN)
 	</td>
 	 <td>
-		<select name="ethernet1-input" id="ethernet1-input">
-			<option value="--1" id="ethernet1-input-none">None</option>
+		<select name="eth1-input" id="eth1-input">
+			<option value="--1" id="eth1-input-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="ethernet1-input-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="eth1-input-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>
 	<td>
-		<select name="ethernet1-output" id="ethernet1-output">
-			<option value="--1" id="ethernet1-output-none">None</option>
+		<select name="eth1-output" id="eth1-output">
+			<option value="--1" id="eth1-output-none">None</option>
 			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="ethernet1-output-<?echo row.rulename?>"><?echo row.rulename?></option>
+			<option value="<?echo row.rulename?>" id="eth1-output-<?echo row.rulename?>"><?echo row.rulename?></option>
 			<?endforeach?>
 		</select>
 	</td>

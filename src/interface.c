@@ -436,10 +436,17 @@ static cgi_table * _fetch_eth_info(void)
 
 	for (i = 0; i < ETHERNET_IFACE_NUM; i++) {
 		snprintf(iface, 16, "%s%d", fam->linux_string, i);
-		if (librouter_ip_iface_get_config(iface, &conf, NULL) < 0)
-			return NULL;
 
-		snprintf(iface, 16, "%s%d", fam->web_string, i);
+		if (librouter_ip_iface_get_config(iface, &conf, NULL) < 0){
+			web_dbg("result NULL after librouter_ip_iface_get_config -- (%s)",iface);
+			/* FIX TEMPORARIO ATÈ ARRUMAR ETH1 (switch) */
+			if (!strcmp(iface,"eth1"))
+				goto jump;
+
+			return NULL;
+		}
+
+jump:		snprintf(iface, 16, "%s%d", fam->web_string, i);
 
 		cgi_table_add_row(t);
 
@@ -477,8 +484,10 @@ static cgi_table * _fetch_lo_info(void)
 
 	for (i = 0; i < LOOPBACK_IFACE_NUM; i++) {
 		snprintf(iface, 16, "%s%d", fam->linux_string, i);
-		if (librouter_ip_iface_get_config(iface, &conf, NULL) < 0)
+		if (librouter_ip_iface_get_config(iface, &conf, NULL) < 0){
+			web_dbg("return NULL after librouter_ip_iface_get_config --(%s)",iface);
 			return NULL;
+		}
 
 		snprintf(iface, 16,"%s%d", fam->web_string, i);
 

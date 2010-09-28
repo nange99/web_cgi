@@ -175,10 +175,10 @@ int handle_apply_nat_general_settings(struct request *req, struct response *resp
 	char *m3g1_in, *m3g1_out;
 	char *m3g2_in, *m3g2_out;
 
-	ethernet0_in  = _get_parameter(req, "ethernet0-input");
-	ethernet0_out = _get_parameter(req, "ethernet0-output");
-	ethernet1_in  = _get_parameter(req, "ethernet1-input");
-	ethernet1_out = _get_parameter(req, "ethernet1-output");
+	ethernet0_in  = _get_parameter(req, "eth0-input");
+	ethernet0_out = _get_parameter(req, "eth0-output");
+	ethernet1_in  = _get_parameter(req, "eth1-input");
+	ethernet1_out = _get_parameter(req, "eth1-output");
 
 	m3g0_in  = _get_parameter(req, "m3GModem0-input");
 	m3g0_out = _get_parameter(req, "m3GModem0-output");
