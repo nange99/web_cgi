@@ -228,7 +228,7 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 		ret = -1;
 
 
-	if (major != 0){
+	if (major != BTIN_M3G_ALIAS){
 		ret = librouter_modem3g_set_apn(apn0, major);
 		ret = librouter_modem3g_set_username(user0, major);
 		ret = librouter_modem3g_set_password(pass0, major);
@@ -321,7 +321,7 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 
 
 	if (up != NULL){
-		if (!librouter_usb_device_is_modem(major+1)){
+		if (librouter_usb_device_is_modem( librouter_usb_get_realport_by_aliasport(major) ) < 0){
 			if (ret < 0)
 				strcat(warning_string, "<br/><br/> The interface is not connected or is not a modem!");
 			else{
@@ -437,7 +437,7 @@ static cgi_table * _fetch_eth_info(void)
 	for (i = 0; i < ETHERNET_IFACE_NUM; i++) {
 		snprintf(iface, 16, "%s%d", fam->linux_string, i);
 
-		if (librouter_ip_iface_get_config(iface, &conf, NULL) < 0){
+/* FIXME */	if (librouter_ip_iface_get_config(iface, &conf, NULL) < 0){
 			web_dbg("result NULL after librouter_ip_iface_get_config -- (%s)",iface);
 			/* FIX TEMPORARIO ATÈ ARRUMAR ETH1 (switch) */
 			if (!strcmp(iface,"eth1"))
@@ -539,7 +539,7 @@ static cgi_table * _fetch_3g_info(void)
 		cgi_table_add_row(t);
 
 		cgi_table_add_value(t, "name",  (char *) iface, CGI_STRING);
-		if (i == 0){
+		if (i == BTIN_M3G_ALIAS){
 			if (!ppp_cfg.sim_main.sim_num){
 				cgi_table_add_value(t, "apn0",  (char *) ppp_cfg.sim_main.apn, CGI_STRING);
 				cgi_table_add_value(t, "user0", (char *) ppp_cfg.sim_main.username, CGI_STRING);
