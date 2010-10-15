@@ -523,9 +523,10 @@ static cgi_table * _fetch_3g_info(void)
 		return NULL;
 
 	/* Create loopback table */
-	t = cgi_table_create(12, "name", "apn0", "user0", "pass0", "apn1",
-			         "user1", "pass1", "sim_order", "up",  "backup_method",
-			         "backup_interface", "ping_addr");
+	t = cgi_table_create(15, "name", "apn0", "user0", "pass0", "apn1",
+			         "user1", "pass1", "sim_order", "up",
+			         "backup_method", "backup_interface",
+			         "ping_addr", "ipaddr", "ipmask", "ippeer");
 
 	for (i = 0; i < M3G_IFACE_NUM; i++) {
 		snprintf(iface, 16, "%s%d", fam->linux_string, i);
@@ -585,6 +586,12 @@ static cgi_table * _fetch_3g_info(void)
 
 		cgi_table_add_value(t, "up", (void *) (conf.up || (!ppp_cfg.bckp_conf.shutdown)), CGI_INTEGER);
 		cgi_table_add_value(t, "ping_addr",(char *) ppp_cfg.bckp_conf.ping_address, CGI_STRING);
+
+		/* Interface Status purpose */
+		cgi_table_add_value(t, "ipaddr", (char *) conf.main_ip.ipaddr, CGI_STRING);
+		cgi_table_add_value(t, "ipmask", (char *) conf.main_ip.ipmask, CGI_STRING);
+		cgi_table_add_value(t, "ippeer", (char *) conf.main_ip.ippeer, CGI_STRING);
+
 	}
 
 	return t;
