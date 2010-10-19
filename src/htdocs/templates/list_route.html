@@ -22,8 +22,7 @@ $(function() {
 	var gateway = $("#gateway");
 	var mask = $("#mask");
 	var metric = $("#metric");
-	var interface = $("#interface");
-	var allFields = $([]).add(destination).add(gateway).add(mask).add(metric).add(interface);
+	var allFields = $([]).add(destination).add(gateway).add(mask).add(metric);
 	
 	/* Fetch route table */
 	function updateRouteTable() {
@@ -84,7 +83,6 @@ $(function() {
         <th>Destination</th>
         <th>Mask</th>
         <th>Gateway</th>
-        <th>Interface</th>
         <th>Metric</th>
         <th></th>
     </tr>
@@ -99,7 +97,6 @@ $(function() {
 			  <td><?echo row.dest?></td>
 			  <td><?echo row.mask?></td>
 			  <td><?echo row.gateway?></td>
-			  <td><?echo row.interface?></td>
 			  <td><?echo row.metric?></td>
 			  <td><a href="#" onclick="deleteRoute('<?echo row.hash?>');">remove</a></td>
 			</tr>
@@ -126,16 +123,6 @@ $(function() {
 	<div>
 	<label for="metric">Metric:</label>
 	<input type="text" name="metric" id="metric" class="text ui-widget-content ui-corner-all"/>
-	</div>
-	<div>
-	<label for="interface">Interface:</label>
-	<select name="interface" id="interface"
-	class="text ui-widget-content ui-corner-all">
-		<option value=""></option>
-		<option value="ethernet0">ethernet</option>
-		<option value="ppp0">3g</option>
-		<option value="loopback0">loopback</option>
-	</select>
 	</div>
 </fieldset>
 </form>

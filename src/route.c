@@ -37,7 +37,6 @@ int handle_add_route(struct request *req, struct response *resp)
 	route->network = _get_parameter(req, "dest");
 	route->mask = _get_parameter(req, "mask");
 	route->gateway = _get_parameter(req, "gateway");
-	route->interface = _get_parameter(req, "interface");
 	if (_get_parameter(req, "metric") != NULL)
 		route->metric = atoi(_get_parameter(req, "metric"));
 
@@ -73,7 +72,7 @@ int handle_static_routes(struct request *req, struct response *resp)
 	/* Check if returning just table (AJAX) */
 	table = _get_parameter(req, "table");
 
-	t = cgi_table_create(6, "dest", "mask", "gateway", "interface", "metric", "hash");
+	t = cgi_table_create(5, "dest", "mask", "gateway", "metric", "hash");
 
 	next = route = librouter_quagga_get_routes();
 
@@ -89,11 +88,6 @@ int handle_static_routes(struct request *req, struct response *resp)
 			cgi_table_add_value(t, "gateway", (char *) next->gateway, CGI_STRING);
 		else
 			cgi_table_add_value(t, "gateway", (char *) "-", CGI_STRING);
-
-		if (next->interface)
-			cgi_table_add_value(t, "interface", (char *) next->interface, CGI_STRING);
-		else
-			cgi_table_add_value(t, "interface", (char *) "-", CGI_STRING);
 
 		if (next->metric)
 			cgi_table_add_value(t, "metric", (void *) next->metric, CGI_INTEGER);
