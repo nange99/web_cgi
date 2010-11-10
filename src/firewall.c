@@ -168,6 +168,8 @@ int handle_config_firewall(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	cgi_response_add_parameter(resp, "ethernet_iface_num", (void *) ETHERNET_IFACE_NUM, CGI_INTEGER);
+	cgi_response_add_parameter(resp, "m3g_iface_num", (void *) M3G_IFACE_NUM, CGI_INTEGER);
 	cgi_response_add_parameter(resp, "menu_config", (void *) 3, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/config_firewall.html");
 

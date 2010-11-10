@@ -437,12 +437,8 @@ static cgi_table * _fetch_eth_info(void)
 	for (i = 0; i < ETHERNET_IFACE_NUM; i++) {
 		snprintf(iface, 16, "%s%d", fam->linux_string, i);
 
-/* FIXME */	if (librouter_ip_iface_get_config(iface, &conf, NULL) < 0){
+		if (librouter_ip_iface_get_config(iface, &conf, NULL) < 0){
 			web_dbg("result NULL after librouter_ip_iface_get_config -- (%s)",iface);
-			/* FIX TEMPORARIO ATÈ ARRUMAR ETH1 (switch) */
-			if (!strcmp(iface,"eth1"))
-				goto jump;
-
 			return NULL;
 		}
 
@@ -613,10 +609,6 @@ int handle_config_interface(struct request *req, struct response *resp)
 		return 0;
 	}
 
-	/* Pode ser apagado depois de o Lo_table abaixo ter sido ativado */
-//	/*FIXME*/ lo_table = cgi_table_create(4, "name", "ipaddr", "ipmask", "up");
-
-
 	eth_table = _fetch_eth_info();
 	if (eth_table == NULL) {
 		log_err("Failed to fetch ethernet information\n");
@@ -640,6 +632,7 @@ int handle_config_interface(struct request *req, struct response *resp)
 	cgi_response_add_parameter(resp, "eth_table", (void *) eth_table, CGI_TABLE);
 	cgi_response_add_parameter(resp, "lo_table", (void *) lo_table, CGI_TABLE);
 	cgi_response_add_parameter(resp, "m3g_table", (void *) m3g_table, CGI_TABLE);
+	cgi_response_add_parameter(resp, "ethernet_iface_num", (void *) ETHERNET_IFACE_NUM, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/config_interfaces.html");
 
 	return 0;

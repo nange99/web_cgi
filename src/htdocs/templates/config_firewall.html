@@ -335,95 +335,99 @@ $(function() {
 </tr>
 
 <!-- Ethernet 1 -->
-<tr>
-	<td>
-		Ethernet 1 (WAN)
-	</td>
-	 <td>
-		<select name="eth1-input" id="eth1-input">
-			<option value="--1" id="eth1-input-none">None</option>
-			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="eth1-input-<?echo row.rulename?>"><?echo row.rulename?></option>
-			<?endforeach?>
-		</select>
-	</td>
-	<td>
-		<select name="eth1-output" id="eth1-output">
-			<option value="--1" id="eth1-output-none">None</option>
-			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="eth1-output-<?echo row.rulename?>"><?echo row.rulename?></option>
-			<?endforeach?>
-		</select>
-	</td>
-</tr>
+<?if response.ethernet_iface_num >= 2 then?>
+	<tr>
+		<td>
+			Ethernet 1 (WAN)
+		</td>
+		 <td>
+			<select name="eth1-input" id="eth1-input">
+				<option value="--1" id="eth1-input-none">None</option>
+				<?foreach row in response.rules_table?>
+				<option value="<?echo row.rulename?>" id="eth1-input-<?echo row.rulename?>"><?echo row.rulename?></option>
+				<?endforeach?>
+			</select>
+		</td>
+		<td>
+			<select name="eth1-output" id="eth1-output">
+				<option value="--1" id="eth1-output-none">None</option>
+				<?foreach row in response.rules_table?>
+				<option value="<?echo row.rulename?>" id="eth1-output-<?echo row.rulename?>"><?echo row.rulename?></option>
+				<?endforeach?>
+			</select>
+		</td>
+	</tr>
+<?endif?>
 
 <!-- 3G Internal -->
-<tr class="odd">
-	<td>
-		Internal 3G Modem 0
-	</td>
-	 <td>
-		<select name="m3GModem0-input" id="m3GModem0-input">
-			<option value="--1" id="m3GModem0-input-none">None</option>
-			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3GModem0-input-<?echo row.rulename?>"><?echo row.rulename?></option>
-			<?endforeach?>
-		</select>
-	</td>
-	<td>
-		<select name="m3GModem0-output" id="m3GModem0-output">
-			<option value="--1" id="m3GModem0-output-none">None</option>
-			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3GModem0-output-<?echo row.rulename?>"><?echo row.rulename?></option>
-			<?endforeach?>
-		</select>
-	</td>
-</tr>
-
-<!-- 3G Externals -->
-<tr>
-	<td>
-		External 3G Modem 1
-	</td>
-	 <td>
-		<select name="m3GModem1-input" id="m3GModem1-input">
-			<option value="--1" id="m3GModem1-input-none">None</option>
-			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3GModem1-input-<?echo row.rulename?>"><?echo row.rulename?></option>
-			<?endforeach?>
-		</select>
-	</td>
-	<td>
-		<select name="m3GModem1-output" id="m3GModem1-output">
-			<option value="--1" id="m3GModem1-output-none">None</option>
-			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3GModem1-output-<?echo row.rulename?>"><?echo row.rulename?></option>
-			<?endforeach?>
-		</select>
-	</td>
-</tr>
-
-<tr class="odd">
-	<td>
-		External 3G Modem 2
-	</td>
-	 <td>
-		<select name="m3GModem2-input" id="m3GModem2-input">
-			<option value="--1" id="m3GModem2-input-none">None</option>
-			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3GModem2-input-<?echo row.rulename?>"><?echo row.rulename?></option>
-			<?endforeach?>
-		</select>
-	</td>
-	<td>
-		<select name="m3GModem2-output" id="m3GModem2-output">
-			<option value="--1" id="m3GModem2-output-none">None</option>
-			<?foreach row in response.rules_table?>
-			<option value="<?echo row.rulename?>" id="m3GModem2-output-<?echo row.rulename?>"><?echo row.rulename?></option>
-			<?endforeach?>
-		</select>
-	</td>
-</tr>
+<?if response.m3g_iface_num == 3 then?>
+	<tr class="odd">
+		<td>
+			Internal 3G Modem 0
+		</td>
+		 <td>
+			<select name="m3GModem0-input" id="m3GModem0-input">
+				<option value="--1" id="m3GModem0-input-none">None</option>
+				<?foreach row in response.rules_table?>
+				<option value="<?echo row.rulename?>" id="m3GModem0-input-<?echo row.rulename?>"><?echo row.rulename?></option>
+				<?endforeach?>
+			</select>
+		</td>
+		<td>
+			<select name="m3GModem0-output" id="m3GModem0-output">
+				<option value="--1" id="m3GModem0-output-none">None</option>
+				<?foreach row in response.rules_table?>
+				<option value="<?echo row.rulename?>" id="m3GModem0-output-<?echo row.rulename?>"><?echo row.rulename?></option>
+				<?endforeach?>
+			</select>
+		</td>
+	</tr>
+	
+	<!-- 3G Externals -->
+	<tr>
+		<td>
+			External 3G Modem 1
+		</td>
+		 <td>
+			<select name="m3GModem1-input" id="m3GModem1-input">
+				<option value="--1" id="m3GModem1-input-none">None</option>
+				<?foreach row in response.rules_table?>
+				<option value="<?echo row.rulename?>" id="m3GModem1-input-<?echo row.rulename?>"><?echo row.rulename?></option>
+				<?endforeach?>
+			</select>
+		</td>
+		<td>
+			<select name="m3GModem1-output" id="m3GModem1-output">
+				<option value="--1" id="m3GModem1-output-none">None</option>
+				<?foreach row in response.rules_table?>
+				<option value="<?echo row.rulename?>" id="m3GModem1-output-<?echo row.rulename?>"><?echo row.rulename?></option>
+				<?endforeach?>
+			</select>
+		</td>
+	</tr>
+	
+	<tr class="odd">
+		<td>
+			External 3G Modem 2
+		</td>
+		 <td>
+			<select name="m3GModem2-input" id="m3GModem2-input">
+				<option value="--1" id="m3GModem2-input-none">None</option>
+				<?foreach row in response.rules_table?>
+				<option value="<?echo row.rulename?>" id="m3GModem2-input-<?echo row.rulename?>"><?echo row.rulename?></option>
+				<?endforeach?>
+			</select>
+		</td>
+		<td>
+			<select name="m3GModem2-output" id="m3GModem2-output">
+				<option value="--1" id="m3GModem2-output-none">None</option>
+				<?foreach row in response.rules_table?>
+				<option value="<?echo row.rulename?>" id="m3GModem2-output-<?echo row.rulename?>"><?echo row.rulename?></option>
+				<?endforeach?>
+			</select>
+		</td>
+	</tr>
+<?endif?>
 
 </tbody>
 </table>
