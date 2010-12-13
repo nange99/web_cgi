@@ -83,6 +83,7 @@ $(function() {
         <th>Destination</th>
         <th>Mask</th>
         <th>Gateway</th>
+        <th>Interface</th>
         <th>Metric</th>
         <th></th>
     </tr>
@@ -97,6 +98,7 @@ $(function() {
 			  <td><?echo row.dest?></td>
 			  <td><?echo row.mask?></td>
 			  <td><?echo row.gateway?></td>
+			  <td><?echo row.interface?></td>
 			  <td><?echo row.metric?></td>
 			  <td><a href="#" onclick="deleteRoute('<?echo row.hash?>');">remove</a></td>
 			</tr>
