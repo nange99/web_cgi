@@ -206,6 +206,13 @@ $(function() {
 			}
 		}
 
+		ok = inRange($("#<?echo row.name?>-gwmetric"), 1, 255) && ok;
+		if (ok == false) {
+			setTimeout(function () {
+				$("#<?echo row.name?>-gwmetric").removeClass("ui-state-error");
+			}, 3000);
+			return;
+		}
 		
 		form = $(this).parents("form").get(0);
 		form_data = $(this).parents("form").serialize();
@@ -420,8 +427,21 @@ $(function() {
 							</td>
 						</tr>
 					</table> 
-					
 				</fieldset>
+				
+				
+				<fieldset class="inner">
+				<legend> Default Gateway Configuration </legend>
+					<div>
+						<label for="<?echo row.name?>-gw">Default Gateway</label>
+						<input type="checkbox" name="gw" id="<?echo row.name?>-gw" <?if row.gw then?>checked="checked"<?endif?> class="text ui-widget-content ui-corner-all" />
+					</div>
+					<div>
+						<label for="<?echo row.name?>-gwmetric">Route Distance</label>
+						<input type="text" name="gwmetric" id="<?echo row.name?>-gwmetric" <?if row.gwmetric then?>value="<?echo row.gwmetric?>"<?endif?> class="text ui-widget-content ui-corner-all" style="width:50px" />
+					</div>
+				</fieldset>
+							
 				
 				<fieldset class="inner">
 					<div>

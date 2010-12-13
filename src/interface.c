@@ -176,8 +176,9 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 	char *apn0, *user0, *pass0, *apn1, *user1, *pass1;
 	char *backup_method, *backup_interface, *ping_addr, *sim_order, *up;
 	char *linux_interface, *interface;
-	char * intf_return_backup_error = malloc(24);
-	char * warning_string = NULL;
+	char *intf_return_backup_error = malloc(24);
+	char *warning_string = NULL;
+	char *default_route, *default_route_metric;
 	int major=-1, ret=-1, warning_intf=0;
 
 
@@ -192,6 +193,8 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 	backup_method = _get_parameter(req,"backup_method");
 	ping_addr = _get_parameter(req,"ping_addr");
 	backup_interface = _get_parameter(req,"backup_interface");
+	default_route = _get_parameter(req,"gw");
+	default_route_metric = _get_parameter(req,"gwmetric");
 	up = _get_parameter(req, "up");
 
 
@@ -203,10 +206,7 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 		return -1;
 	}
 	major = librouter_device_get_major(linux_interface, str_linux);
-
 	web_dbg("(2) - Major is %d, Linux Intf is %s\n", major, linux_interface);
-
-
 
 	/* Realiza o shutdown da interface 3G para aplicar as configurações */
 	ret = librouter_ppp_backupd_set_shutdown_3Gmodem(linux_interface);
@@ -226,6 +226,11 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 		goto end;
 	else
 		ret = -1;
+
+	/* Should install default route */
+	librouter_ppp_backupd_set_default_route(linux_interface, (default_route != NULL ? 1 : 0));
+	if (default_route_metric != NULL)
+		librouter_ppp_backupd_set_default_metric(linux_interface, atoi(default_route_metric));
 
 
 	if (major != BTIN_M3G_ALIAS){
@@ -442,7 +447,7 @@ static cgi_table * _fetch_eth_info(void)
 			return NULL;
 		}
 
-jump:		snprintf(iface, 16, "%s%d", fam->web_string, i);
+		snprintf(iface, 16, "%s%d", fam->web_string, i);
 
 		cgi_table_add_row(t);
 
@@ -519,10 +524,10 @@ static cgi_table * _fetch_3g_info(void)
 		return NULL;
 
 	/* Create loopback table */
-	t = cgi_table_create(15, "name", "apn0", "user0", "pass0", "apn1",
+	t = cgi_table_create(17, "name", "apn0", "user0", "pass0", "apn1",
 			         "user1", "pass1", "sim_order", "up",
 			         "backup_method", "backup_interface",
-			         "ping_addr", "ipaddr", "ipmask", "ippeer");
+			         "ping_addr", "ipaddr", "ipmask", "ippeer", "gw", "gwmetric");
 
 	for (i = 0; i < M3G_IFACE_NUM; i++) {
 		snprintf(iface, 16, "%s%d", fam->linux_string, i);
@@ -580,6 +585,10 @@ static cgi_table * _fetch_3g_info(void)
 		else
 			cgi_table_add_value(t, "backup_method", (char *) "backup_method-ping", CGI_STRING);
 
+		/* Default route */
+		cgi_table_add_value(t, "gw", (void *) (ppp_cfg.bckp_conf.is_default_gateway), CGI_INTEGER);
+		cgi_table_add_value(t, "gwmetric", (void *) (ppp_cfg.bckp_conf.default_route_distance), CGI_INTEGER);
+
 		cgi_table_add_value(t, "up", (void *) (conf.up || (!ppp_cfg.bckp_conf.shutdown)), CGI_INTEGER);
 		cgi_table_add_value(t, "ping_addr",(char *) ppp_cfg.bckp_conf.ping_address, CGI_STRING);
 
@@ -609,18 +618,21 @@ int handle_config_interface(struct request *req, struct response *resp)
 		return 0;
 	}
 
+	web_dbg("Fetching ethernet info...\n");
 	eth_table = _fetch_eth_info();
 	if (eth_table == NULL) {
 		log_err("Failed to fetch ethernet information\n");
 		return -1;
 	}
 
+	web_dbg("Fetching loopback info...\n");
 	lo_table = _fetch_lo_info();
 	if (lo_table == NULL) {
 		log_err("Failed to fetch loopback information\n");
 		return -1;
 	}
 
+	web_dbg("Fetching 3G info...\n");
 	m3g_table = _fetch_3g_info();
 	if (m3g_table == NULL) {
 		log_err("Failed to fetch 3G information\n");
