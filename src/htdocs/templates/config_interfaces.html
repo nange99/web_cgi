@@ -410,6 +410,12 @@ $(function() {
 									<?if response.ethernet_iface_num >= 2 then?>
 										<option value="1"  id="<?echo row.name?>-backup-intf-ethernet1">Ethernet 1</option>
 									<?endif?>
+									<?if row.name == "3GModem1" then?>
+										<option value="3"  id="<?echo row.name?>-backup-intf-m3G2">3GModem 2</option>
+									<?endif?>								
+									<?if row.name == "3GModem2" then?>
+										<option value="2"  id="<?echo row.name?>-backup-intf-m3G1">3GModem 1</option>
+									<?endif?>			
 								</select>
 							</td>
 						</tr>

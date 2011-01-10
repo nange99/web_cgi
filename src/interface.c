@@ -176,7 +176,9 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 	char *apn0, *user0, *pass0, *apn1, *user1, *pass1;
 	char *backup_method, *backup_interface, *ping_addr, *sim_order, *up;
 	char *linux_interface, *interface;
+#ifdef AVOID_SAME_BCKP_INTF
 	char *intf_return_backup_error = malloc(24);
+#endif
 	char *warning_string = NULL;
 	char *default_route, *default_route_metric;
 	int major=-1, ret=-1, warning_intf=0;
@@ -303,25 +305,68 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 	switch (atoi(backup_interface)){
 		case -1:
 			ret = librouter_ppp_backupd_set_no_backup_interface(linux_interface);
+#ifdef AVOID_SAME_BCKP_INTF
 			intf_return_backup_error = NULL;
+#endif
 			web_dbg("(8) - Check for problems after set no backup interface - (ret = %s)\n", ret < 0 ? "fail" : "ok" );
 			break;
 		case 0:
-			ret = librouter_ppp_backupd_set_backup_interface(linux_interface,"ethernet0",intf_return_backup_error);
+#ifdef AVOID_SAME_BCKP_INTF
+			//WARNING: Linha de código a seguir substituida para possibilitar duas interfaces backups distintas de monitorar uma mesma interface
+			ret = librouter_ppp_backupd_set_backup_interface_avoiding_same_bckp_intf(linux_interface,"ethernet0",intf_return_backup_error);
+#else
+			ret = librouter_ppp_backupd_set_backup_interface(linux_interface,"ethernet0");
+#endif
 			web_dbg("(8) - Check for problems after set backup interface - ethernet0 - (ret = %s)\n", ret < 0 ? "fail" : "ok");
 			break;
 		case 1:
-			ret = librouter_ppp_backupd_set_backup_interface(linux_interface,"ethernet1",intf_return_backup_error);
+#ifdef AVOID_SAME_BCKP_INTF
+			//WARNING: Linha de código a seguir substituida para possibilitar duas interfaces backups distintas de monitorar uma mesma interface
+			ret = librouter_ppp_backupd_set_backup_interface_avoiding_same_bckp_intf(linux_interface,"ethernet1",intf_return_backup_error);
+#else
+			ret = librouter_ppp_backupd_set_backup_interface(linux_interface,"ethernet1");
+#endif
 			web_dbg("(8) - Check for problems after set backup interface - ethernet1 - (ret = %s)\n", ret < 0 ? "fail" : "ok");
 			break;
+		case 2:
+#ifdef AVOID_SAME_BCKP_INTF
+			//WARNING: Linha de código a seguir substituida para possibilitar duas interfaces backups distintas de monitorar uma mesma interface
+			ret = librouter_ppp_backupd_set_backup_interface_avoiding_same_bckp_intf(linux_interface,"m3G1",intf_return_backup_error);
+#else
+			ret = librouter_ppp_backupd_set_backup_interface(linux_interface,"m3G1");
+#endif
+			web_dbg("(8) - Check for problems after set backup interface - m3G1 - (ret = %s)\n", ret < 0 ? "fail" : "ok");
+			break;
+		case 3:
+#ifdef AVOID_SAME_BCKP_INTF
+			//WARNING: Linha de código a seguir substituida para possibilitar duas interfaces backups distintas de monitorar uma mesma interface
+			ret = librouter_ppp_backupd_set_backup_interface_avoiding_same_bckp_intf(linux_interface,"m3G2",intf_return_backup_error);
+#else
+			ret = librouter_ppp_backupd_set_backup_interface(linux_interface,"m3G2");
+#endif
+			web_dbg("(8) - Check for problems after set backup interface - m3G2 - (ret = %s)\n", ret < 0 ? "fail" : "ok");
+			break;
 	}
-	web_dbg("(9) - Check for problems after set backup interface (ret = %s) - Returned interface error = %s\n", ret < 0 ? "fail" : "ok", intf_return_backup_error);
 
+#ifdef AVOID_SAME_BCKP_INTF
+//WARNING: Bloco de código retirado para possibilitar duas interfaces backups distintas de monitorar uma mesma interface
+
+	web_dbg("(9) - Check for problems after set backup interface (ret = %s) - Returned interface error = %s\n", ret < 0 ? "fail" : "ok", intf_return_backup_error);
 
 	if ((intf_return_backup_error != NULL) && (ret < 0)){
 		warning_string = malloc(256);
 		sprintf(warning_string,"<br/> An error happened when applying changes!<br/> <br/> The backup interface selected is already set by %s! ",_convert_string_linux_to_web(ppp,intf_return_backup_error) );
 	}
+
+#else
+	web_dbg("(9) - Check for problems after set backup interface (ret = %s)", ret < 0 ? "fail" : "ok");
+
+	if (ret < 0){
+		warning_string = malloc(256);
+		sprintf(warning_string,"<br/> An error happened when applying changes!<br/>");
+	}
+#endif
+
 	web_dbg("(10) - Check for interface status during configuration = %s",librouter_ppp_backupd_is_interface_3G_enable(linux_interface) == 1 ? "ON" : "OFF");
 
 
@@ -358,8 +403,10 @@ end:
 	free(linux_interface);
 	linux_interface=NULL;
 
+#ifdef AVOID_SAME_BCKP_INTF
 	free(intf_return_backup_error);
 	intf_return_backup_error=NULL;
+#endif
 
 	if (warning_string)
 		free(warning_string);

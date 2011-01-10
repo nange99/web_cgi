@@ -255,6 +255,14 @@ span.data_status_value {font-size: 12px}
 									<?else?>
 										<?if row.backup_interface == "backup-intf-ethernet1" then?>
 											Ethernet1
+										<?else?>
+											<?if row.backup_interface == "backup-intf-m3G1" then?>
+												3GModem1
+											<?else?>
+												<?if row.backup_interface == "backup-intf-m3G2" then?>
+													3GModem2
+												<?endif?>
+											<?endif?>	
 										<?endif?>
 									<?endif?>					
 								</span>
