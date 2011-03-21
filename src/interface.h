@@ -9,10 +9,10 @@
 #ifndef INTERFACE_H_
 #define INTERFACE_H_
 
-#ifdef OPTION_NO_WAN
-#define ETHERNET_IFACE_NUM	1
-#else
+#ifdef OPTION_ETHERNET_WAN
 #define ETHERNET_IFACE_NUM	2
+#else
+#define ETHERNET_IFACE_NUM	1
 #endif
 
 #define LOOPBACK_IFACE_NUM	1
