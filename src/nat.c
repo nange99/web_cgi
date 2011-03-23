@@ -16,6 +16,7 @@
 #include <libcgiservlet/cgi_session.h>
 #include <libcgiservlet/cgi_table.h>
 
+#include <librouter/options.h>
 #include <librouter/nat.h>
 #include <librouter/args.h>
 #include <librouter/device.h>
@@ -25,6 +26,7 @@
 #include "web_config.h"
 #include "interface.h"
 
+#ifdef OPTION_NAT
 static void _get_rules_table(struct response *resp)
 {
 	cgi_table *t;
@@ -603,3 +605,4 @@ int handle_nat_view_rule(struct request *req, struct response *resp)
 	free (buffer);
 	return ret;
 }
+#endif /* OPTION_NAT */
