@@ -554,6 +554,7 @@ static cgi_table * _fetch_lo_info(void)
 	return t;
 }
 
+
 #ifdef OPTION_MODEM3G
 /**
  * _fetch_3g_info	Fetch 3G information
@@ -654,6 +655,7 @@ static cgi_table * _fetch_3g_info(void)
 	return t;
 }
 #endif /* OPTION_MODEM3G */
+
 /**
  * handle_config_interface	Main handler for interface configuration
  *
@@ -663,7 +665,10 @@ static cgi_table * _fetch_3g_info(void)
  */
 int handle_config_interface(struct request *req, struct response *resp)
 {
-	cgi_table *eth_table, *lo_table, *m3g_table = NULL;
+	cgi_table *eth_table, *lo_table;
+#ifdef OPTION_MODEM3G
+	cgi_table *m3g_table;
+#endif
 
 	if (!cgi_session_exists(req)) {
 		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
@@ -683,6 +688,7 @@ int handle_config_interface(struct request *req, struct response *resp)
 		log_err("Failed to fetch loopback information\n");
 		return -1;
 	}
+
 #ifdef OPTION_MODEM3G
 	web_dbg("Fetching 3G info...\n");
 	m3g_table = _fetch_3g_info();
@@ -707,7 +713,10 @@ int handle_config_interface(struct request *req, struct response *resp)
 
 int handle_config_interface_status(struct request *req, struct response *resp)
 {
-	cgi_table *eth_table, *lo_table, *m3g_table = NULL;
+	cgi_table *eth_table, *lo_table;
+#ifdef OPTION_MODEM3G
+	cgi_table *m3g_table;
+#endif
 	char uptime_buf[256];
 
 	if (!cgi_session_exists(req)) {
@@ -726,6 +735,7 @@ int handle_config_interface_status(struct request *req, struct response *resp)
 		log_err("Failed to fetch loopback information\n");
 		return -1;
 	}
+
 #ifdef OPTION_MODEM3G
 	m3g_table = _fetch_3g_info();
 	if (m3g_table == NULL) {
@@ -733,6 +743,7 @@ int handle_config_interface_status(struct request *req, struct response *resp)
 		return -1;
 	}
 #endif
+
 	if (librouter_time_get_uptime(uptime_buf) < 0){
 		log_err("Failed to fetch Up Time information\n");
 		return -1;
@@ -742,7 +753,9 @@ int handle_config_interface_status(struct request *req, struct response *resp)
 	cgi_response_add_parameter(resp, "menu_status", (void *) 1, CGI_INTEGER);
 	cgi_response_add_parameter(resp, "eth_table", (void *) eth_table, CGI_TABLE);
 	cgi_response_add_parameter(resp, "lo_table", (void *) lo_table, CGI_TABLE);
+#ifdef OPTION_MODEM3G
 	cgi_response_add_parameter(resp, "m3g_table", (void *) m3g_table, CGI_TABLE);
+#endif
 	cgi_response_add_parameter(resp, "uptime", (void *) uptime_buf, CGI_STRING);
 	cgi_response_set_html(resp, "/wn/cgi/templates/status_interfaces.html");
 
