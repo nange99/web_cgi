@@ -186,9 +186,9 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 
 
 	interface = _get_parameter(req, "name");
-	apn0 = _get_parameter(req, "apn0");
-	user0 = _get_parameter(req, "user0");
-	pass0 = _get_parameter(req, "pass0");
+	apn0 = _get_parameter(req, "apn2");
+	user0 = _get_parameter(req, "user2");
+	pass0 = _get_parameter(req, "pass2");
 	apn1 = _get_parameter(req, "apn1");
 	user1 = _get_parameter(req, "user1");
 	pass1 = _get_parameter(req, "pass1");
@@ -577,8 +577,8 @@ static cgi_table * _fetch_3g_info(void)
 		return NULL;
 
 	/* Create loopback table */
-	t = cgi_table_create(17, "name", "apn0", "user0", "pass0", "apn1",
-			         "user1", "pass1", "sim_order", "up",
+	t = cgi_table_create(17, "name", "apn1", "user1", "pass1", "apn2",
+			         "user2", "pass2", "sim_order", "up",
 			         "backup_method", "backup_interface",
 			         "ping_addr", "ipaddr", "ipmask", "ippeer", "gw", "gwmetric");
 
@@ -596,9 +596,9 @@ static cgi_table * _fetch_3g_info(void)
 		cgi_table_add_value(t, "name",  (char *) iface, CGI_STRING);
 		if (i == BTIN_M3G_ALIAS){
 			if (!ppp_cfg.sim_main.sim_num){
-				cgi_table_add_value(t, "apn0",  (char *) ppp_cfg.sim_main.apn, CGI_STRING);
-				cgi_table_add_value(t, "user0", (char *) ppp_cfg.sim_main.username, CGI_STRING);
-				cgi_table_add_value(t, "pass0", (char *) ppp_cfg.sim_main.password, CGI_STRING);
+				cgi_table_add_value(t, "apn2",  (char *) ppp_cfg.sim_main.apn, CGI_STRING);
+				cgi_table_add_value(t, "user2", (char *) ppp_cfg.sim_main.username, CGI_STRING);
+				cgi_table_add_value(t, "pass2", (char *) ppp_cfg.sim_main.password, CGI_STRING);
 				cgi_table_add_value(t, "apn1",  (char *) ppp_cfg.sim_backup.apn, CGI_STRING);
 				cgi_table_add_value(t, "user1", (char *) ppp_cfg.sim_backup.username, CGI_STRING);
 				cgi_table_add_value(t, "pass1", (char *) ppp_cfg.sim_backup.password, CGI_STRING);
@@ -607,9 +607,9 @@ static cgi_table * _fetch_3g_info(void)
 				cgi_table_add_value(t, "apn1",  (char *) ppp_cfg.sim_main.apn, CGI_STRING);
 				cgi_table_add_value(t, "user1", (char *) ppp_cfg.sim_main.username, CGI_STRING);
 				cgi_table_add_value(t, "pass1", (char *) ppp_cfg.sim_main.password, CGI_STRING);
-				cgi_table_add_value(t, "apn0",  (char *) ppp_cfg.sim_backup.apn, CGI_STRING);
-				cgi_table_add_value(t, "user0", (char *) ppp_cfg.sim_backup.username, CGI_STRING);
-				cgi_table_add_value(t, "pass0", (char *) ppp_cfg.sim_backup.password, CGI_STRING);
+				cgi_table_add_value(t, "apn2",  (char *) ppp_cfg.sim_backup.apn, CGI_STRING);
+				cgi_table_add_value(t, "user2", (char *) ppp_cfg.sim_backup.username, CGI_STRING);
+				cgi_table_add_value(t, "pass2", (char *) ppp_cfg.sim_backup.password, CGI_STRING);
 			}
 
 			if (librouter_modem3g_sim_order_is_enable()){
@@ -625,9 +625,9 @@ static cgi_table * _fetch_3g_info(void)
 					cgi_table_add_value(t, "sim_order", (char *) "sim-order-3", CGI_STRING);
 		}
 		else{
-			cgi_table_add_value(t, "apn0", (char *) ppp_cfg.sim_main.apn, CGI_STRING);
-			cgi_table_add_value(t, "user0", (char *) ppp_cfg.sim_main.username, CGI_STRING);
-			cgi_table_add_value(t, "pass0", (char *) ppp_cfg.sim_main.password, CGI_STRING);
+			cgi_table_add_value(t, "apn1", (char *) ppp_cfg.sim_main.apn, CGI_STRING);
+			cgi_table_add_value(t, "user1", (char *) ppp_cfg.sim_main.username, CGI_STRING);
+			cgi_table_add_value(t, "pass1", (char *) ppp_cfg.sim_main.password, CGI_STRING);
 		}
 
 		snprintf(intf_back,24,"backup-intf-%s",ppp_cfg.bckp_conf.main_intf_name);
