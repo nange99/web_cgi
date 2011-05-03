@@ -92,6 +92,7 @@ static int _apply_eth_settings(struct request *req, struct response *resp)
 	char *interface, *dhcpc, *ipaddr, *ipmask, *speed, *up;
 	char daemon_dhcpc[32];
 	char *linux_interface;
+	dev_family *fam;
 
 	/* Handle Ethernet */
 	interface = _get_parameter(req, "name");
@@ -120,10 +121,11 @@ static int _apply_eth_settings(struct request *req, struct response *resp)
 		librouter_ip_ethernet_set_addr(linux_interface, ipaddr, ipmask);
 	}
 
+	fam = librouter_device_get_family_by_name(interface, str_web);
 	if (up)
-		librouter_dev_noshutdown(linux_interface);
+		librouter_dev_noshutdown(linux_interface, fam);
 	else
-		librouter_dev_shutdown(linux_interface);
+		librouter_dev_shutdown(linux_interface, fam);
 
 	free(linux_interface);
 	return 0;
@@ -140,6 +142,7 @@ static int _apply_lo_settings(struct request *req, struct response *resp)
 {
 	char *interface, *ipaddr, *ipmask, *up;
 	char *linux_interface;
+	dev_family *fam;
 
 	interface = _get_parameter(req, "name");
 	ipaddr = _get_parameter(req, "ipaddr");
@@ -155,10 +158,11 @@ static int _apply_lo_settings(struct request *req, struct response *resp)
 
 	librouter_ip_interface_set_addr(linux_interface, ipaddr, ipmask);
 
+	fam = librouter_device_get_family_by_name(interface, str_web);
 	if (up)
-		librouter_dev_noshutdown(linux_interface);
+		librouter_dev_noshutdown(linux_interface, fam);
 	else
-		librouter_dev_shutdown(linux_interface);
+		librouter_dev_shutdown(linux_interface, fam);
 
 	free(linux_interface);
 	return 0;
