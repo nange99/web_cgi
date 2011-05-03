@@ -5,3 +5,6 @@
  *      Author: Thomás Alimena Del Grande (tgrande@pd3.com.br)
  */
 
+#ifdef OPTION_QOS
+
+#endif /* OPTION_QOS */

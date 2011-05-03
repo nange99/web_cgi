@@ -168,6 +168,7 @@ static int _apply_lo_settings(struct request *req, struct response *resp)
 	return 0;
 }
 
+#ifdef OPTION_MODEM3G
 /**
  * _apply_3g_settings	Apply settings to a 3G interface
  *
@@ -189,9 +190,9 @@ static int _apply_3g_settings(struct request *req, struct response *resp)
 
 
 	interface = _get_parameter(req, "name");
-	apn0 = _get_parameter(req, "apn0");
-	user0 = _get_parameter(req, "user0");
-	pass0 = _get_parameter(req, "pass0");
+	apn0 = _get_parameter(req, "apn2");
+	user0 = _get_parameter(req, "user2");
+	pass0 = _get_parameter(req, "pass2");
 	apn1 = _get_parameter(req, "apn1");
 	user1 = _get_parameter(req, "user1");
 	pass1 = _get_parameter(req, "pass1");
@@ -417,6 +418,7 @@ end:
 
 	return 0;
 }
+#endif /* OPTION_MODEM3G */
 
 /**
  * handle_apply_intf_settings	Apply settings to a network interface
@@ -456,9 +458,11 @@ int handle_apply_intf_settings(struct request *req, struct response *resp)
 	case lo:
 		ret = _apply_lo_settings(req, resp);
 		break;
+#ifdef OPTION_MODEM3G
 	case ppp:
 		ret = _apply_3g_settings(req, resp);
 		break;
+#endif
 	default:
 		break;
 	}
@@ -554,6 +558,8 @@ static cgi_table * _fetch_lo_info(void)
 	return t;
 }
 
+
+#ifdef OPTION_MODEM3G
 /**
  * _fetch_3g_info	Fetch 3G information
  *
@@ -575,8 +581,8 @@ static cgi_table * _fetch_3g_info(void)
 		return NULL;
 
 	/* Create loopback table */
-	t = cgi_table_create(17, "name", "apn0", "user0", "pass0", "apn1",
-			         "user1", "pass1", "sim_order", "up",
+	t = cgi_table_create(17, "name", "apn1", "user1", "pass1", "apn2",
+			         "user2", "pass2", "sim_order", "up",
 			         "backup_method", "backup_interface",
 			         "ping_addr", "ipaddr", "ipmask", "ippeer", "gw", "gwmetric");
 
@@ -594,9 +600,9 @@ static cgi_table * _fetch_3g_info(void)
 		cgi_table_add_value(t, "name",  (char *) iface, CGI_STRING);
 		if (i == BTIN_M3G_ALIAS){
 			if (!ppp_cfg.sim_main.sim_num){
-				cgi_table_add_value(t, "apn0",  (char *) ppp_cfg.sim_main.apn, CGI_STRING);
-				cgi_table_add_value(t, "user0", (char *) ppp_cfg.sim_main.username, CGI_STRING);
-				cgi_table_add_value(t, "pass0", (char *) ppp_cfg.sim_main.password, CGI_STRING);
+				cgi_table_add_value(t, "apn2",  (char *) ppp_cfg.sim_main.apn, CGI_STRING);
+				cgi_table_add_value(t, "user2", (char *) ppp_cfg.sim_main.username, CGI_STRING);
+				cgi_table_add_value(t, "pass2", (char *) ppp_cfg.sim_main.password, CGI_STRING);
 				cgi_table_add_value(t, "apn1",  (char *) ppp_cfg.sim_backup.apn, CGI_STRING);
 				cgi_table_add_value(t, "user1", (char *) ppp_cfg.sim_backup.username, CGI_STRING);
 				cgi_table_add_value(t, "pass1", (char *) ppp_cfg.sim_backup.password, CGI_STRING);
@@ -605,9 +611,9 @@ static cgi_table * _fetch_3g_info(void)
 				cgi_table_add_value(t, "apn1",  (char *) ppp_cfg.sim_main.apn, CGI_STRING);
 				cgi_table_add_value(t, "user1", (char *) ppp_cfg.sim_main.username, CGI_STRING);
 				cgi_table_add_value(t, "pass1", (char *) ppp_cfg.sim_main.password, CGI_STRING);
-				cgi_table_add_value(t, "apn0",  (char *) ppp_cfg.sim_backup.apn, CGI_STRING);
-				cgi_table_add_value(t, "user0", (char *) ppp_cfg.sim_backup.username, CGI_STRING);
-				cgi_table_add_value(t, "pass0", (char *) ppp_cfg.sim_backup.password, CGI_STRING);
+				cgi_table_add_value(t, "apn2",  (char *) ppp_cfg.sim_backup.apn, CGI_STRING);
+				cgi_table_add_value(t, "user2", (char *) ppp_cfg.sim_backup.username, CGI_STRING);
+				cgi_table_add_value(t, "pass2", (char *) ppp_cfg.sim_backup.password, CGI_STRING);
 			}
 
 			if (librouter_modem3g_sim_order_is_enable()){
@@ -623,9 +629,9 @@ static cgi_table * _fetch_3g_info(void)
 					cgi_table_add_value(t, "sim_order", (char *) "sim-order-3", CGI_STRING);
 		}
 		else{
-			cgi_table_add_value(t, "apn0", (char *) ppp_cfg.sim_main.apn, CGI_STRING);
-			cgi_table_add_value(t, "user0", (char *) ppp_cfg.sim_main.username, CGI_STRING);
-			cgi_table_add_value(t, "pass0", (char *) ppp_cfg.sim_main.password, CGI_STRING);
+			cgi_table_add_value(t, "apn1", (char *) ppp_cfg.sim_main.apn, CGI_STRING);
+			cgi_table_add_value(t, "user1", (char *) ppp_cfg.sim_main.username, CGI_STRING);
+			cgi_table_add_value(t, "pass1", (char *) ppp_cfg.sim_main.password, CGI_STRING);
 		}
 
 		snprintf(intf_back,24,"backup-intf-%s",ppp_cfg.bckp_conf.main_intf_name);
@@ -652,6 +658,7 @@ static cgi_table * _fetch_3g_info(void)
 
 	return t;
 }
+#endif /* OPTION_MODEM3G */
 
 /**
  * handle_config_interface	Main handler for interface configuration
@@ -662,7 +669,10 @@ static cgi_table * _fetch_3g_info(void)
  */
 int handle_config_interface(struct request *req, struct response *resp)
 {
-	cgi_table *eth_table, *lo_table, *m3g_table;
+	cgi_table *eth_table, *lo_table;
+#ifdef OPTION_MODEM3G
+	cgi_table *m3g_table;
+#endif
 
 	if (!cgi_session_exists(req)) {
 		cgi_response_set_html(resp, "/wn/cgi/templates/do_login.html");
@@ -683,27 +693,34 @@ int handle_config_interface(struct request *req, struct response *resp)
 		return -1;
 	}
 
+#ifdef OPTION_MODEM3G
 	web_dbg("Fetching 3G info...\n");
 	m3g_table = _fetch_3g_info();
 	if (m3g_table == NULL) {
 		log_err("Failed to fetch 3G information\n");
 		return -1;
 	}
+#endif
 
 	web_dbg("Filling tables...\n");
 	cgi_response_add_parameter(resp, "menu_config", (void *) 1, CGI_INTEGER);
 	cgi_response_add_parameter(resp, "eth_table", (void *) eth_table, CGI_TABLE);
 	cgi_response_add_parameter(resp, "lo_table", (void *) lo_table, CGI_TABLE);
+#ifdef OPTION_MODEM3G
 	cgi_response_add_parameter(resp, "m3g_table", (void *) m3g_table, CGI_TABLE);
+#endif
 	cgi_response_add_parameter(resp, "ethernet_iface_num", (void *) ETHERNET_IFACE_NUM, CGI_INTEGER);
 	cgi_response_set_html(resp, "/wn/cgi/templates/config_interfaces.html");
-
+	web_dbg("done...\n");
 	return 0;
 }
 
 int handle_config_interface_status(struct request *req, struct response *resp)
 {
-	cgi_table *eth_table, *lo_table, *m3g_table;
+	cgi_table *eth_table, *lo_table;
+#ifdef OPTION_MODEM3G
+	cgi_table *m3g_table;
+#endif
 	char uptime_buf[256];
 
 	if (!cgi_session_exists(req)) {
@@ -723,11 +740,13 @@ int handle_config_interface_status(struct request *req, struct response *resp)
 		return -1;
 	}
 
+#ifdef OPTION_MODEM3G
 	m3g_table = _fetch_3g_info();
 	if (m3g_table == NULL) {
 		log_err("Failed to fetch 3G information\n");
 		return -1;
 	}
+#endif
 
 	if (librouter_time_get_uptime(uptime_buf) < 0){
 		log_err("Failed to fetch Up Time information\n");
@@ -738,7 +757,9 @@ int handle_config_interface_status(struct request *req, struct response *resp)
 	cgi_response_add_parameter(resp, "menu_status", (void *) 1, CGI_INTEGER);
 	cgi_response_add_parameter(resp, "eth_table", (void *) eth_table, CGI_TABLE);
 	cgi_response_add_parameter(resp, "lo_table", (void *) lo_table, CGI_TABLE);
+#ifdef OPTION_MODEM3G
 	cgi_response_add_parameter(resp, "m3g_table", (void *) m3g_table, CGI_TABLE);
+#endif
 	cgi_response_add_parameter(resp, "uptime", (void *) uptime_buf, CGI_STRING);
 	cgi_response_set_html(resp, "/wn/cgi/templates/status_interfaces.html");
 

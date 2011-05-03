@@ -196,7 +196,7 @@ span.data_status_value {font-size: 12px}
 								</td>
 								
 								<td>
-									<span class="data_status_value"><?echo row.apn0?></span>
+									<span class="data_status_value"><?echo row.apn1?></span>
 								</td>
 							</tr>
 							<tr>
@@ -205,7 +205,7 @@ span.data_status_value {font-size: 12px}
 								</td>
 								
 								<td>
-									<span class="data_status_value"><?echo row.apn1?></span>
+									<span class="data_status_value"><?echo row.apn2?></span>
 								</td>
 							</tr>
 							<tr>
@@ -216,15 +216,15 @@ span.data_status_value {font-size: 12px}
 								<td>
 									<span class="data_status_value">
 										<?if row.sim_order == "sim-order-0" then?>
-											Card 1 -MAIN SIM | Card 2 -BACKUP SIM
+											Card 2 -MAIN SIM | Card 1 -BACKUP SIM
 										<?else?>
 											<?if row.sim_order == "sim-order-1" then?>
-												Card 2 -MAIN SIM | Card 1 -BACKUP SIM
+												Card 1 -MAIN SIM | Card 2 -BACKUP SIM
 											<?else?>
 												<?if row.sim_order == "sim-order-2" then?>
-													Card 1 -MAIN SIM | No BACKUP SIM
-												<?else?>
 													Card 2 -MAIN SIM | No BACKUP SIM
+												<?else?>
+													Card 1 -MAIN SIM | No BACKUP SIM
 												<?endif?>
 											<?endif?>
 										<?endif?>						
@@ -238,7 +238,7 @@ span.data_status_value {font-size: 12px}
 								</td>
 								
 								<td>
-									<span class="data_status_value"><?echo row.apn0?></span>
+									<span class="data_status_value"><?echo row.apn1?></span>
 								</td>
 							</tr>
 						<?endif?>

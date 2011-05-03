@@ -16,6 +16,7 @@
 #include <libcgiservlet/cgi_session.h>
 #include <libcgiservlet/cgi_table.h>
 
+#include <librouter/options.h>
 #include <librouter/pam.h>
 #include <librouter/config_mapper.h>
 #include <librouter/config_fetcher.h>
@@ -199,6 +200,7 @@ saveconf_finish:
  * Temporary Handlers
  *
  */
+#ifdef OPTION_FIREWALL
 int handle_status_firewall(struct request *req, struct response *resp)
 {
 	if (!cgi_session_exists(req)) {
@@ -211,7 +213,9 @@ int handle_status_firewall(struct request *req, struct response *resp)
 
 	return 1;
 }
+#endif
 
+#ifdef OPTION_NAT
 int handle_status_nat(struct request *req, struct response *resp)
 {
 	if (!cgi_session_exists(req)) {
@@ -224,7 +228,9 @@ int handle_status_nat(struct request *req, struct response *resp)
 
 	return 1;
 }
+#endif
 
+#ifdef OPTION_QOS
 int handle_status_qos(struct request *req, struct response *resp)
 {
 	if (!cgi_session_exists(req)) {
@@ -237,7 +243,9 @@ int handle_status_qos(struct request *req, struct response *resp)
 
 	return 1;
 }
+#endif
 
+#ifdef OPTION_IPSEC
 int handle_status_ipsec(struct request *req, struct response *resp)
 {
 	if (!cgi_session_exists(req)) {
@@ -250,6 +258,8 @@ int handle_status_ipsec(struct request *req, struct response *resp)
 
 	return 1;
 }
+#endif
+
 
 int handle_status_snmp(struct request *req, struct response *resp)
 {
@@ -339,25 +349,33 @@ int main(int argc, char **argv)
 		{.url = "/config_static_routes", .handler = handle_static_routes},
 		{.url = "/add_route", .handler = handle_add_route},
 
+#ifdef OPTION_FIREWALL
 		/* Firewall */
 		{ .url = "/config_firewall", .handler = handle_config_firewall },
 		{ .url = "/apply_fw_general_settings", .handler = handle_apply_fw_general_settings },
 		{ .url = "/add_fw_rule", .handler = handle_fw_add_rule },
 		{ .url = "/del_fw_rule", .handler = handle_fw_del_rule },
 		{ .url = "/view_fw_rule", .handler = handle_fw_view_rule },
+#endif /* OPTION_FIREWALL */
 
+#ifdef OPTION_NAT
 		/* NAT */
 		{ .url = "/config_nat", .handler = handle_config_nat },
 		{ .url = "/apply_nat_general_settings", .handler = handle_apply_nat_general_settings },
 		{ .url = "/add_nat_rule", .handler = handle_nat_add_rule },
 		{ .url = "/del_nat_rule", .handler = handle_nat_del_rule },
 		{ .url = "/view_nat_rule", .handler = handle_nat_view_rule },
+#endif /* OPTION_NAT */
 
+#ifdef OPTION_QOS
 		/* QoS */
 		{ .url = "/config_qos", .handler = handle_config_qos },
+#endif /* OPTION_QOS */
 
+#ifdef OPTION_IPSEC
 		/* IPSec */
 		{ .url = "/config_ipsec", .handler = handle_config_ipsec },
+#endif /* OPTION_IPSEC */
 
 		/* SNMP */
 		{ .url = "/config_snmp", .handler = handle_config_snmp },

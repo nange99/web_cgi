@@ -16,6 +16,7 @@
 #include <libcgiservlet/cgi_session.h>
 #include <libcgiservlet/cgi_table.h>
 
+#include <librouter/options.h>
 #include <librouter/acl.h>
 #include <librouter/args.h>
 #include <librouter/iptc.h>
@@ -25,6 +26,7 @@
 #include "web_config.h"
 #include "interface.h"
 
+#ifdef OPTION_FIREWALL
 static void _get_default_policy(struct response *resp)
 {
 	FILE *f;
@@ -500,5 +502,5 @@ int handle_fw_view_rule(struct request *req, struct response *resp)
 	return ret;
 
 }
-
+#endif /* OPTION_FIREWALL */
 
