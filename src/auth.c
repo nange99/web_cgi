@@ -128,7 +128,7 @@ static int _handle_auth_type(struct response *resp)
 
 	memset(buf, 0, sizeof(buf));
 	sprintf(buf,"cli-");
-	_get_auth_string(FILE_PAM_GENERIC, buf);
+	_get_auth_string(FILE_PAM_LOGIC, buf);
 	cgi_response_add_parameter(resp, "cli_auth_type", (char *) buf, CGI_STRING);
 
 	memset(buf, 0, sizeof(buf));
@@ -222,7 +222,15 @@ int handle_add_user(struct request *req, struct response *resp)
 	if (strcmp(passwd, confirm))
 		return -1;
 
+	/*Add user sequence*/
+	if (librouter_pam_cmds_del_user_from_group(username) < 0 )
+		return -1;
+
 	if (librouter_pam_add_user(username, passwd) < 0)
+		return -1;
+
+	/* Adicionado privilege 15 hardcoded for now */
+	if (librouter_pam_cmds_add_user_to_group(username, "15") < 0)
 		return -1;
 
 	return 0;
@@ -251,7 +259,7 @@ int handle_apply_auth_type(struct request *req, struct response *resp)
 
 	mode = _get_auth_type(cli_auth_type);
 	if (mode > 0)
-		librouter_pam_config_mode(mode, FILE_PAM_GENERIC);
+		librouter_pam_config_mode(mode, FILE_PAM_LOGIC);
 
 	mode = _get_auth_type(web_auth_type);
 	if (mode > 0)
@@ -375,9 +383,11 @@ int handle_config_auth(struct request *req, struct response *resp)
 
 	/* Check if deleting entry */
 	del = _get_parameter(req, "del");
-	if (del != NULL)
+	if (del != NULL){
+		/* Delete user sequence*/
+		librouter_pam_cmds_del_user_from_group(del);
 		librouter_pam_del_user(del);
-
+	}
 	/* Check if returning just table (AJAX) */
 	table = _get_parameter(req, "table");
 
