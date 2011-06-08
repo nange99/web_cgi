@@ -128,7 +128,7 @@ static int _handle_auth_type(struct response *resp)
 
 	memset(buf, 0, sizeof(buf));
 	sprintf(buf,"cli-");
-	_get_auth_string(FILE_PAM_LOGIC, buf);
+	_get_auth_string(FILE_PAM_LOGIN, buf);
 	cgi_response_add_parameter(resp, "cli_auth_type", (char *) buf, CGI_STRING);
 
 	memset(buf, 0, sizeof(buf));
@@ -259,7 +259,7 @@ int handle_apply_auth_type(struct request *req, struct response *resp)
 
 	mode = _get_auth_type(cli_auth_type);
 	if (mode > 0)
-		librouter_pam_config_mode(mode, FILE_PAM_LOGIC);
+		librouter_pam_config_mode(mode, FILE_PAM_LOGIN);
 
 	mode = _get_auth_type(web_auth_type);
 	if (mode > 0)
