@@ -67,7 +67,7 @@ int handle_static_routes(struct request *req, struct response *resp)
 
 	/* Check if we are deleting one entry */
 	if (del)
-		librouter_quagga_del_route(del);
+		librouter_quagga_del_route_hash(del);
 
 	/* Check if returning just table (AJAX) */
 	table = _get_parameter(req, "table");
